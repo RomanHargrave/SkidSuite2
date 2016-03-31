@@ -38,10 +38,19 @@ $RECYCLE.BIN/
 .TemporaryItems
 .Trashes
 .VolumeIcon.icns
-
+.metadata/**
+.recommenders/**
+**/bin/**
+*.jar
+*.project
+*.classpath
+*.prefs
 # Directories potentially created on remote AFP share
 .AppleDB
 .AppleDesktop
 Network Trash Folder
 Temporary Items
 .apdisk
+*.lock
+*.log
+SkidReob/filename.txt
