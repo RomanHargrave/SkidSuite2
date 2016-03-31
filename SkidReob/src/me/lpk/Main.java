@@ -65,7 +65,7 @@ public class Main {
 			private static final long serialVersionUID = 1L;
 
 			{
-				put("iSkullFuckedUrNan/tigurMed_pvpgUW0Pup2L06r", "net/minecraft/client/Minecraft");
+				put("packageName/tigurMed_pvpgUW0Pup2L06r", "net/minecraft/client/Minecraft");
 			}
 		};
 		for (String obfu : h.keySet()) {
@@ -96,18 +96,12 @@ public class Main {
 
 	private static Map<String, MappedClass> uglyHacksPre(Map<String, MappedClass> mappedClasses) {
 		mappedClasses.get("net/minecraft/client/main/Main").setNewName("net/minecraft/client/main/Main");
-		mappedClasses.get("iSkullFuckedUrNan/tigurMed_sl1hSW8rVG6bOBv").setNewName("tigur/Tigur");
-		mappedClasses.get("iSkullFuckedUrNan/tigurMed_ewAsCOGZSS1uiff").setNewName("tigur/IRC");
-		mappedClasses.get("iSkullFuckedUrNan/tigurMed_1DSvDbDC4fF4r6B").setNewName("tigur/mods/ModBase");
 		mappedClasses.get("net/minecraft/client/main/Main").setRenamed(true);
 		return mappedClasses;
 	}
 
 	private static Map<String, MappedClass> uglyHacks(Map<String, MappedClass> mappedClasses) {
 		mappedClasses.get("net/minecraft/client/main/Main").setNewName("net/minecraft/client/main/Main");
-		mappedClasses.get("iSkullFuckedUrNan/tigurMed_sl1hSW8rVG6bOBv").setNewName("tigur/Tigur");
-		mappedClasses.get("iSkullFuckedUrNan/tigurMed_ewAsCOGZSS1uiff").setNewName("tigur/IRC");
-		mappedClasses.get("iSkullFuckedUrNan/tigurMed_1DSvDbDC4fF4r6B").setNewName("tigur/mods/ModBase");
 		//
 		return mappedClasses;
 	}
