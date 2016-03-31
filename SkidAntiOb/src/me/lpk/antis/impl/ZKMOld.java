@@ -21,24 +21,21 @@ public class ZKMOld extends AntiBase {
 	private final Map<Integer, Integer> modifiers = new HashMap<Integer, Integer>();
 	private String zkmFieldName;
 	private boolean multiZKM = false;
-	//TODO: Test return types being the parameters vs being void
-	// Java sending as reference or by value
-
+	
 	@Override
 	protected ClassNode scan(ClassNode node) {
 		for (MethodNode mnode : node.methods) {
 			if (mnode.name.startsWith("<c")) {
 				extractStatic(mnode);
-				mnode.instructions = cleanStatic(mnode);
+				cleanStatic(mnode);
 			}
 		}
 		for (MethodNode mnode : node.methods) {
 			if (mnode.name.startsWith("<")) {
 				continue;
 			}
-			mnode.instructions = replace(mnode);
+			replace(mnode);
 		}
-
 		return node;
 	}
 	/**
@@ -47,7 +44,7 @@ public class ZKMOld extends AntiBase {
 	 * 
 	 * @param method
 	 */
-	private InsnList replace(MethodNode method) {
+	private void replace(MethodNode method) {
 		for (AbstractInsnNode ain : method.instructions.toArray()) {
 			// If there are multiple values in the ZKM encrypted field are
 			// detected (multiZKM) and the opcode is loading from an array...
@@ -87,7 +84,6 @@ public class ZKMOld extends AntiBase {
 				}
 			}
 		}
-		return method.instructions;
 	}
 
 	/**
@@ -95,7 +91,7 @@ public class ZKMOld extends AntiBase {
 	 * 
 	 * @param method
 	 */
-	private InsnList extractStatic(MethodNode method) {
+	private void extractStatic(MethodNode method) {
 		for (AbstractInsnNode ain : method.instructions.toArray()) {
 			// Setup common to ZKM array and single string
 			if (ain.getOpcode() == Opcodes.PUTSTATIC) {
@@ -171,7 +167,6 @@ public class ZKMOld extends AntiBase {
 		for (int in : strings.keySet()) {
 			strings.replace(in, (decrypt(strings.get(in))));
 		}
-		return method.instructions;
 	}
 
 	/**
@@ -181,9 +176,8 @@ public class ZKMOld extends AntiBase {
 	 * @param method
 	 * @return 
 	 */
-	private InsnList cleanStatic(MethodNode method) {
+	private void cleanStatic(MethodNode method) {
 
-		return method.instructions;
 	}
 
 	/**
@@ -201,7 +195,6 @@ public class ZKMOld extends AntiBase {
 		for (char in : input.toCharArray()) {
 			Integer map = modifiers.get(i % 5);
 			if (map == null) {
-				System.out.println(input + ":" + (i % 5));
 				return input;
 			}
 			int charInt = ((in) ^ map);
