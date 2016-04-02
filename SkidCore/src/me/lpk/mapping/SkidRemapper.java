@@ -67,7 +67,7 @@ public class SkidRemapper extends Remapper {
 	@Override
 	public String mapMethodName(String owner, String name, String desc) {
 		MappedClass mc = renamed.get(owner);
-		if (me.lpk.mapping.remap.ClassRemapper.isNameWhitelisted(name)) {
+		if (me.lpk.mapping.remap.MappingRenamer.isNameWhitelisted(name)) {
 			return super.mapMethodName(owner, name, desc);
 		}
 		if (mc == null) {
@@ -84,7 +84,7 @@ public class SkidRemapper extends Remapper {
 	@Override
 	public String mapInvokeDynamicMethodName(String name, String desc) {
 		MappedClass mc = renamed.get(StringUtil.getMappedFromDesc(renamed, desc));
-		if (me.lpk.mapping.remap.ClassRemapper.isNameWhitelisted(name)) {
+		if (me.lpk.mapping.remap.MappingRenamer.isNameWhitelisted(name)) {
 			return super.mapInvokeDynamicMethodName(name, desc);
 		}
 		if (mc == null) {

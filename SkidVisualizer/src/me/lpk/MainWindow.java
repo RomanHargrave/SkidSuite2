@@ -38,7 +38,7 @@ public class MainWindow extends JFrame {
 
 	public static void main(String[] args) {
 		new MainWindow().setVisible(true);
-		//TODO: Method simularion using: asm Analyzer, Frame, BasicInterpreter, BasicValue
+		//TODO: Method simulation using: asm Analyzer, Frame, BasicInterpreter, BasicValue
 	}
 
 	public MainWindow() {

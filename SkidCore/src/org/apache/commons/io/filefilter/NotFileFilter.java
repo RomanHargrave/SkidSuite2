@@ -27,7 +27,7 @@ import java.io.Serializable;
  * @see FileFilterUtils#notFileFilter(IOFileFilter)
  */
 public class NotFileFilter extends AbstractFileFilter implements Serializable {
-    
+	private static final long serialVersionUID = 1L;
     /** The filter */
     private final IOFileFilter filter;
 

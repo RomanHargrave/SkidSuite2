@@ -43,7 +43,7 @@ import java.util.List;
  * @since 2.0
  */
 public class CompositeFileComparator extends AbstractFileComparator implements Serializable {
-
+	private static final long serialVersionUID = 1L;
     private static final Comparator<?>[] NO_COMPARATORS = {};
     private final Comparator<File>[] delegates;
 

@@ -42,7 +42,7 @@ import org.apache.commons.io.IOCase;
  * @see FileFilterUtils#nameFileFilter(String, IOCase)
  */
 public class NameFileFilter extends AbstractFileFilter implements Serializable {
-    
+	private static final long serialVersionUID = 1L;
     /** The filenames to search for */
     private final String[] names;
     /** Whether the comparison is case sensitive. */

@@ -27,7 +27,7 @@ import java.io.Serializable;
  * @see FileFilterUtils#trueFileFilter()
  */
 public class TrueFileFilter implements IOFileFilter, Serializable {
-
+	private static final long serialVersionUID = 1L;
     /**
      * Singleton instance of true filter.
      * @since 1.3

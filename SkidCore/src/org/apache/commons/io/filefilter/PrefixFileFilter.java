@@ -42,7 +42,7 @@ import org.apache.commons.io.IOCase;
  * @see FileFilterUtils#prefixFileFilter(String, IOCase)
  */
 public class PrefixFileFilter extends AbstractFileFilter implements Serializable {
-    
+	private static final long serialVersionUID = 1L;
     /** The filename prefixes to search for */
     private final String[] prefixes;
 

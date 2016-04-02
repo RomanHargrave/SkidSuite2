@@ -43,7 +43,7 @@ import org.apache.commons.io.IOCase;
  * @see FileFilterUtils#suffixFileFilter(String, IOCase)
  */
 public class SuffixFileFilter extends AbstractFileFilter implements Serializable {
-    
+	private static final long serialVersionUID = 1L;
     /** The filename suffixes to search for */
     private final String[] suffixes;
 

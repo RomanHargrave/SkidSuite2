@@ -43,7 +43,7 @@ import org.apache.commons.io.IOCase;
  * @since 1.4
  */
 public class RegexFileFilter extends AbstractFileFilter implements Serializable {
-
+	private static final long serialVersionUID = 1L;
     /** The regular expression pattern that will be used to match filenames */
     private final Pattern pattern;
 

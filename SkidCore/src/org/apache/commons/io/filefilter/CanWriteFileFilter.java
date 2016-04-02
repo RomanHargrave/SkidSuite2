@@ -53,7 +53,7 @@ import java.io.Serializable;
  * @version $Id: CanWriteFileFilter.java 1307462 2012-03-30 15:13:11Z ggregory $
  */
 public class CanWriteFileFilter extends AbstractFileFilter implements Serializable {
-    
+	private static final long serialVersionUID = 1L;
     /** Singleton instance of <i>writable</i> filter */
     public static final IOFileFilter CAN_WRITE = new CanWriteFileFilter();
 

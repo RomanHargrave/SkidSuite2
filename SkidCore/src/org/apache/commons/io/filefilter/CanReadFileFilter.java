@@ -61,7 +61,7 @@ import java.io.Serializable;
  * @version $Id: CanReadFileFilter.java 1307462 2012-03-30 15:13:11Z ggregory $
  */
 public class CanReadFileFilter extends AbstractFileFilter implements Serializable {
-    
+	private static final long serialVersionUID = 1L;
     /** Singleton instance of <i>readable</i> filter */
     public static final IOFileFilter CAN_READ = new CanReadFileFilter();
 

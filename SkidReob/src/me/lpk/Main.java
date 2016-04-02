@@ -7,12 +7,10 @@ import java.util.Map;
 
 import org.objectweb.asm.tree.ClassNode;
 
-import me.lpk.gui.windows.WindowEnigma;
-import me.lpk.gui.windows.WindowProguard;
+import me.lpk.gui.windows.mapping.WindowProguard;
 import me.lpk.mapping.MappedClass;
 import me.lpk.mapping.MappingGen;
 import me.lpk.mapping.MappingProcessor;
-import me.lpk.mapping.remap.ClassRemapper;
 import me.lpk.mapping.remap.impl.ModeSimple;
 import me.lpk.util.JarUtil;
 import me.lpk.util.Timer;
@@ -43,7 +41,7 @@ public class Main {
 		// Filling in the gaps
 		System.out.println("Filling in missing classes...");
 		mappedClasses = uglyHacksPre(mappedClasses);
-		mappedClasses = ClassRemapper.fillInTheGaps(mappedClasses, new ModeSimple());
+		mappedClasses = CorrelationMapperr.fillInTheGaps(mappedClasses, new ModeSimple());
 		mappedClasses = uglyHacks(mappedClasses);
 		t.log("Filled the gaps in: ");
 		// Processing

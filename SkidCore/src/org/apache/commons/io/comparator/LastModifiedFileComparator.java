@@ -46,7 +46,7 @@ import java.util.Comparator;
  * @since 1.4
  */
 public class LastModifiedFileComparator extends AbstractFileComparator implements Serializable {
-
+	private static final long serialVersionUID = 1L;
     /** Last modified comparator instance */
     public static final Comparator<File> LASTMODIFIED_COMPARATOR = new LastModifiedFileComparator();
 

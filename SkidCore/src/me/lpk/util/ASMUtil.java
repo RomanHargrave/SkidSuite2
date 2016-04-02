@@ -40,7 +40,7 @@ public class ASMUtil {
 			try {
 				cr.accept(cn, ClassReader.SKIP_FRAMES);
 			} catch (Exception e2) {
-				//e2.printStackTrace();
+				// e2.printStackTrace();
 			}
 		}
 		cr = null;
@@ -108,20 +108,5 @@ public class ASMUtil {
 				classNode.interfaces.add(interfaceClass.getName().replaceAll(".", "/"));
 			}
 		}
-	}
-
-	/**
-	 * Convert a ClassNode to a byte array
-	 * 
-	 * @author Xerces
-	 * @param classNode
-	 *            the {@link org.objectweb.asm.tree.ClassNode} to convert to a
-	 *            byte array
-	 * @return the byte array
-	 */
-	public static byte[] classNodeToBytes(ClassNode classNode) {
-		ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
-		classNode.accept(classWriter);
-		return classWriter.toByteArray();
 	}
 }

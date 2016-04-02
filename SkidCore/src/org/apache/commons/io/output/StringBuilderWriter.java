@@ -32,8 +32,8 @@ import java.io.Writer;
  * @since 2.0
  */
 public class StringBuilderWriter extends Writer implements Serializable {
-
-    private final StringBuilder builder;
+	private static final long serialVersionUID = 123L;
+	private final StringBuilder builder;
 
     /**
      * Construct a new {@link StringBuilder} instance with default capacity.

@@ -51,7 +51,7 @@ import org.apache.commons.io.FilenameUtils;
  */
 @Deprecated
 public class WildcardFilter extends AbstractFileFilter implements Serializable {
-
+	private static final long serialVersionUID = 1L;
     /** The wildcards that will be used to match filenames. */
     private final String[] wildcards;
 

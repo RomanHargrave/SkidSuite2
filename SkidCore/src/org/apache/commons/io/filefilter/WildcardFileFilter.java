@@ -49,7 +49,7 @@ import org.apache.commons.io.IOCase;
  * @since 1.3
  */
 public class WildcardFileFilter extends AbstractFileFilter implements Serializable {
-
+	private static final long serialVersionUID = 1L;
     /** The wildcards that will be used to match filenames. */
     private final String[] wildcards;
     /** Whether the comparison is case sensitive. */

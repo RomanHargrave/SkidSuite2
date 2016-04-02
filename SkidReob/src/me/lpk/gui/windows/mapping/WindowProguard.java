@@ -1,4 +1,4 @@
-package me.lpk.gui.windows;
+package me.lpk.gui.windows.mapping;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

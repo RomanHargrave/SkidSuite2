@@ -275,7 +275,8 @@ public class ByteArrayOutputStream extends OutputStream {
      */
     public static InputStream toBufferedInputStream(InputStream input)
             throws IOException {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        @SuppressWarnings("resource")
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
         output.write(input);
         return output.toBufferedInputStream();
     }

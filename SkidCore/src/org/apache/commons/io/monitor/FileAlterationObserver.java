@@ -120,8 +120,8 @@ import org.apache.commons.io.comparator.NameFileComparator;
  * @since 2.0
  */
 public class FileAlterationObserver implements Serializable {
-
-    private final List<FileAlterationListener> listeners = new CopyOnWriteArrayList<FileAlterationListener>();
+	private static final long serialVersionUID = 12345L;
+	private final List<FileAlterationListener> listeners = new CopyOnWriteArrayList<FileAlterationListener>();
     private final FileEntry rootEntry;
     private final FileFilter fileFilter;
     private final Comparator<File> comparator;

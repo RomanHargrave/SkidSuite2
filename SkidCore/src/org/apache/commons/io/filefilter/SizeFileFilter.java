@@ -41,7 +41,7 @@ import java.io.Serializable;
  * @see FileFilterUtils#sizeRangeFileFilter(long, long)
  */
 public class SizeFileFilter extends AbstractFileFilter implements Serializable {
-
+	private static final long serialVersionUID = 1L;
     /** The size threshold. */
     private final long size;
     /** Whether the files accepted will be larger or smaller. */

@@ -49,7 +49,7 @@ import java.io.Serializable;
  * @version $Id: HiddenFileFilter.java 1307462 2012-03-30 15:13:11Z ggregory $
  */
 public class HiddenFileFilter extends AbstractFileFilter implements Serializable {
-    
+	private static final long serialVersionUID = 1L;
     /** Singleton instance of <i>hidden</i> filter */
     public static final IOFileFilter HIDDEN  = new HiddenFileFilter();
     

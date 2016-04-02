@@ -44,7 +44,7 @@ import java.util.Comparator;
  * @since 2.0
  */
 public class DirectoryFileComparator extends AbstractFileComparator implements Serializable {
-
+	private static final long serialVersionUID = 1L;
     /** Singleton default comparator instance */
     public static final Comparator<File> DIRECTORY_COMPARATOR = new DirectoryFileComparator();
 

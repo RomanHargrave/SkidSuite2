@@ -53,7 +53,7 @@ public class JarOptimizer {
                 break;
             }
         }
-
+        lnr.close();
         int argIndex = 1;
         if (args[argIndex].equals("-nodebug")) {
             nodebug = true;

@@ -40,8 +40,8 @@ import java.io.Serializable;
  * @since 2.0
  */
 public class FileEntry implements Serializable {
-
-    static final FileEntry[] EMPTY_ENTRIES = new FileEntry[0];
+	private static final long serialVersionUID = 1234L;
+	static final FileEntry[] EMPTY_ENTRIES = new FileEntry[0];
 
     private final FileEntry parent;
     private FileEntry[] children;
