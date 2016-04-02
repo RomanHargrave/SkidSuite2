@@ -6,15 +6,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.objectweb.asm.tree.ClassNode;
+
+import me.lpk.gui.windows.WindowEnigma;
+import me.lpk.gui.windows.WindowProguard;
 import me.lpk.mapping.MappedClass;
 import me.lpk.mapping.MappingGen;
 import me.lpk.mapping.MappingProcessor;
 import me.lpk.mapping.remap.ClassRemapper;
 import me.lpk.mapping.remap.impl.ModeSimple;
 import me.lpk.util.JarUtil;
+import me.lpk.util.Timer;
 
 public class Main {
 	public static void main(String[] args) {
+		WindowProguard.showWindow();
+	}
+	
+	public static void old(){
 		Timer t = new Timer();
 		// Loading
 		File night = new File("Tigur.jar");

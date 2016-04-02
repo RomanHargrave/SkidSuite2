@@ -23,6 +23,7 @@ class ProguardLoader {
 				put("void", "V");
 				put("int", "I");
 				put("long", "J");
+				put("byte", "B");
 				put("double", "D");
 				put("float", "F");
 				put("boolean", "Z");
@@ -46,8 +47,8 @@ class ProguardLoader {
 	}
 
 	public Map<String, MappedClass> read(BufferedReader fileReader) throws Exception {
-		Map<String, MappedClass> remap = new HashMap<String, MappedClass>();
-		Map<String, MappedClass> remap2 = new HashMap<String, MappedClass>();
+		Map<String, MappedClass> origNameMap = new HashMap<String, MappedClass>();
+		Map<String, MappedClass> newNameMap = new HashMap<String, MappedClass>();
 		String line = null;
 		MappedClass curClass = null;
 		while ((line = fileReader.readLine()) != null) {
@@ -59,11 +60,9 @@ class ProguardLoader {
 				if (line.trim().endsWith(":")) {
 					// Class definition
 					curClass = readClass(parts);
-					// System.err.println(curClass.getOriginalName() + ":" +
-					// curClass.getNewName());
 					if (curClass != null) {
-						remap.put(curClass.getOriginalName(), curClass);
-						remap2.put(curClass.getNewName(), curClass);
+						origNameMap.put(curClass.getOriginalName(), curClass);
+						newNameMap.put(curClass.getNewName(), curClass);
 					}
 				} else if (curClass != null) {
 					if (isMethod(line.trim())) {
@@ -79,34 +78,23 @@ class ProguardLoader {
 			}
 		}
 		// Fixing the MappedClass's parent / child structure.
-		Set<String> x = new HashSet<String>();
-		x.addAll(remap.keySet());
-		for (String className : x) {
-			MappedClass mappedClass = remap.get(className);
-			remap = MappingGen.linkMappings(mappedClass, remap);
+		Set<String> origMapSet = new HashSet<String>();
+		origMapSet.addAll(origNameMap.keySet());
+		for (String className : origMapSet) {
+			MappedClass mappedClass = origNameMap.get(className);
+			origNameMap = MappingGen.linkMappings(mappedClass, origNameMap);
 		}
-		for (String className : x) {
-			MappedClass mappedClass = remap.get(className);
+		for (String className : origMapSet) {
+			MappedClass mappedClass = origNameMap.get(className);
 			for (MappedMember field : mappedClass.getFields()) {
-				field.setDesc(StringUtil.fixDescReverse(field.getDesc(), remap, remap2));
+				field.setDesc(StringUtil.fixDescReverse(field.getDesc(), origNameMap, newNameMap));
 			}
 			for (MappedMember method : mappedClass.getMethods()) {
-				method.setDesc(StringUtil.fixDescReverse(method.getDesc(), remap, remap2));
+				method.setDesc(StringUtil.fixDescReverse(method.getDesc(), origNameMap, newNameMap));
 			}
+			origNameMap.put(className, mappedClass);
 		}
-		/*
-		 * for (String className : remap.keySet()) { MappedClass classMap =
-		 * remap.get(className); // MappedClass has no parent. if
-		 * (classMap.getParent() == null) { // Find its parent. MappedClass
-		 * parent = remap.get(classMap.getNode().superName); // If found, set
-		 * it's parent. Have the parent set it as its // child. if (parent !=
-		 * null) { classMap.setParent(parent); parent.addChild(classMap); } }
-		 * else { // MappedClass has parent. // If the parent does not have it
-		 * as a child, add it. if
-		 * (!classMap.getParent().getChildrenMap().containsKey(classMap.
-		 * getOriginalName())) { classMap.getParent().addChild(classMap); } } }
-		 */
-		return remap;
+		return origNameMap;
 	}
 
 	private boolean isMethod(String trim) {
@@ -140,8 +128,6 @@ class ProguardLoader {
 		String newName = parts[1];
 		String original = parts[3];
 		String desc = fixDesc(parts[0]);
-		// (MappedClass owner, Object memberNode, int index, String desc, String
-		// orig)
 		MappedMember mm = new MappedMember(clazz, null, -1, desc, original);
 		mm.setNewName(newName);
 		clazz.addField(mm);
@@ -157,8 +143,6 @@ class ProguardLoader {
 		String newName = parts[1].substring(0, parts[1].indexOf("("));
 		String original = parts[3];
 		String desc = fixDesc(parts[0], parts[1].substring(parts[1].indexOf("(")));
-		// (MappedClass owner, Object memberNode, int index, String desc, String
-		// orig)
 		MappedMember mm = new MappedMember(clazz, null, -1, desc, original);
 		mm.setNewName(newName);
 		clazz.addMethod(mm);
@@ -166,13 +150,12 @@ class ProguardLoader {
 
 	private String fixDesc(String type, String parameters) {
 		// type : parameters
-		// void : (java.lang.Object)
 		// void : (java.lang.Iterable,java.lang.Iterable,java.util.Map)
-		String type_array_prefix = "", type_mid = null, type_params = "", type_noArr = type.replace("[]", "");
+		String type_mid = null, type_params = "", type_noArr = type.replace("[]", "");
 		// Apply primitive names
 		for (String key : primitives.keySet()) {
 			if (type_noArr.equals(key)) {
-				type_mid = primitives.get(key);
+				type_mid = getArrStr(type) + primitives.get(key);
 			}
 		}
 		if (parameters.contains(",")) {
@@ -181,15 +164,15 @@ class ProguardLoader {
 			for (String param : params) {
 				boolean done = false;
 				for (String key : primitives.keySet()) {
-					if (param.equals(key)) {
-						type_params += primitives.get(key);
+					if (param.replace("[]", "").equals(key)) {
+						type_params += getArrStr(param) + primitives.get(key);
 						done = true;
 					}
 				}
-				if (!done) {
-					type_params += "L" + param.replace(".", "/") + ";";
-				}
 
+				if (!done) {
+					type_params += getArrStr(param) + "L" + param.replace(".", "/").replace("[]", "") + ";";
+				}
 			}
 		} else if (parameters.equals("()")) {
 			// No parameters
@@ -199,60 +182,52 @@ class ProguardLoader {
 			String param = parameters.substring(1, parameters.length() - 1);
 			boolean done = false;
 			for (String key : primitives.keySet()) {
-				if (param.equals(key)) {
-					type_params += primitives.get(key);
+				if (param.replace("[]", "").equals(key)) {
+					type_params += getArrStr(param) + primitives.get(key);
 					done = true;
 				}
 			}
 			if (!done) {
-				type_params += "L" + param.replace(".", "/") + ";";
+				type_params += getArrStr(param) + "L" + param.replace("[]", "").replace(".", "/") + ";";
 			}
 		}
-		type_params = "(" + type_params + type_params + ")";
-		// Checking for arrays
-		if (type.contains("[]")) {
-			int array = 0;
-			String type_copy = type + "";
-			while (type_copy.contains("[]")) {
-				array++;
-				type_copy = type_copy.substring(type_copy.indexOf("[]") + 2);
-				for (int i = 0; i < array; i++) {
-					type_array_prefix = "[" + type_array_prefix;
-				}
-			}
-		}
+		type_params = "(" + type_params + ")";
 		// Type is not just a primitive
 		if (type_mid == null) {
 			type_mid = "L" + type_noArr.replace(".", "/") + ";";
 		}
-		return type_array_prefix + type_params + type_mid;
+		return type_params + type_mid;
 	}
 
 	private String fixDesc(String type) {
 		// net.minecraft.util.IntHashMap$Entry[]
-		String type_array_prefix = "", type_mid = null, type_noArr = type.replace("[]", "");
+		String type_mid = null, type_noArr = type.replace("[]", "");
 		// Apply primitive names
 		for (String key : primitives.keySet()) {
-			if (type_noArr.equals(key)) {
-				type_mid = primitives.get(key);
-			}
-		}
-		// Checking for arrays
-		if (type.contains("[]")) {
-			int array = 0;
-			String type_copy = type + "";
-			while (type_copy.contains("[]")) {
-				array++;
-				type_copy = type_copy.substring(type_copy.indexOf("[]") + 2);
-				for (int i = 0; i < array; i++) {
-					type_array_prefix = "[" + type_array_prefix;
-				}
+			if (type.replace("[]", "").equals(key)) {
+				type_mid = getArrStr(type) + primitives.get(key);
 			}
 		}
 		// Type is not just a primitive
 		if (type_mid == null) {
 			type_mid = "L" + type_noArr.replace(".", "/") + ";";
 		}
-		return type_array_prefix + type_mid;
+		return getArrStr(type) + type_mid;
+	}
+
+	private String getArrStr(String param) {
+		String param_array_prefix = "";
+		if (param.contains("[]")) {
+			int array = 0;
+			String param_copy = param + "";
+			while (param_copy.contains("[]")) {
+				array++;
+				param_copy = param_copy.substring(param_copy.indexOf("[]") + 2);
+				for (int i = 0; i < array; i++) {
+					param_array_prefix = "[" + param_array_prefix;
+				}
+			}
+		}
+		return param_array_prefix;
 	}
 }

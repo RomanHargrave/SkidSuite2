@@ -1,0 +1,61 @@
+CLASS none/a me/lpk/client/Client
+	FIELD a INSTANCE Lnone/a;
+	FIELD b AUTHOR Ljava/lang/String;
+	FIELD c CLIENT_NAME Ljava/lang/String;
+	FIELD version VERSION Ljava/lang/String;
+CLASS none/ac me/lpk/client/Bindable
+	METHOD a setKey (Lnone/af;)V
+CLASS none/ae me/lpk/client/key/KeyMask
+	FIELD aK NONE Lnone/ae;
+	FIELD aL SHIFT Lnone/ae;
+	FIELD aM CONTROL Lnone/ae;
+	FIELD aN ALT Lnone/ae;
+CLASS none/af me/lpk/client/key/Keybind
+	FIELD aQ DEFAULT_KEY Lnone/af;
+	FIELD aS keyName Ljava/lang/String;
+	FIELD aT mask Lnone/ae;
+CLASS none/ah me/lpk/client/Saveable
+CLASS none/aj me/lpk/client/mod/Mod
+	FIELD bf minecraft Lnone/ks;
+	FIELD bg data Lnone/am;
+	FIELD bh settings Lnone/ap;
+	FIELD bi keybind Lnone/af;
+	METHOD a setKey (Lnone/af;)V
+	METHOD au getKey ()Lnone/af;
+	METHOD d getSetting (Ljava/lang/String;)Lnone/ao;
+CLASS none/am me/lpk/client/mod/ModData
+	FIELD aT mask Lnone/ae;
+	FIELD bk type Lnone/an;
+	METHOD a setData (Lnone/am;)V
+	METHOD ai getMask ()Lnone/ae;
+	METHOD av getType ()Lnone/an;
+	METHOD b setMask (Lnone/ae;)V
+	METHOD p setKey (I)V
+CLASS none/an me/lpk/client/mod/ModType
+	FIELD bm COMBAT Lnone/an;
+CLASS none/ao me/lpk/client/mod/Setting
+CLASS none/ap me/lpk/client/mod/SettingsHolder
+CLASS none/aq me/lpk/client/mod/impl/Aura
+	FIELD bs KEYRANGE Ljava/lang/String;
+	FIELD bt KEYSPEED Ljava/lang/String;
+	FIELD bu KEYAUTO Ljava/lang/String;
+	FIELD bv timer Lnone/ba;
+CLASS none/ba me/lpk/client/util/Timer
+CLASS none/ks net/minecraft/Minecraft
+	METHOD ej getMinecraft ()Lnone/ks;
+CLASS none/bot
+	FIELD bCA fuck1 Ljava/lang/String;
+	FIELD bCB fuck2 Ljava/lang/String;
+	FIELD bCC fuck3 Ljava/lang/String;
+	FIELD bCD kek1 Z
+	FIELD bCE kek2 Z
+	FIELD bCF kek Lnone/boy;
+	FIELD bCG memes Lnone/boy;
+	FIELD bCH dank Lnone/bsr;
+	FIELD bCy fuck0 Ljava/lang/String;
+CLASS none/box dank/Fucker
+CLASS none/boy dankes/Meme
+	FIELD bCT ALWAYS Lnone/boy;
+	FIELD bCU NEVER Lnone/boy;
+	FIELD bCV OTHER Lnone/boy;
+	FIELD bCW OWN Lnone/boy;

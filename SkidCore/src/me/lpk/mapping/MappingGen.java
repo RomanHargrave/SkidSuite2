@@ -26,15 +26,20 @@ public class MappingGen {
 	 * @return
 	 */
 	public static Map<String, MappedClass> mappingsFromEnigma(File file, Map<String, ClassNode> nodes) {
-		Map<String, MappedClass> mappedClasses = new HashMap<String, MappedClass>();
-		EnigmaLoader loader = new EnigmaLoader(nodes);;
+		Map<String, MappedClass> base = mappingsFromNodes(nodes);
+		EnigmaLoader loader = new EnigmaLoader(nodes);
 		try {
-			return loader.read(new FileReader(file));
+			Map<String, MappedClass> newMappings = loader.read(new FileReader(file));
+			for (MappedClass mappedClass : newMappings.values()) {
+				newMappings = linkMappings(mappedClass, newMappings);
+			}
+			base = fixFromMappingsText(base, newMappings);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
-		return mappedClasses;
+		return base;
 	}
+
 	/**
 	 * Returns a map of class names to mapped classes given a proguard mapping
 	 * file.
@@ -43,14 +48,51 @@ public class MappingGen {
 	 * @return
 	 */
 	public static Map<String, MappedClass> mappingsFromProguard(File file, Map<String, ClassNode> nodes) {
-		Map<String, MappedClass> mappedClasses = new HashMap<String, MappedClass>();
-		ProguardLoader loader = new ProguardLoader(nodes);;
+		Map<String, MappedClass> base = mappingsFromNodes(nodes);
+		ProguardLoader loader = new ProguardLoader(nodes);
 		try {
-			return loader.read(new FileReader(file));
+			Map<String, MappedClass> newMappings = loader.read(new FileReader(file));
+			for (MappedClass mappedClass : newMappings.values()) {
+				newMappings = linkMappings(mappedClass, newMappings);
+			}
+			base = fixFromMappingsText(base, newMappings);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
-		return mappedClasses;
+		return base;
+	}
+
+	/**
+	 * Given two maps of mappings, applies the data from the new map to the base
+	 * map.
+	 * 
+	 * @param base
+	 * @param newMappings
+	 * @return
+	 */
+	private static Map<String, MappedClass> fixFromMappingsText(Map<String, MappedClass> base, Map<String, MappedClass> newMappings) {
+		for (String className : newMappings.keySet()) {
+			MappedClass baseClass = base.get(className);
+			MappedClass newClass = newMappings.get(className);
+			if (baseClass == null) {
+				continue;
+			}
+			baseClass.setNewName(newClass.getNewName());
+			for (MappedMember newMember : newClass.getFields()) {
+				MappedMember baseMember = ParentUtils.findField(baseClass, newMember.getOriginalName(), newMember.getDesc());
+				if (baseMember != null && ParentUtils.matches(baseMember, newMember.getOriginalName(), newMember.getDesc())) {
+					baseMember.setNewName(newMember.getNewName());
+				}
+			}
+			for (MappedMember newMember : newClass.getMethods()) {
+				MappedMember baseMember = ParentUtils.findMethod(baseClass, newMember.getOriginalName(), newMember.getDesc());
+				if (baseMember != null && ParentUtils.matches(baseMember, newMember.getOriginalName(), newMember.getDesc())) {
+					baseMember.setNewName(newMember.getNewName());
+				}
+			}
+			base.put(className, baseClass);
+		}
+		return base;
 	}
 
 	/**
@@ -172,7 +214,7 @@ public class MappingGen {
 			for (int fieldKey : mappedClass.getFieldMap().keySet()) {
 				// Check for synthetic fields
 				FieldNode fn = mappedClass.getFieldMap().get(fieldKey).getFieldNode();
-				if (fn == null ){
+				if (fn == null) {
 					continue;
 				}
 				int access = fn.access;

@@ -27,21 +27,61 @@ public class ParentUtils {
 		return false;
 	}
 
+	/**
+	 * Returns the field in the given class with the name and description. If
+	 * it's not in the given class, parents are checked. Returns null if nothing
+	 * is found.
+	 * 
+	 * @param owner
+	 * @param name
+	 * @param desc
+	 * @return
+	 */
 	public static MappedMember findMethod(MappedClass owner, String name, String desc) {
 		// Check the class itself
 		for (MappedMember mm : owner.getMethods()) {
-			if (mm.getOriginalName().equals(name) && mm.getDesc().equals(desc)) {
+			if (matches(mm, name, desc)) {
 				return mm;
 			}
 		}
-		return findMethodParent(owner,name,desc);
+		return findMethodParent(owner, name, desc);
 	}
-	
+
+	/**
+	 * Returns the method in the given class with the name and description. If
+	 * it's not in the given class, parents are checked. Returns null if nothing
+	 * is found.
+	 * 
+	 * @param owner
+	 * @param name
+	 * @param desc
+	 * @return
+	 */
+	public static MappedMember findField(MappedClass owner, String name, String desc) {
+		// Check the class itself
+		for (MappedMember mm : owner.getFields()) {
+			if (matches(mm, name, desc)) {
+				return mm;
+			}
+		}
+		return findFieldInParent(owner, name, desc);
+	}
+
+	/**
+	 * Returns the method in the given class's parent with the name and
+	 * description. If it's not in the given class, further parents are checked.
+	 * Returns null if nothing is found.
+	 * 
+	 * @param owner
+	 * @param name
+	 * @param desc
+	 * @return
+	 */
 	public static MappedMember findMethodParent(MappedClass owner, String name, String desc) {
 		// Check for interfaces in the method's class.
 		for (MappedClass interfaceClass : owner.getInterfacesMap().values()) {
 			for (MappedMember mm : interfaceClass.getMethods()) {
-				if (mm.getOriginalName().equals(name) && mm.getDesc().equals(desc)) {
+				if (matches(mm, name, desc)) {
 					return mm;
 				}
 			}
@@ -52,14 +92,14 @@ public class ParentUtils {
 			// Check interfaces of parent.
 			for (MappedClass interfaceClass : owner.getInterfacesMap().values()) {
 				for (MappedMember mm : interfaceClass.getMethods()) {
-					if (mm.getOriginalName().equals(name) && mm.getDesc().equals(desc)) {
+					if (matches(mm, name, desc)) {
 						return mm;
 					}
 				}
 			}
 			// Check members of the parent.
 			for (MappedMember mm : owner.getMethods()) {
-				if (mm.getOriginalName().equals(name) && mm.getDesc().equals(desc)) {
+				if (matches(mm, name, desc)) {
 					return mm;
 				}
 			}
@@ -68,27 +108,27 @@ public class ParentUtils {
 		return null;
 	}
 
-	public static MappedMember findField(MappedClass owner, String name, String desc) {
-		// Check the class itself
-		for (MappedMember mm : owner.getFields()) {
-			if (mm.getOriginalName().equals(name) && mm.getDesc().equals(desc)) {
-				return mm;
-			}
-		}
-		return findFieldInParent(owner, name, desc);
-	}
-
+	/**
+	 * Returns the field in the given class's parent with the name and
+	 * description. If it's not in the given class, further parents are checked.
+	 * Returns null if nothing is found.
+	 * 
+	 * @param owner
+	 * @param name
+	 * @param desc
+	 * @return
+	 */
 	public static MappedMember findFieldInParent(MappedClass owner, String name, String desc) {
 		// Check the class itself
 		for (MappedMember mm : owner.getFields()) {
-			if (mm.getOriginalName().equals(name) && mm.getDesc().equals(desc)) {
+			if (matches(mm, name, desc)) {
 				return mm;
 			}
 		}
 		// Check for interfaces in the method's class.
 		for (MappedClass interfaceClass : owner.getInterfacesMap().values()) {
 			for (MappedMember mm : interfaceClass.getFields()) {
-				if (mm.getOriginalName().equals(name) && mm.getDesc().equals(desc)) {
+				if (matches(mm, name, desc)) {
 					return mm;
 				}
 			}
@@ -99,14 +139,14 @@ public class ParentUtils {
 			// Check interfaces of parent.
 			for (MappedClass interfaceClass : owner.getInterfacesMap().values()) {
 				for (MappedMember mm : interfaceClass.getFields()) {
-					if (mm.getOriginalName().equals(name) && mm.getDesc().equals(desc)) {
+					if (matches(mm, name, desc)) {
 						return mm;
 					}
 				}
 			}
 			// Check members of the parent.
 			for (MappedMember mm : owner.getFields()) {
-				if (mm.getOriginalName().equals(name) && mm.getDesc().equals(desc)) {
+				if (matches(mm, name, desc)) {
 					return mm;
 				}
 			}
@@ -123,12 +163,22 @@ public class ParentUtils {
 	 */
 	public static MappedMember findMethodOverride(MappedMember mm) {
 		if (mm.doesOverride()) {
-			if (mm.getOverride().getOwner().getOriginalName().equals(mm.getOwner().getOriginalName())){
-				System.err.println("findMethodOverride");
+			if (mm.getOverride().getOwner().getOriginalName().equals(mm.getOwner().getOriginalName())) {
 				return mm;
 			}
 			return findMethodOverride(mm.getOverride());
 		}
 		return mm;
+	}
+
+	public static boolean matches(MappedMember mm, String name, String desc) {
+		if (mm.getOriginalName().equals(name) && mm.getDesc().equals(desc)) {
+			return true;
+		}
+		return false;
+	}
+
+	public static boolean matches(MappedMember mm, MappedMember mm2, boolean orig) {
+		return matches(mm, orig ? mm2.getOriginalName() : mm2.getNewName(), mm2.getDesc());
 	}
 }

@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.FieldNode;
+import org.objectweb.asm.tree.MethodNode;
 
 class EnigmaLoader {
 	private final Map<String, ClassNode> nodes;
@@ -55,14 +57,8 @@ class EnigmaLoader {
 						remap.put(curClass.getOriginalName(), curClass);
 					} else {
 						// inner class
-						/*
-						 * if (!(mappingStack.peek() instanceof MappedClass))
-						 * throw new Exception( "Unexpected CLASS entry (Line: "
-						 * + lineNumber + " )" ); classMapping =
-						 * readClass(parts, true); ((MappedClass)
-						 * mappingStack.peek()).addInnerClassMapping(
-						 * classMapping);
-						 */
+						// TODO: If Engima is ever updated so that inner classes
+						// aren't borked add this.
 					}
 				} else if (token.equalsIgnoreCase("FIELD")) {
 					if (curClass == null) {
@@ -85,18 +81,6 @@ class EnigmaLoader {
 			}
 		}
 		// Fixing the MappedClass's parent / child structure.
-		/*
-		 * for (String className : remap.keySet()) { MappedClass classMap =
-		 * remap.get(className); // MappedClass has no parent. if
-		 * (classMap.getParent() == null) { // Find its parent. MappedClass
-		 * parent = remap.get(classMap.getNode().superName); // If found, set
-		 * it's parent. Have the parent set it as its // child. if (parent !=
-		 * null) { classMap.setParent(parent); parent.addChild(classMap); } }
-		 * else { // MappedClass has parent. // If the parent does not have it
-		 * as a child, add it. if
-		 * (!classMap.getParent().getChildrenMap().containsKey(classMap.
-		 * getOriginalName())) { classMap.getParent().addChild(classMap); } } }
-		 */
 		for (String className : remap.keySet()) {
 			MappedClass mappedClass = remap.get(className);
 			remap = MappingGen.linkMappings(mappedClass, remap);
@@ -146,8 +130,10 @@ class EnigmaLoader {
 		} else {
 			return;
 		}
-
-		MappedMember mm = new MappedMember(clazz, null, -1, desc, original);
+		if (desc.contains("Lnone/")) {
+			desc = desc.replace("Lnone/", "L");
+		}
+		MappedMember mm = new MappedMember(clazz, findField(clazz.getNode(), original, desc), -1, desc, original);
 		mm.setNewName(newName);
 		clazz.addField(mm);
 	}
@@ -173,9 +159,35 @@ class EnigmaLoader {
 		} else {
 			return;
 		}
-
-		MappedMember mm = new MappedMember(clazz, null, -1, desc, original);
+		if (desc.contains("Lnone/")) {
+			desc = desc.replace("Lnone/", "L");
+		}
+		MappedMember mm = new MappedMember(clazz, findMethod(clazz.getNode(), original, desc), -1, desc, original);
 		mm.setNewName(newName);
 		clazz.addMethod(mm);
+	}
+
+	private FieldNode findField(ClassNode cn, String name, String desc) {
+		if (cn == null) {
+			return null;
+		}
+		for (FieldNode fn : cn.fields){
+			if (fn.desc.equals(desc) && fn.name.equals(name)){
+				return fn;
+			}
+		}
+		return null;
+	}
+
+	private MethodNode findMethod(ClassNode cn, String name, String desc) {
+		if (cn == null) {
+			return null;
+		}
+		for (MethodNode mn : cn.methods){
+			if (mn.desc.equals(desc) && mn.name.equals(name)){
+				return mn;
+			}
+		}
+		return null;
 	}
 }
