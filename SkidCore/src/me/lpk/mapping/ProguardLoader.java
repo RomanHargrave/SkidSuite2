@@ -151,11 +151,11 @@ class ProguardLoader {
 	private String fixDesc(String type, String parameters) {
 		// type : parameters
 		// void : (java.lang.Iterable,java.lang.Iterable,java.util.Map)
-		String type_mid = null, type_params = "", type_noArr = type.replace("[]", "");
+		String strReturnDesc = null, strParamsDesc = "", typeNoArr = type.replace("[]", "");
 		// Apply primitive names
 		for (String key : primitives.keySet()) {
-			if (type_noArr.equals(key)) {
-				type_mid = getArrStr(type) + primitives.get(key);
+			if (typeNoArr.equals(key)) {
+				strReturnDesc = getArrStr(type) + primitives.get(key);
 			}
 		}
 		if (parameters.contains(",")) {
@@ -165,69 +165,69 @@ class ProguardLoader {
 				boolean done = false;
 				for (String key : primitives.keySet()) {
 					if (param.replace("[]", "").equals(key)) {
-						type_params += getArrStr(param) + primitives.get(key);
+						strParamsDesc += getArrStr(param) + primitives.get(key);
 						done = true;
 					}
 				}
 
 				if (!done) {
-					type_params += getArrStr(param) + "L" + param.replace(".", "/").replace("[]", "") + ";";
+					strParamsDesc += getArrStr(param) + "L" + param.replace(".", "/").replace("[]", "") + ";";
 				}
 			}
 		} else if (parameters.equals("()")) {
 			// No parameters
-			type_params = "";
+			strParamsDesc = "";
 		} else {
 			// One parameter
 			String param = parameters.substring(1, parameters.length() - 1);
 			boolean done = false;
 			for (String key : primitives.keySet()) {
 				if (param.replace("[]", "").equals(key)) {
-					type_params += getArrStr(param) + primitives.get(key);
+					strParamsDesc += getArrStr(param) + primitives.get(key);
 					done = true;
 				}
 			}
 			if (!done) {
-				type_params += getArrStr(param) + "L" + param.replace("[]", "").replace(".", "/") + ";";
+				strParamsDesc += getArrStr(param) + "L" + param.replace("[]", "").replace(".", "/") + ";";
 			}
 		}
-		type_params = "(" + type_params + ")";
+		strParamsDesc = "(" + strParamsDesc + ")";
 		// Type is not just a primitive
-		if (type_mid == null) {
-			type_mid = "L" + type_noArr.replace(".", "/") + ";";
+		if (strReturnDesc == null) {
+			strReturnDesc = "L" + typeNoArr.replace(".", "/") + ";";
 		}
-		return type_params + type_mid;
+		return strParamsDesc + strReturnDesc;
 	}
 
 	private String fixDesc(String type) {
 		// net.minecraft.util.IntHashMap$Entry[]
-		String type_mid = null, type_noArr = type.replace("[]", "");
+		String returnDesc = null, typeNoArr = type.replace("[]", "");
 		// Apply primitive names
 		for (String key : primitives.keySet()) {
 			if (type.replace("[]", "").equals(key)) {
-				type_mid = getArrStr(type) + primitives.get(key);
+				returnDesc = getArrStr(type) + primitives.get(key);
 			}
 		}
 		// Type is not just a primitive
-		if (type_mid == null) {
-			type_mid = "L" + type_noArr.replace(".", "/") + ";";
+		if (returnDesc == null) {
+			returnDesc = "L" + typeNoArr.replace(".", "/") + ";";
 		}
-		return getArrStr(type) + type_mid;
+		return getArrStr(type) + returnDesc;
 	}
 
 	private String getArrStr(String param) {
-		String param_array_prefix = "";
+		String arrayPrefix = "";
 		if (param.contains("[]")) {
 			int array = 0;
-			String param_copy = param + "";
-			while (param_copy.contains("[]")) {
+			String paramCopy = param + "";
+			while (paramCopy.contains("[]")) {
 				array++;
-				param_copy = param_copy.substring(param_copy.indexOf("[]") + 2);
+				paramCopy = paramCopy.substring(paramCopy.indexOf("[]") + 2);
 				for (int i = 0; i < array; i++) {
-					param_array_prefix = "[" + param_array_prefix;
+					arrayPrefix = "[" + arrayPrefix;
 				}
 			}
 		}
-		return param_array_prefix;
+		return arrayPrefix;
 	}
 }
