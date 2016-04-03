@@ -102,7 +102,7 @@ public class Main {
 
 	private static Map<String, MappedClass> uglyHacksPre(Map<String, MappedClass> mappedClasses) {
 		mappedClasses.get("net/minecraft/client/main/Main").setNewName("net/minecraft/client/main/Main");
-		mappedClasses.get("net/minecraft/client/main/Main").setRenamed(true);
+		mappedClasses.get("net/minecraft/client/main/Main").setRenamedOverride(true);
 		return mappedClasses;
 	}
 
@@ -115,7 +115,7 @@ public class Main {
 	private static Map<String, MappedClass> resetRemapped(Map<String, MappedClass> mappedClasses) {
 		for (String name : mappedClasses.keySet()) {
 			MappedClass mc = mappedClasses.get(name);
-			mc.setRenamed(false);
+			mc.setRenamedOverride(false);
 			mappedClasses.put(name, mc);
 		}
 		return mappedClasses;

@@ -179,10 +179,19 @@ public class CorrelationMapperr {
 		if (mappedClass.isInnerClass()) {
 			MappedClass outerClass = mappedClass.getOuterClass();
 			mappedClasses = fillGap(outerClass, mappedClasses, mode);
-			// I'm lazy and this can be broken.
-			// TODO: Properly increment the amount of inner classes
-			int post = (int) (Math.random() * 200);
-			mappedClass.setNewName(outerClass.getNewName() + "$" + post);
+			if (mappedClass.getOriginalName().contains("$")) {
+				String post = mappedClass.getOriginalName().substring(mappedClass.getOriginalName().indexOf("$") + 1);
+				mappedClass.setNewName(mappedClass.getOuterClass().getNewName() + "$" + post);
+			} else {
+				int index = 0;
+				for (String name : mappedClass.getOuterClass().getInnerClassMap().keySet()) {
+					index += 1;
+					if (name.equals(mappedClass.getOriginalName())) {
+						break;
+					}
+				}
+				mappedClass.setNewName(mappedClass.getOuterClass().getNewName() + "$" + index);
+			}
 		} else {
 			// Normal class
 			String newNameClass = mode.getClassName(mappedClass.getNode());

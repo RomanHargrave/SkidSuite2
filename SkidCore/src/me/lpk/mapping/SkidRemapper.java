@@ -101,19 +101,11 @@ public class SkidRemapper extends Remapper {
 	@Override
 	public String mapFieldName(String owner, String name, String desc) {
 		MappedClass mc = renamed.get(owner);
-		while (mc != null) {
-			List<Integer> fieldIndecies = mc.findFieldsByDesc(desc);
-			int index = -1;
-			for (int i : fieldIndecies) {
-				if (mc.findFieldByIndex(i).getOriginalName().equals(name)) {
-					index = i;
-					break;
-				}
+		if (mc != null) {
+			MappedMember field = ParentUtils.findField(mc, name, desc);
+			if (field != null) {
+				return super.mapFieldName(owner, field.getNewName(), desc);
 			}
-			if (index >= 0) {
-				return super.mapFieldName(owner, mc.findFieldByIndex(index).getNewName(), desc);
-			}
-			mc = mc.getParent();
 		}
 		return super.mapFieldName(owner, name, desc);
 	}

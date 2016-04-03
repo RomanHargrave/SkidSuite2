@@ -133,6 +133,11 @@ public class WindowObfu {
 					Map<String, byte[]> out = JarUtil.loadNonClassEntries(file);
 					out.putAll(MappingProcessor.process(nodes, mappings));
 					JarUtil.saveAsJar(out, file.getName() + "-Obf.jar");
+					String data = "";
+					for (MappedClass mc : mappings.values()){
+						data += mc.getOriginalName() + " -> " + mc.getNewName() + "\n";
+					}
+					org.apache.commons.io.FileUtils.write(new File("fuck.txt"), data);
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}

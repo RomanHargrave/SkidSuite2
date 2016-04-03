@@ -197,53 +197,62 @@ public class MappingGen {
 			}
 		}
 		// Setting up outer/inner class structure
-		boolean outerClassASM = mappedClass.getNode().outerClass != null;
-		boolean outerClassName = mappedClass.getOriginalName().contains("$");
-		String outerClass = null;
-		if (outerClassASM) {
-			outerClass = mappedClass.getNode().outerClass;
-		} else if (outerClassName) {
-			outerClass = mappedClass.getOriginalName().substring(0, mappedClass.getOriginalName().indexOf("$"));
-			if (outerClass.endsWith("/")) {
-				// The name starts with the $ so probably not actually an
-				// outer class. Just obfuscation.
-				outerClass = null;
-			}
-		} else {
-			int synths = 0, synthID = -1;
-			for (int fieldKey : mappedClass.getFieldMap().keySet()) {
-				// Check for synthetic fields
-				FieldNode fn = mappedClass.getFieldMap().get(fieldKey).getFieldNode();
-				if (fn == null) {
-					continue;
+		if (mappedClass.getOuterClass() == null) {
+			boolean outerClassASM = mappedClass.getNode().outerClass != null;
+			boolean outerClassName = mappedClass.getOriginalName().contains("$");
+			String outerClass = null;
+			if (outerClassASM) {
+				outerClass = mappedClass.getNode().outerClass;
+			} else if (outerClassName) {
+				outerClass = mappedClass.getOriginalName().substring(0, mappedClass.getOriginalName().indexOf("$"));
+				if (outerClass.endsWith("/")) {
+					// TODO: Do this better, account for obfuscations that
+					// purposefully put $'s in names
+					// The name starts with the $ so probably not actually an
+					// outer class. Just obfuscation.
+					outerClass = null;
 				}
-				int access = fn.access;
-				if (AccessHelper.isSynthetic(access) && AccessHelper.isFinal(access) && !AccessHelper.isPublic(access) && !AccessHelper.isPrivate(access)
-						&& !AccessHelper.isProtected(access)) {
-					synths++;
-					synthID = fieldKey;
+			} else {
+				int synths = 0, synthID = -1;
+				for (int fieldKey : mappedClass.getFieldMap().keySet()) {
+					// Check for synthetic fields
+					FieldNode fn = mappedClass.getFieldMap().get(fieldKey).getFieldNode();
+					if (fn == null) {
+						continue;
+					}
+					int access = fn.access;
+					if (AccessHelper.isSynthetic(access) && AccessHelper.isFinal(access) && !AccessHelper.isPublic(access) && !AccessHelper.isPrivate(access)
+							&& !AccessHelper.isProtected(access)) {
+						synths++;
+						synthID = fieldKey;
+					}
 				}
-			}
-			if (synths == 1) {
-				// If there is a single synthetic field referencing a class,
-				// it's probably an anonymous inner class.
-				FieldNode fn = mappedClass.getFieldMap().get(synthID).getFieldNode();
-				if (fn != null && fn.desc.contains(";")) {
-					List<String> matches = Regexr.matchDescriptionClasses(fn.desc);
-					if (matches.size() > 0) {
-						outerClass = matches.get(0);
+				if (synths == 1) {
+					// If there is a single synthetic field referencing a class,
+					// it's probably an anonymous inner class.
+					FieldNode fn = mappedClass.getFieldMap().get(synthID).getFieldNode();
+					if (fn != null && fn.desc.contains(";")) {
+						List<String> matches = Regexr.matchDescriptionClasses(fn.desc);
+						if (matches.size() > 0) {
+							outerClass = matches.get(0);
+						}
 					}
 				}
 			}
-		}
-		if (outerClass != null) {
-			MappedClass outer = mappedClasses.get(outerClass);
-			if (outer != null) {
-				outer.addInnerClass(mappedClass);
+			// Adding inner classes
+			if (outerClass != null) {
+				MappedClass outer = mappedClasses.get(outerClass);
+				if (outer != null) {
+					outer.addInnerClass(mappedClass);
+				}
+				mappedClasses = linkMappings(outer, mappedClasses);
 			}
 		}
 		// Adding method overrides
 		for (MappedMember method : mappedClass.getMethods()) {
+			if (method.getOverride() != null){
+				continue;
+			}
 			MappedMember methodOverriden = ParentUtils.findMethodParent(method.getOwner(), method.getOriginalName(), method.getDesc());
 			if (methodOverriden != null) {
 				method.setOverride(methodOverriden);

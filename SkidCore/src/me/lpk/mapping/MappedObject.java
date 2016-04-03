@@ -72,7 +72,7 @@ class MappedObject {
 	 * 
 	 * @param isRenamedOverride
 	 */
-	public void setRenamed(boolean isRenamedOverride) {
+	public void setRenamedOverride(boolean isRenamedOverride) {
 		this.isRenamedOverride = isRenamedOverride;
 	}
 }
