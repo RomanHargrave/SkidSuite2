@@ -5,8 +5,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
 import me.lpk.mapping.MappedClass;
@@ -42,11 +40,10 @@ public class MappingRenamer {
 		if (mc.isInnerClass()) {
 			mappings = remapClass(mc.getOuterClass(), mappings, mode);
 		}
-		if (!mc.isInnerClass()){
-			//Handling naming of normal class
+		if (!mc.isInnerClass()) {
+			// Handling naming of normal class
 			mc.setNewName(mode.getClassName(mc.getNode()));
-		}
-		else {
+		} else {
 			// Handling naming of inner class names
 			if (mc.getOriginalName().contains("$")) {
 				String post = mc.getOriginalName().substring(mc.getOriginalName().indexOf("$") + 1);
@@ -131,8 +128,12 @@ public class MappingRenamer {
 		// TODO: Will need to set this up for a lot of basic methods.
 		// Should let user add additional names to the list
 		// Have the ugly reflection hack optional for lazy retards like myself.
-		Collections.addAll(whitelist, "clone", "apply", "compareTo", "equals", "add", "hashCode", "name", "getName", "ordinal", "toString", "valueOf", "values", "get",
-				"clear", "iterator", "forEach", "read", "put", "size", "run", "hasNext", "compare", "equals", "defineClass", "findClass", "findResource", "getResource",
-				"getResourceAsStream", "indexOf", "replace", "getClass", "finalize", "handle", "actionPerformed", "next");
+		Collections.addAll(whitelist, 
+				"getDefaultPort","getHostAddress","hostsEqual", "openConnection","parseURL", "sameFile", "setURL", "toExternalForm",
+				"load", "save", "close", "closeQuietly", "clone", "copy", "get", "set", "put", "create", "setDelegate", "remove", "fromJson", "toJson", "serialize",
+				"deserialize", "forEach", "iterator", "spliterator", "read", "write", "accept", "getActualTypeArguments", "getRawType", "getOwnerType", "clone", "apply",
+				"compareTo", "equals", "add", "hashCode", "name", "getName", "ordinal", "toString", "valueOf", "values", "get", "clear", "iterator", "forEach", "read",
+				"put", "size", "run", "hasNext", "compare", "equals", "defineClass", "findClass", "findResource", "getResource", "getResourceAsStream", "indexOf",
+				"replace", "getClass", "finalize", "handle", "actionPerformed", "next");
 	}
 }

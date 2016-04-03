@@ -80,30 +80,17 @@ public class ParentUtils {
 	public static MappedMember findMethodParent(MappedClass owner, String name, String desc) {
 		// Check for interfaces in the method's class.
 		for (MappedClass interfaceClass : owner.getInterfacesMap().values()) {
-			for (MappedMember mm : interfaceClass.getMethods()) {
-				if (matches(mm, name, desc)) {
-					return mm;
-				}
+			MappedMember mm = findMethod(interfaceClass, name, desc);
+			if (mm != null) {
+				return mm;
 			}
 		}
-		// No match so far. Check in the parent.
-		owner = owner.getParent();
-		while (owner != null) {
-			// Check interfaces of parent.
-			for (MappedClass interfaceClass : owner.getInterfacesMap().values()) {
-				for (MappedMember mm : interfaceClass.getMethods()) {
-					if (matches(mm, name, desc)) {
-						return mm;
-					}
-				}
+		// Check the parents
+		if (owner.getParent() != null) {
+			MappedMember mm = findMethod(owner.getParent(), name, desc);
+			if (mm != null) {
+				return mm;
 			}
-			// Check members of the parent.
-			for (MappedMember mm : owner.getMethods()) {
-				if (matches(mm, name, desc)) {
-					return mm;
-				}
-			}
-			owner = owner.getParent();
 		}
 		return null;
 	}
@@ -119,38 +106,19 @@ public class ParentUtils {
 	 * @return
 	 */
 	public static MappedMember findFieldInParent(MappedClass owner, String name, String desc) {
-		// Check the class itself
-		for (MappedMember mm : owner.getFields()) {
-			if (matches(mm, name, desc)) {
+		// Check for interfaces in the field's class.
+		for (MappedClass interfaceClass : owner.getInterfacesMap().values()) {
+			MappedMember mm = findField(interfaceClass, name, desc);
+			if (mm != null) {
 				return mm;
 			}
 		}
-		// Check for interfaces in the method's class.
-		for (MappedClass interfaceClass : owner.getInterfacesMap().values()) {
-			for (MappedMember mm : interfaceClass.getFields()) {
-				if (matches(mm, name, desc)) {
-					return mm;
-				}
+		// Check the parents
+		if (owner.getParent() != null) {
+			MappedMember mm = findField(owner.getParent(), name, desc);
+			if (mm != null) {
+				return mm;
 			}
-		}
-		// No match so far. Check in the parent.
-		owner = owner.getParent();
-		while (owner != null) {
-			// Check interfaces of parent.
-			for (MappedClass interfaceClass : owner.getInterfacesMap().values()) {
-				for (MappedMember mm : interfaceClass.getFields()) {
-					if (matches(mm, name, desc)) {
-						return mm;
-					}
-				}
-			}
-			// Check members of the parent.
-			for (MappedMember mm : owner.getFields()) {
-				if (matches(mm, name, desc)) {
-					return mm;
-				}
-			}
-			owner = owner.getParent();
 		}
 		return null;
 	}
@@ -163,6 +131,7 @@ public class ParentUtils {
 	 */
 	public static MappedMember findMethodOverride(MappedMember mm) {
 		if (mm.doesOverride()) {
+			// Overridden method's parent == given method's parent.
 			if (mm.getOverride().getOwner().getOriginalName().equals(mm.getOwner().getOriginalName())) {
 				return mm;
 			}

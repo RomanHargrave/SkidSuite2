@@ -1,6 +1,5 @@
 package me.lpk.mapping;
 
-import java.util.List;
 import java.util.Map;
 
 import org.objectweb.asm.commons.Remapper;
