@@ -128,6 +128,21 @@ public class MappingGen {
 		}
 		return mappedClasses;
 	}
+	
+	/**
+	 * Returns a map of class names to mapped classes given a map of class names
+	 * to ClassNodes. Does not link the classes once the mappings are generated.
+	 * 
+	 * @param nodes
+	 * @return
+	 */
+	public static Map<String, MappedClass> mappingsFromNodesNoLinking(Map<String, ClassNode> nodes) {
+		Map<String, MappedClass> mappedClasses = new HashMap<String, MappedClass>();
+		for (ClassNode node : nodes.values()) {
+			mappedClasses = generateClassMapping(node, nodes, mappedClasses);
+		}
+		return mappedClasses;
+	}
 
 	/**
 	 * Generates mapping for the given node and it's parents / interfaces.
@@ -244,8 +259,8 @@ public class MappingGen {
 				MappedClass outer = mappedClasses.get(outerClass);
 				if (outer != null) {
 					outer.addInnerClass(mappedClass);
+					mappedClasses = linkMappings(outer, mappedClasses);
 				}
-				mappedClasses = linkMappings(outer, mappedClasses);
 			}
 		}
 		// Adding method overrides

@@ -128,12 +128,9 @@ public class MappingRenamer {
 		// TODO: Will need to set this up for a lot of basic methods.
 		// Should let user add additional names to the list
 		// Have the ugly reflection hack optional for lazy retards like myself.
-		Collections.addAll(whitelist, 
-				"getDefaultPort","getHostAddress","hostsEqual", "openConnection","parseURL", "sameFile", "setURL", "toExternalForm",
-				"load", "save", "close", "closeQuietly", "clone", "copy", "get", "set", "put", "create", "setDelegate", "remove", "fromJson", "toJson", "serialize",
-				"deserialize", "forEach", "iterator", "spliterator", "read", "write", "accept", "getActualTypeArguments", "getRawType", "getOwnerType", "clone", "apply",
-				"compareTo", "equals", "add", "hashCode", "name", "getName", "ordinal", "toString", "valueOf", "values", "get", "clear", "iterator", "forEach", "read",
-				"put", "size", "run", "hasNext", "compare", "equals", "defineClass", "findClass", "findResource", "getResource", "getResourceAsStream", "indexOf",
-				"replace", "getClass", "finalize", "handle", "actionPerformed", "next");
+		Collections.addAll(whitelist, "accept", "actionPerformed", "add", "apply", "clear", "clone", "clone", "compare", "compareTo", "copy", "create", "defineClass",
+				"deserialize", "equals", "equals", "finalize", "findClass", "findResource", "forEach", "get", "getClass", "getName", "getResource", "getResourceAsStream",
+				"handle", "hashCode", "hasNext", "indexOf", "iterator", "name", "next", "ordinal", "put", "read", "remove", "replace", "run", "serialize", "set", "size",
+				"spliterator", "toString", "valueOf", "values", "write");
 	}
 }

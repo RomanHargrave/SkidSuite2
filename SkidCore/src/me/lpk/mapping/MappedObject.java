@@ -3,7 +3,7 @@ package me.lpk.mapping;
 class MappedObject {
 	private final String nameOriginal;
 	private String desc, nameNew;
-	private boolean isRenamedOverride;
+	private boolean isRenamedOverride, isLibrary;
 
 	public MappedObject(String desc, String nameOriginal, String nameNew) {
 		this.desc = desc;
@@ -44,6 +44,9 @@ class MappedObject {
 	 * @param nameNew
 	 */
 	public void setNewName(String nameNew) {
+		if (isLibrary){
+			return;
+		}
 		this.nameNew = nameNew;
 	}
 
@@ -64,7 +67,7 @@ class MappedObject {
 	}
 
 	public boolean isTruelyRenamed() {
-		return !nameOriginal.equals(nameNew);
+		return !nameOriginal.equals(nameNew) || isLibrary;
 	}
 
 	/**
@@ -74,5 +77,24 @@ class MappedObject {
 	 */
 	public void setRenamedOverride(boolean isRenamedOverride) {
 		this.isRenamedOverride = isRenamedOverride;
+	}
+	
+	/**
+	 * Returns true if the Mapped object is considered to be a library object.
+	 * Library objects are not to be modified.
+	 * 
+	 * @return
+	 */
+	public boolean isLibrary() {
+		return isLibrary;
+	}
+
+	/**
+	 * Sets isLibrary. See {@link #isLibrary()} for details.
+	 * 
+	 * @param isLibrary
+	 */
+	public void setIsLibrary(boolean isLibrary) {
+		this.isLibrary = isLibrary;
 	}
 }

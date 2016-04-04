@@ -6,9 +6,12 @@ import javax.swing.JFrame;
 import javax.swing.JFileChooser;
 
 import java.awt.BorderLayout;
+
+import org.apache.commons.io.FileUtils;
 import org.objectweb.asm.tree.ClassNode;
 
 import me.lpk.mapping.MappedClass;
+import me.lpk.mapping.MappedMember;
 import me.lpk.mapping.MappingGen;
 import me.lpk.mapping.MappingProcessor;
 import me.lpk.mapping.remap.MappingRenamer;
@@ -26,6 +29,9 @@ import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.awt.event.ActionEvent;
 import javax.swing.JLabel;
@@ -66,7 +72,6 @@ public class WindowObfu {
 		frame = new JFrame();
 		frame.setBounds(100, 100, 787, 529);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
 		JSplitPane splitPaneMain = new JSplitPane();
 		frame.getContentPane().add(splitPaneMain, BorderLayout.CENTER);
 
@@ -118,30 +123,58 @@ public class WindowObfu {
 				if (file == null || !file.exists()) {
 					return;
 				}
+				System.out.println("Starting");
+				Map<String, ClassNode> libNodes = new HashMap<String, ClassNode>();
 				Map<String, ClassNode> nodes = null;
 				try {
+					for (File lib : getLibraries()) {
+						libNodes.putAll(JarUtil.loadClasses(lib));
+					}
+					//
 					nodes = JarUtil.loadClasses(file);
 				} catch (IOException e1) {
 					e1.printStackTrace();
 					return;
 				}
-				Map<String, MappedClass> mappings = MappingGen.mappingsFromNodes(nodes);
+				System.out.println("Loaded nodes");
+				Map<String, MappedClass> libMappings = MappingGen.mappingsFromNodesNoLinking(libNodes);
+				for (MappedClass mc : libMappings.values()) {
+					mc.setIsLibrary(true);
+					for (MappedMember mm : mc.getFields()) {
+						mm.setIsLibrary(true);
+					}
+					for (MappedMember mm : mc.getMethods()) {
+						mm.setIsLibrary(true);
+					}
+				}
+				Map<String, MappedClass> mappings = MappingGen.mappingsFromNodesNoLinking(nodes);
+				System.out.println("Made mappings");
+				mappings.putAll(libMappings);
+				for (MappedClass mc : mappings.values()) {
+					MappingGen.linkMappings(mc, mappings);
+				}
+				System.out.println("Linked mappings");
 				MappingMode mode = modeByRadiobutton();
 				mappings = MappingRenamer.remapClasses(mappings, mode);
+				for (MappedClass mc : mappings.values()) {
+					if (mc.getOriginalName().contains("realms")) {
+						mc.setNewName(mc.getOriginalName());
+					}
+				}
 				mappings.get("net/minecraft/client/main/Main").setNewName("Main");
 				try {
 					Map<String, byte[]> out = JarUtil.loadNonClassEntries(file);
 					out.putAll(MappingProcessor.process(nodes, mappings));
 					JarUtil.saveAsJar(out, file.getName() + "-Obf.jar");
 					String data = "";
-					for (MappedClass mc : mappings.values()){
+					for (MappedClass mc : mappings.values()) {
 						data += mc.getOriginalName() + " -> " + mc.getNewName() + "\n";
 					}
 					org.apache.commons.io.FileUtils.write(new File("fuck.txt"), data);
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
-				
+
 			}
 
 			private MappingMode modeByRadiobutton() {
@@ -167,5 +200,17 @@ public class WindowObfu {
 			chooser.setCurrentDirectory(fileDir);
 		}
 		return chooser;
+	}
+
+	protected List<File> getLibraries() {
+		List<File> files = new ArrayList<File>();
+		files.add(new File(System.getProperty("java.home") + File.separator + "lib" + File.separator + "rt.jar"));
+		//
+		File libDir = new File("libraries");
+		libDir.mkdirs();
+		for (File lib : FileUtils.listFiles(libDir, new String[] {"jar"}, true)) {
+			files.add(lib);
+		}
+		return files;
 	}
 }

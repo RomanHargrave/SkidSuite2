@@ -1,5 +1,9 @@
 package me.lpk.util;
 
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
@@ -141,8 +145,23 @@ public class ParentUtils {
 	}
 
 	public static boolean matches(MappedMember mm, String name, String desc) {
-		if (mm.getOriginalName().equals(name) && mm.getDesc().equals(desc)) {
-			return true;
+		if (mm.getOriginalName().equals(name)) {
+			String o = "java/lang/Object";
+			if (mm.getDesc().equals(desc)) {
+				return true;
+			} else if (mm.getDesc().contains(o) && !desc.contains(o)) {
+				// Generic info is saved in the signature so if there is data in the signature, check for generics.
+				if (mm.getOwner().getNode().signature != null) {
+					List<String> fuck = Regexr.matchDescriptionClasses(desc);
+					String descCopy = desc + "";
+					for (String nigger : fuck) {
+						descCopy = descCopy.replace(nigger, o);
+					}
+					if (mm.getDesc().equals(descCopy)) {
+						return true;
+					}
+				}
+			}
 		}
 		return false;
 	}
