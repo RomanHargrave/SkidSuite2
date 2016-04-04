@@ -40,7 +40,7 @@ public class SkidRemapper extends Remapper {
 		if ("()V".equals(desc)) {
 			return desc;
 		}
-		return super.mapMethodDesc(StringUtil.fixDesc(desc, renamed));
+		return (StringUtil.fixDesc(desc, renamed));
 	}
 
 	@Override

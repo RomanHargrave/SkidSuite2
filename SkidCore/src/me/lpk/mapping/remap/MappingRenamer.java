@@ -23,7 +23,7 @@ public class MappingRenamer {
 	 * @param mode
 	 * @return
 	 */
-	public static Map<String, MappedClass> remapClasses(Map<String, MappedClass> mappings, MappingMode mode) {
+	public static Map<String, MappedClass> remapClasses(Map<String, MappedClass> mappings, MappingMode mode) {	
 		for (MappedClass mc : mappings.values()) {
 			remapClass(mc, mappings, mode);
 		}

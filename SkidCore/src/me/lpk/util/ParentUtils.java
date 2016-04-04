@@ -152,10 +152,10 @@ public class ParentUtils {
 			} else if (mm.getDesc().contains(o) && !desc.contains(o)) {
 				// Generic info is saved in the signature so if there is data in the signature, check for generics.
 				if (mm.getOwner().getNode().signature != null) {
-					List<String> fuck = Regexr.matchDescriptionClasses(desc);
+					List<String> classes = Regexr.matchDescriptionClasses(desc);
 					String descCopy = desc + "";
-					for (String nigger : fuck) {
-						descCopy = descCopy.replace(nigger, o);
+					for (String detection : classes) {
+						descCopy = descCopy.replace(detection, o);
 					}
 					if (mm.getDesc().equals(descCopy)) {
 						return true;
