@@ -78,7 +78,7 @@ public class SearchResultPanel extends JPanel {
 
 	private String getPath() {
 		SearchResultEntry sre = getSelectedSearchEntry();
-		return sre.getTarget() == null ? null : sre.getTarget().name;
+		return sre == null ? null : sre.getTarget() == null ? null : sre.getTarget().name;
 	}
 
 	private SearchResultEntry getSelectedSearchEntry() {

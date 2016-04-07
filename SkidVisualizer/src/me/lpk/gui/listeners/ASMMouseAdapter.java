@@ -4,24 +4,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.FieldNode;
-import org.objectweb.asm.tree.MethodNode;
-
 import me.lpk.MainWindow;
 import me.lpk.gui.component.ASMDecompileSelection;
 import me.lpk.gui.component.SearchResultEntry;
-import me.lpk.mapping.MappedClass;
-import me.lpk.util.Reference;
-import me.lpk.util.ReferenceUtil;
+import me.lpk.util.SearchUtil;
 
 public class ASMMouseAdapter extends MouseAdapter {
 	public void mouseReleased(MouseEvent e) {
@@ -48,7 +40,7 @@ public class ASMMouseAdapter extends MouseAdapter {
 		contextParent.setEnabled(false);
 		context.add(contextType);
 		context.add(contextParent);
-		String outer = getOuter(selection.getNode());
+		String outer = SearchUtil.getOuter(selection.getNode());
 		if (selection.getNode().superName == null) {
 			contextParent.setToolTipText("Could not locate the parent class in the loaded Jar file.");
 		} else if (outer != null) {
@@ -67,7 +59,7 @@ public class ASMMouseAdapter extends MouseAdapter {
 			searchChildren.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					List<SearchResultEntry> results = findChildren(selection.getNode());
+					List<SearchResultEntry> results = SearchUtil.findChildren(selection.getNode());
 					MainWindow.instance.getResultPanel().clearResults();
 					for (SearchResultEntry result : results) {
 						MainWindow.instance.getResultPanel().addResult(result);
@@ -78,7 +70,7 @@ public class ASMMouseAdapter extends MouseAdapter {
 			searchReferences.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					List<SearchResultEntry> results = findReferences(selection.getNode());
+					List<SearchResultEntry> results = SearchUtil.findReferences(selection.getNode());
 					MainWindow.instance.getResultPanel().clearResults();
 					for (SearchResultEntry result : results) {
 						MainWindow.instance.getResultPanel().addResult(result);
@@ -109,7 +101,7 @@ public class ASMMouseAdapter extends MouseAdapter {
 				searchReferences.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						List<SearchResultEntry> results = findReferences(selection.getNode(), selection.getField());
+						List<SearchResultEntry> results = SearchUtil.findReferences(selection.getNode(), selection.getField());
 						MainWindow.instance.getResultPanel().clearResults();
 						for (SearchResultEntry result : results) {
 							MainWindow.instance.getResultPanel().addResult(result);
@@ -124,7 +116,7 @@ public class ASMMouseAdapter extends MouseAdapter {
 				searchReferences.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						List<SearchResultEntry> results = findReferences(selection.getNode(), selection.getMethod());
+						List<SearchResultEntry> results = SearchUtil.findReferences(selection.getNode(), selection.getMethod());
 						MainWindow.instance.getResultPanel().clearResults();
 						for (SearchResultEntry result : results) {
 							MainWindow.instance.getResultPanel().addResult(result);
@@ -138,7 +130,7 @@ public class ASMMouseAdapter extends MouseAdapter {
 			searchContaining.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					List<SearchResultEntry> results = findStringsContaining(selection.getSelection());
+					List<SearchResultEntry> results = SearchUtil.findStringsContaining(selection.getSelection());
 					MainWindow.instance.getResultPanel().clearResults();
 					for (SearchResultEntry result : results) {
 						MainWindow.instance.getResultPanel().addResult(result);
@@ -149,7 +141,7 @@ public class ASMMouseAdapter extends MouseAdapter {
 			searchSimiliar.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					List<SearchResultEntry> results = findStringsSimiliar(selection.getSelection());
+					List<SearchResultEntry> results = SearchUtil.findStringsSimiliar(selection.getSelection());
 					MainWindow.instance.getResultPanel().clearResults();
 					for (SearchResultEntry result : results) {
 						MainWindow.instance.getResultPanel().addResult(result);
@@ -161,90 +153,5 @@ public class ASMMouseAdapter extends MouseAdapter {
 		}
 		JScrollPane scroll = MainWindow.instance.getASMPanel().getTextScroll();
 		context.show(MainWindow.instance.getASMPanel(), e.getX() + scroll.getX(), e.getY() - scroll.getVerticalScrollBar().getValue());
-	}
-
-	private List<SearchResultEntry> findStringsSimiliar(String selection) {
-		List<SearchResultEntry> results = new ArrayList<SearchResultEntry>();
-		return results;
-	}
-
-	private List<SearchResultEntry> findStringsContaining(String selection) {
-		List<SearchResultEntry> results = new ArrayList<SearchResultEntry>();
-		return results;
-	}
-
-	private List<SearchResultEntry> findReferences(ClassNode node, MethodNode method) {
-		List<SearchResultEntry> results = findChildren(node);
-		List<Reference> references = new ArrayList<Reference>();
-		for (ClassNode cn : MainWindow.instance.getNodes().values()) {
-			references.addAll(ReferenceUtil.getReferences(node, method, cn));
-		}
-		for (Reference reference : references) {
-			results.add(new SearchResultEntry(reference.getNode(), reference.getMethod(), getIndex(reference.getAin())));
-		}
-		return results;
-	}
-
-	private List<SearchResultEntry> findReferences(ClassNode node, FieldNode field) {
-		List<SearchResultEntry> results = findChildren(node);
-		List<Reference> references = new ArrayList<Reference>();
-		for (ClassNode cn : MainWindow.instance.getNodes().values()) {
-			references.addAll(ReferenceUtil.getReferences(node, field, cn));
-		}
-		for (Reference reference : references) {
-			results.add(new SearchResultEntry(reference.getNode(), reference.getMethod(), getIndex(reference.getAin())));
-		}
-		return results;
-	}
-
-	private List<SearchResultEntry> findReferences(ClassNode node) {
-		List<SearchResultEntry> results = findChildren(node);
-		List<Reference> references = new ArrayList<Reference>();
-		for (ClassNode cn : MainWindow.instance.getNodes().values()) {
-			references.addAll(ReferenceUtil.getReferences(node, cn));
-		}
-		for (Reference reference : references) {
-			results.add(new SearchResultEntry(reference.getNode(), reference.getMethod(), getIndex(reference.getAin())));
-		}
-		return results;
-	}
-
-	private int getIndex(AbstractInsnNode ain) {
-		int index = 0;
-		while (ain.getPrevious() != null) {
-			ain = ain.getPrevious();
-			index += 1;
-		}
-		return index;
-	}
-
-	private List<SearchResultEntry> findChildren(ClassNode node) {
-		List<SearchResultEntry> results = new ArrayList<SearchResultEntry>();
-		MappedClass parent = fromNode(node);
-		for (MappedClass mc : MainWindow.instance.getMappings().values()) {
-			if (mc.equals(parent)) {
-				continue;
-			}
-			if (mc.hasParent(parent)) {
-				results.add(new SearchResultEntry(mc.getNode()));
-			}
-		}
-		return results;
-	}
-
-	private String getOuter(ClassNode node) {
-		MappedClass mc = fromNode(node);
-		if (mc != null && mc.getOuterClass() != null) {
-			return mc.getOuterClass().getNewName();
-		}
-		return null;
-	}
-
-	private MappedClass fromNode(ClassNode node) {
-		return fromString(node.name);
-	}
-
-	private MappedClass fromString(String owner) {
-		return MainWindow.instance.getMappings().get(owner);
 	}
 }

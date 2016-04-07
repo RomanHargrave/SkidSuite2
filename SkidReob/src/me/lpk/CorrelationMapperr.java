@@ -263,7 +263,13 @@ public class CorrelationMapperr {
 	 * @return
 	 */
 	private static boolean areSimiliar(MappedClass c1, MappedClass c2) {
+		if (c1 == null || c2 == null){
+			return false;
+		}
 		if (c1.hasParent() && !c2.hasParent()) {
+			return false;
+		}
+		if (c1.getNode() == null || c2.getNode() == null){
 			return false;
 		}
 		if (c1.getNode().interfaces.size() != c2.getNode().interfaces.size()) {
@@ -336,6 +342,7 @@ public class CorrelationMapperr {
 	 * @return
 	 */
 	public static String fix(String desc) {
+		List<String> fucks = Regexr.matchDescriptionClasses(desc);
 		while (desc.contains("L")) {
 			int lIndex = desc.indexOf("L");
 			int cIndex = desc.indexOf(";");
