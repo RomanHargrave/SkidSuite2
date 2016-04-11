@@ -119,9 +119,6 @@ public class MethodSimulatorPanel extends JPanel {
 		@SuppressWarnings({ "rawtypes", "unchecked" })
 		InsnAnalyzer analyzer = new InsnAnalyzer(interpreter);
 		try {
-			if (mn.owner == null){
-				System.err.println("FUGGGG");
-			}
 			msp.frames = analyzer.analyze(mn.owner, mn);
 		} catch (AnalyzerException e) {
 			e.printStackTrace();

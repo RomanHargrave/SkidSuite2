@@ -81,7 +81,7 @@ public class MainWindow extends JFrame {
 		add(splitPane, BorderLayout.CENTER);
 		
 		// Hardcoding because fuck doing this on my own every time:
-		asmPanel.openJar(new File("Base.jar"));
+		//asmPanel.openJar(new File("Base.jar"));
 	}
 
 	/**
