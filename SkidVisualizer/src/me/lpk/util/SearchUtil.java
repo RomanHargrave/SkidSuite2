@@ -16,6 +16,12 @@ import me.lpk.util.Reference;
 import me.lpk.util.ReferenceUtil;
 
 public class SearchUtil {
+	/**
+	 * Gets the index of a AbstractInsnNode.
+	 * 
+	 * @param ain
+	 * @return
+	 */
 	public static int getIndex(AbstractInsnNode ain) {
 		int index = 0;
 		while (ain.getPrevious() != null) {
@@ -25,12 +31,24 @@ public class SearchUtil {
 		return index;
 	}
 
+	/**
+	 * Finds strings similiar to the given parameter.
+	 * 
+	 * @param text
+	 * @return
+	 */
 	public static List<SearchResultEntry> findStringsSimiliar(String text) {
 		List<SearchResultEntry> results = findStringsContaining(text);
-				//new ArrayList<SearchResultEntry>();
+		// new ArrayList<SearchResultEntry>();
 		return results;
 	}
 
+	/**
+	 * Finds strings in methods containing the given text.
+	 * 
+	 * @param text
+	 * @return
+	 */
 	public static List<SearchResultEntry> findStringsContaining(String text) {
 		List<SearchResultEntry> results = new ArrayList<SearchResultEntry>();
 		for (ClassNode cn : MainWindow.instance.getNodes().values()) {
@@ -47,6 +65,13 @@ public class SearchUtil {
 		return results;
 	}
 
+	/**
+	 * Finds references to the given MethodNode.
+	 * 
+	 * @param node
+	 * @param method
+	 * @return
+	 */
 	public static List<SearchResultEntry> findReferences(ClassNode node, MethodNode method) {
 		List<SearchResultEntry> results = findChildren(node);
 		List<Reference> references = new ArrayList<Reference>();
@@ -59,6 +84,13 @@ public class SearchUtil {
 		return results;
 	}
 
+	/**
+	 * Finds references to the given FieldNode.
+	 * 
+	 * @param node
+	 * @param field
+	 * @return
+	 */
 	public static List<SearchResultEntry> findReferences(ClassNode node, FieldNode field) {
 		List<SearchResultEntry> results = findChildren(node);
 		List<Reference> references = new ArrayList<Reference>();
@@ -71,6 +103,12 @@ public class SearchUtil {
 		return results;
 	}
 
+	/**
+	 * Finds references to the given ClassNode.
+	 * 
+	 * @param node
+	 * @return
+	 */
 	public static List<SearchResultEntry> findReferences(ClassNode node) {
 		List<SearchResultEntry> results = findChildren(node);
 		List<Reference> references = new ArrayList<Reference>();
@@ -83,6 +121,12 @@ public class SearchUtil {
 		return results;
 	}
 
+	/**
+	 * Finds children of the given ClassNode.
+	 * 
+	 * @param node
+	 * @return
+	 */
 	public static List<SearchResultEntry> findChildren(ClassNode node) {
 		List<SearchResultEntry> results = new ArrayList<SearchResultEntry>();
 		MappedClass parent = fromNode(node);
@@ -97,6 +141,12 @@ public class SearchUtil {
 		return results;
 	}
 
+	/**
+	 * Finds methods by the given name or description.
+	 * 
+	 * @param text
+	 * @return
+	 */
 	public static List<SearchResultEntry> findMethods(String text) {
 		List<SearchResultEntry> results = new ArrayList<SearchResultEntry>();
 		for (MappedClass mc : MainWindow.instance.getMappings().values()) {
@@ -114,6 +164,12 @@ public class SearchUtil {
 		return results;
 	}
 
+	/**
+	 * Finds fields by the given name or description.
+	 * 
+	 * @param text
+	 * @return
+	 */
 	public static List<SearchResultEntry> findFields(String text) {
 		List<SearchResultEntry> results = new ArrayList<SearchResultEntry>();
 		for (MappedClass mc : MainWindow.instance.getMappings().values()) {

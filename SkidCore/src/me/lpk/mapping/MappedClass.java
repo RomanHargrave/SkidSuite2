@@ -31,7 +31,13 @@ public class MappedClass extends MappedObject {
 	private final Map<Integer, MappedClass> interfaces = new HashMap<Integer, MappedClass>();
 	//
 	private int fieldIndex, methodIndex, interfaceIndex;
+	/**
+	 * The ClassNode associated with the current MappedClass.
+	 */
 	private final ClassNode node;
+	/**
+	 * Inheritance and access classes.
+	 */
 	private MappedClass parent, outer;
 
 	public MappedClass(ClassNode node, String nameNew) {
@@ -39,18 +45,40 @@ public class MappedClass extends MappedObject {
 		this.node = node;
 	}
 
+	/**
+	 * Returns a map of field mappings. Keys are based on the index they appear
+	 * in the class.
+	 * 
+	 * @return
+	 */
 	public Map<Integer, MappedMember> getFieldMap() {
 		return fieldMap;
 	}
 
+	/**
+	 * Returns a map of method mappings. Keys are based on the index they appear
+	 * in the class.
+	 * 
+	 * @return
+	 */
 	public Map<Integer, MappedMember> getMethodMap() {
 		return methodMap;
 	}
 
+	/**
+	 * Returns a collection of fields in the MappedClass.
+	 * 
+	 * @return
+	 */
 	public Collection<MappedMember> getFields() {
 		return fieldMap.values();
 	}
 
+	/**
+	 * Returns a collection of methods in the MappedClass.
+	 * 
+	 * @return
+	 */
 	public Collection<MappedMember> getMethods() {
 		return methodMap.values();
 	}
@@ -104,7 +132,7 @@ public class MappedClass extends MappedObject {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Finds a field given a name and description.
 	 * 
@@ -197,6 +225,7 @@ public class MappedClass extends MappedObject {
 
 	/**
 	 * Adds an interface to the class.
+	 * 
 	 * @param interfaze
 	 */
 	private void addInterface(MappedClass interfaze) {
@@ -274,7 +303,12 @@ public class MappedClass extends MappedObject {
 	public Map<String, MappedClass> getChildrenMap() {
 		return children;
 	}
-	
+
+	/**
+	 * Returns the map of interfaces the class has.
+	 * 
+	 * @return
+	 */
 	public Map<Integer, MappedClass> getInterfacesMap() {
 		return interfaces;
 	}
@@ -351,16 +385,22 @@ public class MappedClass extends MappedObject {
 		return parent != null;
 	}
 
+	/**
+	 * Checks if a given parent is a parent of the current MappedClass.
+	 * 
+	 * @param parent
+	 * @return
+	 */
 	public boolean hasParent(MappedClass parent) {
-		if (parent.equals(this)){
+		if (parent.equals(this)) {
 			return true;
 		}
-		for (MappedClass interfaze : interfaces.values()){
-			if (interfaze.equals(parent)){
+		for (MappedClass interfaze : interfaces.values()) {
+			if (interfaze.equals(parent)) {
 				return true;
 			}
 		}
-		if (hasParent()){
+		if (hasParent()) {
 			return this.parent.hasParent(parent);
 		}
 		return false;

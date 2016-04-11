@@ -4,9 +4,21 @@ import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.MethodNode;
 
 public class MappedMember extends MappedObject {
+	/**
+	 * The member's owner.
+	 */
 	private final MappedClass owner;
+	/**
+	 * The FieldNode or MethodNode of the current MappedMember.
+	 */
 	private final Object memberNode;
+	/**
+	 * The index in the owner that the current member appears in.
+	 */
 	private final int index;
+	/**
+	 * The MappedMember (Method) which this member overrides.
+	 */
 	private MappedMember override;
 
 	public MappedMember(MappedClass owner, Object memberNode, int index, String desc, String nameOriginal) {

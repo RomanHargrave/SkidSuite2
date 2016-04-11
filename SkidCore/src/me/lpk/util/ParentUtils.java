@@ -142,13 +142,24 @@ public class ParentUtils {
 		return mm;
 	}
 
+	/**
+	 * For some reason MappedMember.findNameAndDescWhatever(name,desc) doesn't
+	 * exactly work. This is an external implemtation which does the same thing
+	 * but somehow works.
+	 * 
+	 * @param mm
+	 * @param name
+	 * @param desc
+	 * @return
+	 */
 	public static boolean matches(MappedMember mm, String name, String desc) {
 		if (mm.getOriginalName().equals(name)) {
 			String o = "java/lang/Object";
 			if (mm.getDesc().equals(desc)) {
 				return true;
 			} else if (mm.getDesc().contains(o) && !desc.contains(o)) {
-				// Generic info is saved in the signature so if there is data in the signature, check for generics.
+				// Generic info is saved in the signature so if there is data in
+				// the signature, check for generics.
 				if (mm.getOwner().getNode().signature != null) {
 					List<String> classes = Regexr.matchDescriptionClasses(desc);
 					String descCopy = desc + "";
@@ -164,6 +175,15 @@ public class ParentUtils {
 		return false;
 	}
 
+	/**
+	 * Checks if two mapped members are the same.
+	 * 
+	 * @param mm
+	 * @param mm2
+	 * @param orig
+	 *            Whether to check original names or the updated names.
+	 * @return
+	 */
 	public static boolean matches(MappedMember mm, MappedMember mm2, boolean orig) {
 		return matches(mm, orig ? mm2.getOriginalName() : mm2.getNewName(), mm2.getDesc());
 	}

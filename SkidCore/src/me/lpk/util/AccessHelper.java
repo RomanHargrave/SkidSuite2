@@ -3,7 +3,7 @@ package me.lpk.util;
 import static org.objectweb.asm.Opcodes.*;
 
 /**
- * @author audrey
+ * @author Audrey
  * @since 4/30/15
  */
 public class AccessHelper {
@@ -323,8 +323,8 @@ public class AccessHelper {
 	 * @return True if the field is generic, false otherwise
 	 */
 	public static boolean isFieldGeneric(String desc, String signature) {
-		return signature != null && desc != null && signature.startsWith("T") && signature.endsWith(";")
-				&& Character.isUpperCase(signature.charAt(1)) && desc.contains("java/lang/Object");
+		return signature != null && desc != null && signature.startsWith("T") && signature.endsWith(";") && Character.isUpperCase(signature.charAt(1))
+				&& desc.contains("java/lang/Object");
 
 	}
 }

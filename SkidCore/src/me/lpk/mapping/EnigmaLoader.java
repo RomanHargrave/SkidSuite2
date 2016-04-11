@@ -12,10 +12,23 @@ import org.objectweb.asm.tree.MethodNode;
 class EnigmaLoader {
 	private final Map<String, ClassNode> nodes;
 
+	/**
+	 * Instantiates the loader with a map of classnodes to be mapped.
+	 * 
+	 * @param nodes
+	 */
 	public EnigmaLoader(Map<String, ClassNode> nodes) {
 		this.nodes = nodes;
 	}
 
+	/**
+	 * Returns a map of MappedClasses based on the nodes given in the
+	 * constructor and the mapping file read through the parameter.
+	 * 
+	 * @param in
+	 *            FileReader of the Enigma mappings file
+	 * @return
+	 */
 	public Map<String, MappedClass> read(FileReader in) {
 		try {
 			return read(new BufferedReader(in));
@@ -25,6 +38,13 @@ class EnigmaLoader {
 		return null;
 	}
 
+	/**
+	 * Reads each line in a reader and parses mappings from the Enigma format.
+	 * 
+	 * @param fileReader
+	 * @return
+	 * @throws Exception
+	 */
 	public Map<String, MappedClass> read(BufferedReader fileReader) throws Exception {
 		Map<String, MappedClass> remap = new HashMap<String, MappedClass>();
 		int lineNumber = 0;
@@ -167,24 +187,40 @@ class EnigmaLoader {
 		clazz.addMethod(mm);
 	}
 
+	/**
+	 * Finds a field of a given name and description in a ClassNode.
+	 * 
+	 * @param cn
+	 * @param name
+	 * @param desc
+	 * @return
+	 */
 	private FieldNode findField(ClassNode cn, String name, String desc) {
 		if (cn == null) {
 			return null;
 		}
-		for (FieldNode fn : cn.fields){
-			if (fn.desc.equals(desc) && fn.name.equals(name)){
+		for (FieldNode fn : cn.fields) {
+			if (fn.desc.equals(desc) && fn.name.equals(name)) {
 				return fn;
 			}
 		}
 		return null;
 	}
 
+	/**
+	 * Finds a method of a given name and description in a ClassNode.
+	 * 
+	 * @param cn
+	 * @param name
+	 * @param desc
+	 * @return
+	 */
 	private MethodNode findMethod(ClassNode cn, String name, String desc) {
 		if (cn == null) {
 			return null;
 		}
-		for (MethodNode mn : cn.methods){
-			if (mn.desc.equals(desc) && mn.name.equals(name)){
+		for (MethodNode mn : cn.methods) {
+			if (mn.desc.equals(desc) && mn.name.equals(name)) {
 				return mn;
 			}
 		}

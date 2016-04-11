@@ -23,14 +23,23 @@ public class MappingRenamer {
 	 * @param mode
 	 * @return
 	 */
-	public static Map<String, MappedClass> remapClasses(Map<String, MappedClass> mappings, MappingMode mode) {	
+	public static Map<String, MappedClass> remapClasses(Map<String, MappedClass> mappings, MappingMode mode) {
 		for (MappedClass mc : mappings.values()) {
 			remapClass(mc, mappings, mode);
 		}
 		return mappings;
 	}
 
-	private static Map<String, MappedClass> remapClass(MappedClass mc, Map<String, MappedClass> mappings, MappingMode mode) {
+	/**
+	 * Updates a given class in the given mappings with names based on the given
+	 * MappingMode.
+	 * 
+	 * @param mc
+	 * @param mappings
+	 * @param mode
+	 * @return
+	 */
+	public static Map<String, MappedClass> remapClass(MappedClass mc, Map<String, MappedClass> mappings, MappingMode mode) {
 		if (mc.hasParent()) {
 			mappings = remapClass(mc.getParent(), mappings, mode);
 		}
@@ -92,10 +101,23 @@ public class MappingRenamer {
 		return mappings;
 	}
 
+	/**
+	 * Updates strings when they are used in situations such as Class.forName /
+	 * Reflection.
+	 * 
+	 * @param mn
+	 * @param mappings
+	 */
 	private static void updateStrings(MethodNode mn, Map<String, MappedClass> mappings) {
 		// TODO: Check for Class.forName(String)
 	}
 
+	/**
+	 * Checks if a given MappedMember should not be renamed.
+	 * 
+	 * @param mm
+	 * @return
+	 */
 	public static boolean keepName(MappedMember mm) {
 		// Main class
 		if (mm.getDesc().equals("([Ljava/lang/String;)V") && mm.getOriginalName().equals("main")) {
@@ -124,10 +146,8 @@ public class MappingRenamer {
 	}
 
 	static {
-		// TODO: Can I just fix the program so this isn't even needed?
-		// TODO: Will need to set this up for a lot of basic methods.
 		// Should let user add additional names to the list
-		// Have the ugly reflection hack optional for lazy retards like myself.
+		// I guess classes like Enum don't have this as parent methods per say, so this will be necessary.
 		Collections.addAll(whitelist, "accept", "actionPerformed", "add", "apply", "clear", "clone", "clone", "compare", "compareTo", "copy", "create", "defineClass",
 				"deserialize", "equals", "equals", "finalize", "findClass", "findResource", "forEach", "get", "getClass", "getName", "getResource", "getResourceAsStream",
 				"handle", "hashCode", "hasNext", "indexOf", "iterator", "name", "next", "ordinal", "put", "read", "remove", "replace", "run", "serialize", "set", "size",

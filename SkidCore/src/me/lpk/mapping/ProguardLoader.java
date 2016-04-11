@@ -33,10 +33,23 @@ class ProguardLoader {
 		};
 	}
 
+	/**
+	 * Instantiates the loader with a map of classnodes to be mapped.
+	 * 
+	 * @param nodes
+	 */
 	public ProguardLoader(Map<String, ClassNode> nodes) {
 		this.nodes = nodes;
 	}
 
+	/**
+	 * Returns a map of MappedClasses based on the nodes given in the
+	 * constructor and the mapping file read through the parameter.
+	 * 
+	 * @param in
+	 *            FileReader of the Proguard mappings file
+	 * @return
+	 */
 	public Map<String, MappedClass> read(FileReader in) {
 		try {
 			return read(new BufferedReader(in));
@@ -46,6 +59,13 @@ class ProguardLoader {
 		return null;
 	}
 
+	/**
+	 * Reads each line in a reader and parses mappings from the Proguard format.
+	 * 
+	 * @param fileReader
+	 * @return
+	 * @throws Exception
+	 */
 	public Map<String, MappedClass> read(BufferedReader fileReader) throws Exception {
 		Map<String, MappedClass> origNameMap = new HashMap<String, MappedClass>();
 		Map<String, MappedClass> newNameMap = new HashMap<String, MappedClass>();
@@ -97,8 +117,8 @@ class ProguardLoader {
 		return origNameMap;
 	}
 
-	private boolean isMethod(String trim) {
-		return trim.contains("(");
+	private boolean isMethod(String text) {
+		return text.contains("(");
 	}
 
 	/**
@@ -148,6 +168,14 @@ class ProguardLoader {
 		clazz.addMethod(mm);
 	}
 
+	/**
+	 * Painfully creates a proper ASM description (for a method) given a return
+	 * type and parameters.
+	 * 
+	 * @param type
+	 * @param parameters
+	 * @return
+	 */
 	private String fixDesc(String type, String parameters) {
 		// type : parameters
 		// void : (java.lang.Iterable,java.lang.Iterable,java.util.Map)
@@ -199,6 +227,12 @@ class ProguardLoader {
 		return strParamsDesc + strReturnDesc;
 	}
 
+	/**
+	 * Creates a proper ASM description given a type.
+	 * 
+	 * @param type
+	 * @return
+	 */
 	private String fixDesc(String type) {
 		// net.minecraft.util.IntHashMap$Entry[]
 		String returnDesc = null, typeNoArr = type.replace("[]", "");
@@ -215,6 +249,12 @@ class ProguardLoader {
 		return getArrStr(type) + returnDesc;
 	}
 
+	/**
+	 * Returns a string that signifies array depth in the proper ASM format.
+	 * 
+	 * @param param
+	 * @return
+	 */
 	private String getArrStr(String param) {
 		String arrayPrefix = "";
 		if (param.contains("[]")) {

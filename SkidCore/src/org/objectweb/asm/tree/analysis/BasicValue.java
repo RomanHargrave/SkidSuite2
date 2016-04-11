@@ -99,11 +99,11 @@ public class BasicValue implements Value {
     @Override
     public String toString() {
         if (this == UNINITIALIZED_VALUE) {
-            return "Uninitialized Null";
+            return ".";
         } else if (this == RETURNADDRESS_VALUE) {
-            return "Return Address";
+            return "R";
         } else if (this == REFERENCE_VALUE) {
-            return "Misc. Ref Value";
+            return "V";
         } else {
             return type.getDescriptor();
         }

@@ -16,7 +16,7 @@ import javax.swing.JTextField;
 import org.objectweb.asm.tree.ClassNode;
 import me.lpk.gui.component.ASMDecompilePanel;
 import me.lpk.gui.component.SearchResultPanel;
-import me.lpk.gui.listeners.ASMMouseAdapter;
+import me.lpk.gui.listeners.ContextMenuAdapter;
 import me.lpk.gui.listeners.SearchKeyListener;
 import me.lpk.mapping.MappedClass;
 import me.lpk.mapping.MappingGen;
@@ -69,7 +69,7 @@ public class MainWindow extends JFrame {
 		menuBar.add(txtMenuSearch);
 		menuBar.add(searchType);
 		asmPanel.setJarListener(new JarLoadListener());
-		asmPanel.setMouseListener(new ASMMouseAdapter());
+		asmPanel.setMouseListener(new ContextMenuAdapter());
 		searchResults.setup();
 
 		// asmPanel // searchResults

@@ -16,7 +16,7 @@ import me.lpk.gui.component.MethodSimulatorPanel;
 import me.lpk.gui.component.SearchResultEntry;
 import me.lpk.util.SearchUtil;
 
-public class ASMMouseAdapter extends MouseAdapter {
+public class ContextMenuAdapter extends MouseAdapter {
 	public void mouseReleased(MouseEvent e) {
 		if (e.getButton() == MouseEvent.BUTTON1) {
 			return;

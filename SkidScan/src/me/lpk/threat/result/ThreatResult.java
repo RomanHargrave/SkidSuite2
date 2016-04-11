@@ -16,6 +16,15 @@ public class ThreatResult {
 		this.location = location;
 	}
 
+	/**
+	 * Creates a ThreatResult given data from a method.
+	 * 
+	 * @param type
+	 * @param desc
+	 * @param mn
+	 * @param detections
+	 * @return
+	 */
 	public static ThreatResult fromMethod(String type, String desc, MethodNode mn, List<String> detections) {
 		String detectionStr = "";
 		for (String detection : detections) {

@@ -11,6 +11,14 @@ import org.objectweb.asm.tree.ClassNode;
 public class MappingProcessor {
 	public static boolean PRINT;
 
+	/**
+	 * Given a map of ClassNodes generates a map of bytes with changes according
+	 * to the given map of MappedClasses.
+	 * 
+	 * @param nodes
+	 * @param mappings
+	 * @return
+	 */
 	public static Map<String, byte[]> process(Map<String, ClassNode> nodes, Map<String, MappedClass> mappings) {
 		Map<String, byte[]> out = new HashMap<String, byte[]>();
 		int workIndex = 1;

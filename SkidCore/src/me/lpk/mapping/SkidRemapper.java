@@ -7,6 +7,16 @@ import org.objectweb.asm.commons.Remapper;
 import me.lpk.util.ParentUtils;
 import me.lpk.util.StringUtil;
 
+/**
+ * An implementation of ASM's Remapper. Given a map of MappedClasses in the
+ * constructor updates the modified values in descriptions and names.
+ * 
+ * <ul>
+ * <li>{@link #map(String)} - map type</li>
+ * <li>{@link #mapFieldName(String, String, String)} - map field name</li>
+ * <li>{@link #mapMethodName(String, String, String)} - map method name</li>
+ * </ul>
+ */
 public class SkidRemapper extends Remapper {
 	private final Map<String, MappedClass> renamed;
 
