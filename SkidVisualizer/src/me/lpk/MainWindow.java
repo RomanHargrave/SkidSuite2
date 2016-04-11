@@ -4,11 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.jar.JarFile;
-
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -17,7 +14,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 
 import org.objectweb.asm.tree.ClassNode;
-
 import me.lpk.gui.component.ASMDecompilePanel;
 import me.lpk.gui.component.SearchResultPanel;
 import me.lpk.gui.listeners.ASMMouseAdapter;
@@ -40,8 +36,6 @@ public class MainWindow extends JFrame {
 
 	public static void main(String[] args) {
 		new MainWindow().setVisible(true);
-		// TODO: Method simulation using: asm Analyzer, Frame, BasicInterpreter,
-		// BasicValue
 	}
 
 	public MainWindow() {
@@ -87,11 +81,7 @@ public class MainWindow extends JFrame {
 		add(splitPane, BorderLayout.CENTER);
 		
 		// Hardcoding because fuck doing this on my own every time:
-		try {
-			asmPanel.openJar(new JarFile(new File("Base.jar")));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		asmPanel.openJar(new File("Base.jar"));
 	}
 
 	/**

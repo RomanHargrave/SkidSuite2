@@ -461,6 +461,14 @@ public class OpUtil implements org.objectweb.asm.Opcodes {
 	 */
 	public static int getIntValue(AbstractInsnNode ain) {
 		int p = ain.getOpcode();
+		if (p >= Opcodes.ICONST_M1 && p <= Opcodes.ICONST_5) {
+			return getIntValue(p);
+		} else {
+			return ((IntInsnNode) ain).operand;
+		}
+	}
+
+	public static int getIntValue(int p) {
 		if (p == Opcodes.ICONST_0) {
 			return 0;
 		} else if (p == Opcodes.ICONST_1) {
@@ -473,10 +481,8 @@ public class OpUtil implements org.objectweb.asm.Opcodes {
 			return 4;
 		} else if (p == Opcodes.ICONST_5) {
 			return 5;
-		} else if (p == Opcodes.ICONST_M1) {
-			return -1;
 		} else {
-			return ((IntInsnNode) ain).operand;
+			return -1;
 		}
 	}
 }

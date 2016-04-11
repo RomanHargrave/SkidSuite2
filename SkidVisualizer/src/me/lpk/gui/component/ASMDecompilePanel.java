@@ -13,22 +13,17 @@ import java.awt.event.MouseListener;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
-
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -52,6 +47,7 @@ import me.lpk.MainWindow;
 import me.lpk.mapping.MappedClass;
 import me.lpk.mapping.MappedMember;
 import me.lpk.util.ASMUtil;
+import me.lpk.util.JarUtil;
 import me.lpk.util.OpUtil;
 import me.lpk.util.ParentUtils;
 import me.lpk.util.StringUtil;
@@ -100,7 +96,7 @@ public class ASMDecompilePanel extends JPanel {
 						while (iterator.hasNext()) {
 							final File file;
 							if ((file = iterator.next()).getName().endsWith("jar")) {
-								openJar(new JarFile(new File(file.getAbsolutePath())));
+								openJar(new File(file.getAbsolutePath()));
 							}
 						}
 					} catch (Exception ex) {
@@ -126,41 +122,35 @@ public class ASMDecompilePanel extends JPanel {
 	 * 
 	 * @param file
 	 */
-	public void openJar(JarFile file) {
+	public void openJar(File file) {
 		// Skidded from JByteEdit
 		// <3 you Quux
-		final ArrayList<JarEntry> entries = Collections.list(file.entries());
-		final Iterator<JarEntry> iterator = (Iterator<JarEntry>) entries.iterator();
+		// final ArrayList<JarEntry> entries = Collections.list(file.entries());
+		// final Iterator<JarEntry> iterator = (Iterator<JarEntry>)
+		// entries.iterator();
 		final StringTreeNode root = new StringTreeNode(file.getName(), "");
-		while (iterator.hasNext()) {
-			final JarEntry entry = iterator.next();
-			if (entry.getName().endsWith(".class")) {
-				final ClassNode classNode = new ClassNode();
-				final InputStream input;
-				try {
-					input = file.getInputStream(entry);
-					new ClassReader(input).accept(classNode, 0);
-					input.close();
-				} catch (IOException e) {
-					e.printStackTrace();
+		try {
+			nodes = JarUtil.loadClasses(file);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		if (nodes == null) {
+			return;
+		}
+		for (ClassNode classNode : nodes.values()) {
+			final ArrayList<String> dirPath = new ArrayList<String>(Arrays.asList(classNode.name.split("/")));
+			StringTreeNode parent = root;
+			while (dirPath.size() > 0) {
+				final String section = dirPath.get(0);
+				StringTreeNode node;
+				if ((node = parent.getChild(section)) == null) {
+					final StringTreeNode newDir = new StringTreeNode(section, classNode.name);
+					parent.addChild(section, newDir);
+					parent.add(newDir);
+					node = newDir;
 				}
-				if (classNode != null) {
-					nodes.put(classNode.name, classNode);
-				}
-				final ArrayList<String> dirPath = new ArrayList<String>(Arrays.asList(entry.getName().split("/")));
-				StringTreeNode parent = root;
-				while (dirPath.size() > 0) {
-					final String section = dirPath.get(0);
-					StringTreeNode node;
-					if ((node = parent.getChild(section)) == null) {
-						final StringTreeNode newDir = new StringTreeNode(section, entry.getName().substring(0, entry.getName().length() - 6));
-						parent.addChild(section, newDir);
-						parent.add(newDir);
-						node = newDir;
-					}
-					parent = node;
-					dirPath.remove(0);
-				}
+				parent = node;
+				dirPath.remove(0);
 			}
 		}
 		tree = new JTree(root);
@@ -169,16 +159,14 @@ public class ASMDecompilePanel extends JPanel {
 			public void mouseClicked(MouseEvent e) {
 				if (tree.getSelectionPath() != null) {
 					String path = tree.getSelectionPath().toString();
-					if (!path.contains(".class")) {
-						return;
-					}
 					path = path.substring(1, path.length() - 1);
 					while (path.contains(", ")) {
 						path = path.replace(", ", "/");
 					}
 					path = path.substring(path.indexOf("/") + 1);
-					path = path.substring(0, path.length() - 6);
-					decompile(path);
+					if (nodes.containsKey(path)) {
+						decompile(path);
+					}
 				}
 			}
 
@@ -343,8 +331,7 @@ public class ASMDecompilePanel extends JPanel {
 						forwards = false;
 						ix = 0;
 					}
-				}
-				else{
+				} else {
 					String next = txtEdit.getText(start - ix, 1);
 					if (next.equals(" ")) {
 						break;
@@ -373,9 +360,9 @@ public class ASMDecompilePanel extends JPanel {
 		if (tmp.contains(" class ") || tmp.contains(" interface ") || containsExact || containsTemp) {
 			if (containsTemp) {
 				return new ASMDecompileSelection(ASMDecompileSelection.SelectionType.Class, text, nodes.get(tmp2));
-			} else if (containsExact){
+			} else if (containsExact) {
 				return new ASMDecompileSelection(ASMDecompileSelection.SelectionType.Class, text, nodes.get(text));
-			}else {
+			} else {
 				return new ASMDecompileSelection(ASMDecompileSelection.SelectionType.Class, text, currNode);
 			}
 		}

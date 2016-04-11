@@ -12,6 +12,7 @@ import javax.swing.JScrollPane;
 
 import me.lpk.MainWindow;
 import me.lpk.gui.component.ASMDecompileSelection;
+import me.lpk.gui.component.MethodSimulatorPanel;
 import me.lpk.gui.component.SearchResultEntry;
 import me.lpk.util.SearchUtil;
 
@@ -32,9 +33,9 @@ public class ASMMouseAdapter extends MouseAdapter {
 			context.show(MainWindow.instance.getASMPanel(), e.getX() + scroll.getX(), e.getY() - scroll.getVerticalScrollBar().getValue());
 			return;
 		}
-		String hitler = selection.isClass() ? selection.getNode().name
+		String typeData = selection.isClass() ? selection.getNode().name
 				: selection.isField() ? selection.getField().name : selection.isMethod() ? selection.getMethod().name : selection.getType().name();
-		JMenuItem contextType = new JMenuItem("Selected Type[" + selection.getType().name() + "]: " + hitler);
+		JMenuItem contextType = new JMenuItem("Selected Type[" + selection.getType().name() + "]: " + typeData);
 		JMenuItem contextParent = new JMenuItem("Parent: " + (selection.getNode().superName == null ? "null" : selection.getNode().superName));
 		contextType.setEnabled(false);
 		contextParent.setEnabled(false);
@@ -123,7 +124,15 @@ public class ASMMouseAdapter extends MouseAdapter {
 						}
 					}
 				});
+				JMenuItem analyzeStack = new JMenuItem("Analyze stack of " + selection.getMethod().name);
+				analyzeStack.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						MethodSimulatorPanel.load(selection.getMethod());
+					}
+				});
 				context.add(searchReferences);
+				context.add(analyzeStack);
 			}
 		} else if (selection.isString()) {
 			JMenuItem searchContaining = new JMenuItem("Search strings with '" + selection.getSelection() + "'");

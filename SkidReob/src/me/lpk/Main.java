@@ -8,7 +8,31 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
+import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.FieldInsnNode;
+import org.objectweb.asm.tree.IincInsnNode;
+import org.objectweb.asm.tree.InsnNode;
+import org.objectweb.asm.tree.IntInsnNode;
+import org.objectweb.asm.tree.InvokeDynamicInsnNode;
+import org.objectweb.asm.tree.JumpInsnNode;
+import org.objectweb.asm.tree.LabelNode;
+import org.objectweb.asm.tree.LdcInsnNode;
+import org.objectweb.asm.tree.LookupSwitchInsnNode;
+import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.MultiANewArrayInsnNode;
+import org.objectweb.asm.tree.TableSwitchInsnNode;
+import org.objectweb.asm.tree.TypeInsnNode;
+import org.objectweb.asm.tree.VarInsnNode;
+import org.objectweb.asm.tree.analysis.Analyzer;
+import org.objectweb.asm.tree.analysis.AnalyzerException;
+import org.objectweb.asm.tree.analysis.BasicInterpreter;
+import org.objectweb.asm.tree.analysis.BasicValue;
+import org.objectweb.asm.tree.analysis.Frame;
+import org.objectweb.asm.tree.analysis.Interpreter;
 
 import me.lpk.gui.windows.mapping.WindowProguard;
 import me.lpk.mapping.MappedClass;
@@ -17,14 +41,13 @@ import me.lpk.mapping.MappingProcessor;
 import me.lpk.mapping.remap.impl.ModeNone;
 import me.lpk.mapping.remap.impl.ModeSimple;
 import me.lpk.util.JarUtil;
+import me.lpk.util.OpUtil;
 import me.lpk.util.Timer;
 
 public class Main {
 	public static void main(String[] args) {
-		old();
-		// WindowProguard.showWindow();
+		WindowProguard.showWindow();
 	}
-
 	public static void old() {
 		Timer t = new Timer();
 		// Loading
@@ -80,9 +103,9 @@ public class Main {
 			private static final long serialVersionUID = 1L;
 
 			{
-				put("Class62903",  "me/lpk/client/MCHook");
+				put("Class62903", "me/lpk/client/MCHook");
 				put("Class106053", "net/minecraft/client/resources/FallbackResourceManager");
-				put("Class99954",  "net/minecraft/util/Timer");
+				put("Class99954", "net/minecraft/util/Timer");
 				put("Class107370", "net/minecraft/client/gui/GuiVideoSettings");
 				put("Class108049", "net/minecraft/client/gui/GuiMultiplayer");
 				put("Class103732", "net/minecraft/client/gui/GuiCreateWorld");
@@ -110,7 +133,7 @@ public class Main {
 				put("Class39305", "org/darkstorm/minecraft/gui/component/basic/BasicRadioButton");
 				put("Class39894", "org/darkstorm/minecraft/gui/layout/GridLayoutManager");
 				put("Class135574", "me/lpk/client/management/AbstractManager");
-				put("Class43982",  "me/lpk/client/event/RegisterEvent");
+				put("Class43982", "me/lpk/client/event/RegisterEvent");
 				put("Class104981", "me/lpk/client/gui/screen/impl/GuiClientInit");
 				put("Class104968", "me/lpk/client/gui/screen/impl/GuiAccountList");
 				put("Class105623", "me/lpk/client/module/ModuleManager");
