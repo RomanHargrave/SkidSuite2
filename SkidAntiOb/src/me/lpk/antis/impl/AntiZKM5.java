@@ -15,12 +15,17 @@ import org.objectweb.asm.tree.MethodNode;
 import me.lpk.antis.AntiBase;
 import me.lpk.util.OpUtil;
 
-public class ZKMOld extends AntiBase {
+public class AntiZKM5 extends AntiBase {
 	private final Map<Integer, String> strings = new HashMap<Integer, String>();
 	private final Map<Integer, Integer> modifiers = new HashMap<Integer, Integer>();
 	private String zkmFieldName;
 	private boolean multiZKM = false;
-	
+
+	public AntiZKM5() {
+		// No nodes are needed for reversing.
+		super(null);
+	}
+
 	@Override
 	protected ClassNode scan(ClassNode node) {
 		for (MethodNode mnode : node.methods) {
@@ -37,6 +42,7 @@ public class ZKMOld extends AntiBase {
 		}
 		return node;
 	}
+
 	/**
 	 * Update values of the ZKM String[] with the original strings in a given
 	 * method.
@@ -173,7 +179,7 @@ public class ZKMOld extends AntiBase {
 	 * between!
 	 * 
 	 * @param method
-	 * @return 
+	 * @return
 	 */
 	private void cleanStatic(MethodNode method) {
 

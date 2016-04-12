@@ -8,46 +8,26 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
-import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.FieldInsnNode;
-import org.objectweb.asm.tree.IincInsnNode;
-import org.objectweb.asm.tree.InsnNode;
-import org.objectweb.asm.tree.IntInsnNode;
-import org.objectweb.asm.tree.InvokeDynamicInsnNode;
-import org.objectweb.asm.tree.JumpInsnNode;
-import org.objectweb.asm.tree.LabelNode;
-import org.objectweb.asm.tree.LdcInsnNode;
-import org.objectweb.asm.tree.LookupSwitchInsnNode;
-import org.objectweb.asm.tree.MethodInsnNode;
-import org.objectweb.asm.tree.MethodNode;
-import org.objectweb.asm.tree.MultiANewArrayInsnNode;
-import org.objectweb.asm.tree.TableSwitchInsnNode;
-import org.objectweb.asm.tree.TypeInsnNode;
-import org.objectweb.asm.tree.VarInsnNode;
-import org.objectweb.asm.tree.analysis.Analyzer;
-import org.objectweb.asm.tree.analysis.AnalyzerException;
-import org.objectweb.asm.tree.analysis.BasicInterpreter;
-import org.objectweb.asm.tree.analysis.BasicValue;
-import org.objectweb.asm.tree.analysis.Frame;
-import org.objectweb.asm.tree.analysis.Interpreter;
 
+import me.lpk.gui.windows.mapping.WindowEnigma;
 import me.lpk.gui.windows.mapping.WindowProguard;
 import me.lpk.mapping.MappedClass;
 import me.lpk.mapping.MappingGen;
 import me.lpk.mapping.MappingProcessor;
 import me.lpk.mapping.remap.impl.ModeNone;
-import me.lpk.mapping.remap.impl.ModeSimple;
 import me.lpk.util.JarUtil;
-import me.lpk.util.OpUtil;
 import me.lpk.util.Timer;
 
 public class Main {
 	public static void main(String[] args) {
-		WindowProguard.showWindow();
+		WindowEnigma.showWindow();
 	}
+	
+	public static void dank(){
+		
+	}
+	
 	public static void old() {
 		Timer t = new Timer();
 		// Loading

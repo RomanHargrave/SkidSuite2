@@ -5,6 +5,12 @@ import java.util.Map;
 import org.objectweb.asm.tree.ClassNode;
 
 public abstract class AntiBase {
+	private final Map<String, ClassNode> nodes;
+
+	public AntiBase(Map<String, ClassNode> nodes) {
+		this.nodes = nodes;
+	}
+
 	public final Map<String, ClassNode> scan(Map<String, ClassNode> nodes) {
 		for (String className : nodes.keySet()) {
 			ClassNode node = nodes.get(className);
@@ -14,4 +20,8 @@ public abstract class AntiBase {
 	}
 
 	protected abstract ClassNode scan(ClassNode node);
+
+	protected final Map<String, ClassNode> getNodes() {
+		return nodes;
+	}
 }

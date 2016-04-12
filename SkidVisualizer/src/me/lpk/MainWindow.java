@@ -3,7 +3,6 @@ package me.lpk;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JComboBox;
