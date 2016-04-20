@@ -31,7 +31,7 @@ import org.objectweb.asm.tree.analysis.*;
  */
 public class InsnAnalyzer<V extends Value> implements Opcodes {
 
-	private final Interpreter<V> interpreter;
+	private final InsnInterpreter interpreter;
 
 	private int n;
 
@@ -56,7 +56,7 @@ public class InsnAnalyzer<V extends Value> implements Opcodes {
 	 *            the interpreter to be used to symbolically interpret the
 	 *            bytecode instructions.
 	 */
-	public InsnAnalyzer(final Interpreter<V> interpreter) {
+	public InsnAnalyzer(final InsnInterpreter interpreter) {
 		this.interpreter = interpreter;
 	}
 
@@ -169,7 +169,6 @@ public class InsnAnalyzer<V extends Value> implements Opcodes {
 				} else {
 					current.init(f).execute(insnNode, interpreter);
 					subroutine = subroutine == null ? null : subroutine.copy();
-
 					if (insnNode instanceof JumpInsnNode) {
 						JumpInsnNode j = (JumpInsnNode) insnNode;
 						if (insnOpcode != GOTO && insnOpcode != JSR) {

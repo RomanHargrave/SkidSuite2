@@ -43,6 +43,10 @@ public class InsnValue implements Value {
 		this.type = type;
 		this.value = value;
 	}
+	
+	public Object getValue(){
+		return value;
+	}
 
 	public Type getType() {
 		return type;
@@ -79,7 +83,7 @@ public class InsnValue implements Value {
 	@Override
 	public String toString() {
 		if (value != null) {
-			return type.getDescriptor() + " " + value;
+			return type.getDescriptor() + " " + (value.toString()).trim();
 		}
 		if (this == UNINITIALIZED_VALUE) {
 			return "Uninitialized Null";

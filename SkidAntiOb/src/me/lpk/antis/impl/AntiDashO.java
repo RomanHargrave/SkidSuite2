@@ -23,25 +23,29 @@ public class AntiDashO extends AntiBase {
 		for (MethodNode mnode : node.methods) {
 			replace(mnode);
 		}
+		for (MethodNode mnode : node.methods) {
+			replace(mnode);
+		}
 		return node;
 	}
 
 	/**
-	 * Update values of the ZKM String[] with the original strings in a given
-	 * method.
+	 * Iterates through Insns in a method. If a certain pattern matching DashO
+	 * usage is met, the insns are reformatted to only contain the output
+	 * string.
 	 * 
 	 * @param method
 	 */
 	private void replace(MethodNode method) {
 		for (AbstractInsnNode ain : method.instructions.toArray()) {
-			if (ain.getType() == AbstractInsnNode.LDC_INSN && 
-				(ain.getNext().getOpcode() == Opcodes.BIPUSH || (ain.getNext().getOpcode() >= Opcodes.ICONST_M1 && ain.getNext().getOpcode() <= Opcodes.ICONST_5) ) && 
-				ain.getNext().getNext().getOpcode() == Opcodes.INVOKESTATIC){
-				String desc = ((MethodInsnNode)ain.getNext().getNext()).desc;
-				if (!desc.equals("(Ljava/lang/String;I)Ljava/lang/String;")){
+			if (ain.getType() == AbstractInsnNode.LDC_INSN
+					&& (ain.getNext().getOpcode() == Opcodes.BIPUSH || (ain.getNext().getOpcode() >= Opcodes.ICONST_M1 && ain.getNext().getOpcode() <= Opcodes.ICONST_5))
+					&& ain.getNext().getNext().getOpcode() == Opcodes.INVOKESTATIC) {
+				String desc = ((MethodInsnNode) ain.getNext().getNext()).desc;
+				if (!desc.equals("(Ljava/lang/String;I)Ljava/lang/String;")) {
 					continue;
 				}
-				String inText = ((LdcInsnNode)ain).cst.toString();
+				String inText = ((LdcInsnNode) ain).cst.toString();
 				int inNum = OpUtil.getIntValue(ain.getNext());
 				String out = deobfuscate(inText, inNum);
 				method.instructions.remove(ain.getNext().getNext());
@@ -70,5 +74,28 @@ public class AntiDashO extends AntiBase {
 			outArray[indexCopy] = (char) charInt;
 		}
 		return String.valueOf(outArray, 0, inLength).intern();
+	}
+
+
+	public static String lastIndexOf(final String s, int paramIndex, final int indexCounter) {
+		paramIndex += 15;
+		final char[] charArray = s.toCharArray();
+		final int inLength = charArray.length;
+		final char[] array = charArray;
+		int index = 0;
+		final int mod = (4 << 5) - 1 ^ 0x20;
+		char[] charArrayOut;
+		while (true) {
+			charArrayOut = array;
+			if (index == inLength) {
+				break;
+			}
+			final int indexCopy = index;
+			final int charInt = (paramIndex & mod) ^ charArrayOut[indexCopy];
+			paramIndex += indexCounter;
+			++index;
+			charArrayOut[indexCopy] = (char) charInt;
+		}
+		return String.valueOf(charArrayOut, 0, inLength).intern();
 	}
 }

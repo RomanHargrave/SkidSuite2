@@ -10,8 +10,7 @@ import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.objectweb.asm.tree.ClassNode;
 
-import me.lpk.gui.windows.mapping.WindowEnigma;
-import me.lpk.gui.windows.mapping.WindowProguard;
+import me.lpk.gui.windows.mapping.*;
 import me.lpk.mapping.MappedClass;
 import me.lpk.mapping.MappingGen;
 import me.lpk.mapping.MappingProcessor;

@@ -58,7 +58,7 @@ public class Frame<V extends Value> {
 	 * The expected return type of the analyzed method, or <tt>null</tt> if the
 	 * method returns void.
 	 */
-	private V returnValue;
+	protected V returnValue;
 
 	/**
 	 * The local variables and operand stack of this frame.
