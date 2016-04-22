@@ -12,6 +12,9 @@ Targeted at deobfuscating obfuscated programs.
 ## SkidScan
 Searches for class/method usage that can be used in a potentially malicous manner.
 
+## SkidAnalysis
+Targeted at stack analysis.
+
 ## SkidVisualizer
 A tool used for finding object usage in a program. 
 

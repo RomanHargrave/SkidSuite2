@@ -33,6 +33,7 @@ import org.objectweb.asm.tree.VarInsnNode;
 import org.objectweb.asm.tree.analysis.AnalyzerException;
 import me.lpk.analysis.InsnAnalyzer;
 import me.lpk.analysis.InsnFrame;
+import me.lpk.analysis.InsnHandler;
 import me.lpk.analysis.InsnInterpreter;
 import me.lpk.util.OpUtil;
 
@@ -115,14 +116,7 @@ public class MethodSimulatorPanel extends JPanel {
 		}
 		msp.listOpcodes.setListData(opcodesText.toArray(new String[0]));
 		// Setting up Stack
-		InsnInterpreter interpreter = new InsnInterpreter();
-		@SuppressWarnings({ "rawtypes", "unchecked" })
-		InsnAnalyzer analyzer = new InsnAnalyzer(interpreter);
-		try {
-			msp.frames = analyzer.analyze(mn.owner, mn);
-		} catch (AnalyzerException e) {
-			e.printStackTrace();
-		}
+		msp.frames = InsnHandler.getFrames(mn);
 		// Making the frame
 		JFrame frame = new JFrame();
 		frame.setSize(1000, 555);
@@ -131,6 +125,8 @@ public class MethodSimulatorPanel extends JPanel {
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.setTitle(mn.owner + "." + mn.name + mn.desc);
 	}
+
+	
 
 	private static String toText(AbstractInsnNode ain) {
 		String base = OpUtil.getOpcodeText(ain.getOpcode());

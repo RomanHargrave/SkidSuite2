@@ -31,10 +31,6 @@ public class InsnInterpreter extends Interpreter<InsnValue> implements Opcodes {
 		super(ASM5);
 	}
 
-	protected InsnInterpreter(final int api) {
-		super(api);
-	}
-
 	@Override
 	public InsnValue newValue(final Type type) {
 		if (type == null) {
