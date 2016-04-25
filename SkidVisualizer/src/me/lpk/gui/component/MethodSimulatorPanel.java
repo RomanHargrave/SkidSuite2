@@ -30,11 +30,10 @@ import org.objectweb.asm.tree.MultiANewArrayInsnNode;
 import org.objectweb.asm.tree.TableSwitchInsnNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
-import org.objectweb.asm.tree.analysis.AnalyzerException;
-import me.lpk.analysis.InsnAnalyzer;
+
+import me.lpk.MainWindow;
 import me.lpk.analysis.InsnFrame;
 import me.lpk.analysis.InsnHandler;
-import me.lpk.analysis.InsnInterpreter;
 import me.lpk.util.OpUtil;
 
 public class MethodSimulatorPanel extends JPanel {
@@ -66,6 +65,7 @@ public class MethodSimulatorPanel extends JPanel {
 
 		panelDisplay.add(splitPaneDisplay);
 		scrollOpcodes.setViewportView(listOpcodes);
+		listOpcodes.setCellRenderer(new MethodCellRenderer(this));
 		splitPaneDisplay.setLeftComponent(scrollOpcodes);
 
 		JSplitPane splitBeforeAfter = new JSplitPane();
@@ -116,6 +116,7 @@ public class MethodSimulatorPanel extends JPanel {
 		}
 		msp.listOpcodes.setListData(opcodesText.toArray(new String[0]));
 		// Setting up Stack
+		//msp.frames = InsnHandler.getFrames(mn, MainWindow.instance.getNodes());
 		msp.frames = InsnHandler.getFrames(mn);
 		// Making the frame
 		JFrame frame = new JFrame();
@@ -198,5 +199,9 @@ public class MethodSimulatorPanel extends JPanel {
 			return base + " local[" + var.var + "]";
 		}
 		return base;
+	}
+
+	public boolean doColorOpcodes() {
+		return true;
 	}
 }
