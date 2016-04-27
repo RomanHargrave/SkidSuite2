@@ -19,17 +19,21 @@ import me.lpk.util.OpUtil;
 public class InsnValue implements Value {
 
 	public static final InsnValue UNINITIALIZED_VALUE = new InsnValue(null);
-
 	public static final InsnValue INT_VALUE = new InsnValue(Type.INT_TYPE);
-
 	public static final InsnValue FLOAT_VALUE = new InsnValue(Type.FLOAT_TYPE);
-
 	public static final InsnValue LONG_VALUE = new InsnValue(Type.LONG_TYPE);
-
 	public static final InsnValue DOUBLE_VALUE = new InsnValue(Type.DOUBLE_TYPE);
-
+	public static final InsnValue BYTE_VALUE = new InsnValue(Type.BYTE_TYPE);
+	public static final InsnValue CHAR_VALUE = new InsnValue(Type.CHAR_TYPE);
 	public static final InsnValue REFERENCE_VALUE = new InsnValue(Type.getObjectType("java/lang/Object"));
-
+	//
+	public static final InsnValue CHAR_ARR_VALUE = new InsnValue(Type.getObjectType("[C"));
+	public static final InsnValue DOUBLE_ARR_VALUE = new InsnValue(Type.getObjectType("[D"));
+	public static final InsnValue INT_ARR_VALUE = new InsnValue(Type.getObjectType("[I"));
+	public static final InsnValue FLOAT_ARR_VALUE = new InsnValue(Type.getObjectType("[F"));
+	public static final InsnValue BOOLEAN_ARR_VALUE = new InsnValue(Type.getObjectType("[Z"));
+	public static final InsnValue LONG_ARR_VALUE = new InsnValue(Type.getObjectType("[J"));
+	//
 	public static final InsnValue RETURNADDRESS_VALUE = new InsnValue(Type.VOID_TYPE);
 
 	private final Type type;
@@ -43,8 +47,8 @@ public class InsnValue implements Value {
 		this.type = type;
 		this.value = value;
 	}
-	
-	public Object getValue(){
+
+	public Object getValue() {
 		return value;
 	}
 

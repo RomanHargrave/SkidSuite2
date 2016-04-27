@@ -8,13 +8,19 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.IincInsnNode;
 import org.objectweb.asm.tree.InvokeDynamicInsnNode;
+import org.objectweb.asm.tree.JumpInsnNode;
+import org.objectweb.asm.tree.LabelNode;
+import org.objectweb.asm.tree.LookupSwitchInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MultiANewArrayInsnNode;
+import org.objectweb.asm.tree.TableSwitchInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 import org.objectweb.asm.tree.analysis.AnalyzerException;
 import org.objectweb.asm.tree.analysis.Frame;
 import org.objectweb.asm.tree.analysis.Interpreter;
 import org.objectweb.asm.tree.analysis.Value;
+
+import me.lpk.log.Logger;
 
 /**
  * @editor Matt
@@ -22,6 +28,8 @@ import org.objectweb.asm.tree.analysis.Value;
 @SuppressWarnings("all")
 public class InsnFrame extends Frame {
 	public AbstractInsnNode ain;
+	public LabelNode jin;
+	public boolean doJump;
 
 	public InsnFrame(Frame src, AbstractInsnNode ain2) {
 		super(src);
@@ -37,7 +45,7 @@ public class InsnFrame extends Frame {
 		Value value1, value2, value3, value4;
 		List values;
 		int var;
-
+		doJump = false;
 		switch (insn.getOpcode()) {
 		case Opcodes.NOP:
 			break;
@@ -109,7 +117,14 @@ public class InsnFrame extends Frame {
 			value3 = pop();
 			value2 = pop();
 			value1 = pop();
-			interpreter.ternaryOperation(insn, value1, value2, value3);
+			String before = value1.toString();
+			value1 = interpreter.ternaryOperation(insn, value1, value2, value3);
+			// arrayRef, index, value)
+			if (value1 != null) {
+				Logger.logVeryHigh("\tUpdated array value: " + before + " --> " + value1.toString());
+			} else {
+				Logger.errVeryHigh("\tFailed updating array value: " + before + " --> " + value1.toString());
+			}
 			break;
 		case Opcodes.POP:
 			if (pop().getSize() == 2) {
@@ -340,7 +355,13 @@ public class InsnFrame extends Frame {
 		case Opcodes.IFGE:
 		case Opcodes.IFGT:
 		case Opcodes.IFLE:
-			interpreter.unaryOperation(insn, pop());
+			InsnValue unaryIf = (InsnValue) interpreter.unaryOperation(insn, pop());
+			if (unaryIf.getValue() != null) {
+				if (getInt(unaryIf.getValue()) == 1) {
+					doJump = true;
+				}
+			}
+			jin = ((JumpInsnNode) insn).label;
 			break;
 		case Opcodes.IF_ICMPEQ:
 		case Opcodes.IF_ICMPNE:
@@ -352,18 +373,39 @@ public class InsnFrame extends Frame {
 		case Opcodes.IF_ACMPNE:
 			value2 = pop();
 			value1 = pop();
-			interpreter.binaryOperation(insn, value1, value2);
+			InsnValue binaryIf = (InsnValue) interpreter.binaryOperation(insn, value1, value2);
+			if (binaryIf.getValue() != null) {
+				if (getInt(binaryIf.getValue()) == 1) {
+					doJump = true;
+				}
+			}
+			jin = ((JumpInsnNode) insn).label;
 			break;
 		case Opcodes.GOTO:
+			jin = ((JumpInsnNode) insn).label;
+			doJump = true;
 			break;
 		case Opcodes.JSR:
 			push(interpreter.newOperation(insn));
+			jin = ((JumpInsnNode) insn).label;
+			doJump = true;
 			break;
 		case Opcodes.RET:
 			break;
 		case Opcodes.TABLESWITCH:
 		case Opcodes.LOOKUPSWITCH:
-			interpreter.unaryOperation(insn, pop());
+			InsnValue switchValue = (InsnValue) interpreter.unaryOperation(insn, pop());
+			int index = ((Number) switchValue.getValue()).intValue();
+			if (index != -1) {
+				if (insn.getOpcode() == Opcodes.TABLESWITCH) {
+					TableSwitchInsnNode tsin = (TableSwitchInsnNode) insn;
+					jin = tsin.labels.get(index);
+				} else {
+					LookupSwitchInsnNode lsin = (LookupSwitchInsnNode) insn;
+					jin = lsin.labels.get(index);
+				}
+				doJump = true;
+			}
 			break;
 		case Opcodes.IRETURN:
 		case Opcodes.LRETURN:
@@ -458,5 +500,15 @@ public class InsnFrame extends Frame {
 		default:
 			throw new RuntimeException("Illegal opcode " + insn.getOpcode());
 		}
+	}
+
+	private int getInt(Object value) {
+		try {
+			int i = Integer.parseInt(value.toString());
+			return i;
+		} catch (NumberFormatException nfe) {
+
+		}
+		return -1;
 	}
 }

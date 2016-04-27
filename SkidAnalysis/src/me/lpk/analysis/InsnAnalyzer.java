@@ -60,6 +60,10 @@ public class InsnAnalyzer<V extends Value> implements Opcodes {
 		this.interpreter = interpreter;
 	}
 
+	public InsnFrame[] analyze(final String owner, final MethodNode m) throws AnalyzerException {
+		return analyze(owner, m, null);
+	}
+
 	/**
 	 * Analyzes the given method.
 	 * 
@@ -67,6 +71,8 @@ public class InsnAnalyzer<V extends Value> implements Opcodes {
 	 *            the internal name of the class to which the method belongs.
 	 * @param m
 	 *            the method to be analyzed.
+	 * @param list
+	 *            the parameter initial values.
 	 * @return the symbolic state of the execution stack frame at each bytecode
 	 *         instruction of the method. The size of the returned array is
 	 *         equal to the number of instructions (and labels) of the method. A
@@ -76,7 +82,7 @@ public class InsnAnalyzer<V extends Value> implements Opcodes {
 	 *             if a problem occurs during the analysis.
 	 */
 	@SuppressWarnings("unchecked")
-	public InsnFrame[] analyze(final String owner, final MethodNode m) throws AnalyzerException {
+	public InsnFrame[] analyze(final String owner, final MethodNode m, List<? extends InsnValue> list) throws AnalyzerException {
 		if ((m.access & (ACC_ABSTRACT | ACC_NATIVE)) != 0) {
 			frames = (InsnFrame[]) new InsnFrame[0];
 			return frames;
@@ -138,7 +144,11 @@ public class InsnAnalyzer<V extends Value> implements Opcodes {
 			current.setLocal(local++, interpreter.newValue(ctype));
 		}
 		for (int i = 0; i < args.length; ++i) {
-			current.setLocal(local++, interpreter.newValue(args[i]));
+			if (list != null && i < list.size()) {
+				current.setLocal(local++, list.get(i));
+			} else {
+				current.setLocal(local++, interpreter.newValue(args[i]));
+			}
 			if (args[i].getSize() == 2) {
 				current.setLocal(local++, interpreter.newValue(null));
 			}

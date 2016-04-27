@@ -17,21 +17,6 @@ import me.lpk.util.ReferenceUtil;
 
 public class SearchUtil {
 	/**
-	 * Gets the index of a AbstractInsnNode.
-	 * 
-	 * @param ain
-	 * @return
-	 */
-	public static int getIndex(AbstractInsnNode ain) {
-		int index = 0;
-		while (ain.getPrevious() != null) {
-			ain = ain.getPrevious();
-			index += 1;
-		}
-		return index;
-	}
-
-	/**
 	 * Finds strings similiar to the given parameter.
 	 * 
 	 * @param text
@@ -56,7 +41,7 @@ public class SearchUtil {
 				for (AbstractInsnNode ain : mn.instructions.toArray()) {
 					if (ain.getType() == AbstractInsnNode.LDC_INSN) {
 						if (((LdcInsnNode) ain).cst.toString().toLowerCase().contains(text.toLowerCase())) {
-							results.add(new SearchResultEntry(cn, mn, getIndex(ain)));
+							results.add(new SearchResultEntry(cn, mn, OpUtil.getIndex(ain)));
 						}
 					}
 				}
@@ -79,7 +64,7 @@ public class SearchUtil {
 			references.addAll(ReferenceUtil.getReferences(node, method, cn));
 		}
 		for (Reference reference : references) {
-			results.add(new SearchResultEntry(reference.getNode(), reference.getMethod(), getIndex(reference.getAin())));
+			results.add(new SearchResultEntry(reference.getNode(), reference.getMethod(), OpUtil.getIndex(reference.getAin())));
 		}
 		return results;
 	}
@@ -98,7 +83,7 @@ public class SearchUtil {
 			references.addAll(ReferenceUtil.getReferences(node, field, cn));
 		}
 		for (Reference reference : references) {
-			results.add(new SearchResultEntry(reference.getNode(), reference.getMethod(), getIndex(reference.getAin())));
+			results.add(new SearchResultEntry(reference.getNode(), reference.getMethod(), OpUtil.getIndex(reference.getAin())));
 		}
 		return results;
 	}
@@ -116,7 +101,7 @@ public class SearchUtil {
 			references.addAll(ReferenceUtil.getReferences(node, cn));
 		}
 		for (Reference reference : references) {
-			results.add(new SearchResultEntry(reference.getNode(), reference.getMethod(), getIndex(reference.getAin())));
+			results.add(new SearchResultEntry(reference.getNode(), reference.getMethod(), OpUtil.getIndex(reference.getAin())));
 		}
 		return results;
 	}

@@ -124,6 +124,10 @@ public class Frame<V extends Value> {
 	public void setReturn(final V v) {
 		returnValue = v;
 	}
+	
+	public V getReturn(){
+		return returnValue;
+	}
 
 	/**
 	 * Returns the maximum number of local variables of this frame.

@@ -15,6 +15,16 @@ import me.lpk.util.OpUtil;
 public class AntiDashO extends AntiBase {
 
 	public AntiDashO(Map<String, ClassNode> nodes) {
+		// This currently only works on low/default settings for DashO (As seen in the eval copy)
+		//
+		// TODO: Improve so the anti will work for higher levels of DashO
+		// encryption (Multiple methods w/ multiple different parameters)
+		// Unsure if different methods have different decrypt patterns. Doesn't
+		// really look like they do aside from some index shifts.
+		//
+		// A decently finished stack emulator will make this super easy since
+		// the values needed for decryption are all hard-coded in the same
+		// method.
 		super(nodes);
 	}
 
@@ -75,7 +85,6 @@ public class AntiDashO extends AntiBase {
 		}
 		return String.valueOf(outArray, 0, inLength).intern();
 	}
-
 
 	public static String lastIndexOf(final String s, int paramIndex, final int indexCounter) {
 		paramIndex += 15;

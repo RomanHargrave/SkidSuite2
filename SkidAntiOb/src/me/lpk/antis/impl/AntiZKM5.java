@@ -48,6 +48,7 @@ public class AntiZKM5 extends AntiBase {
 	 * method.
 	 * 
 	 * @param method
+	 *            The method to replace strings in.
 	 */
 	private void replace(MethodNode method) {
 		for (AbstractInsnNode ain : method.instructions.toArray()) {

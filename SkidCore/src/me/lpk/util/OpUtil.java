@@ -491,4 +491,19 @@ public class OpUtil implements org.objectweb.asm.Opcodes {
 			return -1;
 		}
 	}
+
+	/**
+	 * Gets the index of a AbstractInsnNode.
+	 * 
+	 * @param ain
+	 * @return
+	 */
+	public static int getIndex(AbstractInsnNode ain) {
+		int index = 0;
+		while (ain.getPrevious() != null) {
+			ain = ain.getPrevious();
+			index += 1;
+		}
+		return index;
+	}
 }
