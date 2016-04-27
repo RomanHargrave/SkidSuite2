@@ -22,6 +22,7 @@ public class InsnHandler {
 		return null;
 	}
 	
+	public static InsnFrame getFrameExec(MethodNode mn, Map<String, ClassNode> nodes, List<? extends InsnValue> list ) {
 		try {
 			return makeExecAnalyzer(nodes).analyze(mn.owner, mn, list);
 		} catch (AnalyzerException e) {

@@ -748,6 +748,7 @@ public class InsnInterpreter extends Interpreter<InsnValue> implements Opcodes {
 				}
 				Logger.logHigh("Emulating: " + node.name + "#" + methn.name + methn.desc);
 				List<? extends InsnValue> list = values.subList(values.size() - Type.getArgumentTypes(methn.desc).length, values.size());
+				InsnValue ret = (InsnValue) InsnHandler.getFrameExec(methn, nodes, list).pop();
 				if (ret == null) {
 					Logger.errHigh("Emulation Failed!");
 					return retVal;
