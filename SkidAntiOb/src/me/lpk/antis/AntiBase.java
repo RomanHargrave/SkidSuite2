@@ -10,16 +10,8 @@ public abstract class AntiBase {
 	public AntiBase(Map<String, ClassNode> nodes) {
 		this.nodes = nodes;
 	}
-
-	public final Map<String, ClassNode> scan(Map<String, ClassNode> nodes) {
-		for (String className : nodes.keySet()) {
-			ClassNode node = nodes.get(className);
-			nodes.put(className, scan(node));
-		}
-		return nodes;
-	}
-
-	protected abstract ClassNode scan(ClassNode node);
+	
+	public abstract ClassNode scan(ClassNode node);
 
 	protected final Map<String, ClassNode> getNodes() {
 		return nodes;

@@ -27,7 +27,7 @@ public class AntiZKM5 extends AntiBase {
 	}
 
 	@Override
-	protected ClassNode scan(ClassNode node) {
+	public ClassNode scan(ClassNode node) {
 		for (MethodNode mnode : node.methods) {
 			if (mnode.name.startsWith("<c")) {
 				extractStatic(mnode);
@@ -35,7 +35,7 @@ public class AntiZKM5 extends AntiBase {
 			}
 		}
 		for (MethodNode mnode : node.methods) {
-			if (mnode.name.startsWith("<")) {
+			if (mnode.name.startsWith("<c")) {
 				continue;
 			}
 			replace(mnode);
@@ -81,10 +81,13 @@ public class AntiZKM5 extends AntiBase {
 				// If it's a single string in a static field, check for
 				// GetStatic
 				if (ain.getOpcode() == Opcodes.GETSTATIC) {
+
 					FieldInsnNode fin = (FieldInsnNode) ain;
+					System.out.println(fin.name + ":" + fin.desc);
+
 					// Does the name match? Is the field desc a string? We got a
 					// match!
-					if (fin.name == zkmFieldName && fin.desc.equals("Ljava/lang/String;")) {
+					if (fin.name.equals(zkmFieldName) && fin.desc.equals("Ljava/lang/String;")) {
 						method.instructions.set(fin, new LdcInsnNode(strings.get(0)));
 					}
 				}
@@ -102,28 +105,27 @@ public class AntiZKM5 extends AntiBase {
 			// Setup common to ZKM array and single string
 			if (ain.getOpcode() == Opcodes.PUTSTATIC) {
 				// Getting the field name for other methods to reference.
-				if (ain instanceof FieldInsnNode) {
-					FieldInsnNode fin = (FieldInsnNode) ain;
+				FieldInsnNode fin = (FieldInsnNode) ain;
+				// If the previous opcode is array storing, it is a multiZKM
+				// string setup.
+				if (ain.getPrevious().getOpcode() == Opcodes.AASTORE) {
+					// && ain.getNext().getOpcode() == Opcodes.GOTO
+					zkmFieldName = fin.name;
+					multiZKM = true;
+				} else {
+					// Ok so it's not a multi. Let's see if the value setter
+					// is in between two GOTO's.
+					AbstractInsnNode prev = ain.getPrevious();
 
-					// If the previous opcode is array storing, it is a multiZKM
-					// string setup.
-					if (ain.getPrevious().getOpcode() == Opcodes.AASTORE && ain.getNext().getOpcode() == Opcodes.GOTO) {
-						zkmFieldName = fin.name;
-						multiZKM = true;
-					} else {
-						// Ok so it's not a multi. Let's see if the value setter
-						// is in between two GOTO's.
-						int prev = ain.getPrevious().getOpcode();
-						if (prev == Opcodes.F_NEW) {
-							prev = ain.getPrevious().getPrevious().getOpcode();
-						}
-						if (prev == Opcodes.GOTO && ain.getNext().getOpcode() == Opcodes.GOTO) {
-							// This may very well be our zkm field.
-							zkmFieldName = fin.name;
-							multiZKM = false;
-						}
+					while (prev.getOpcode() == Opcodes.F_NEW) {
+						prev = prev.getPrevious();
 					}
-
+					if (prev.getOpcode() == Opcodes.GOTO) {
+						// && ain.getNext().getOpcode() == Opcodes.GOTO
+						// This may very well be our zkm field.
+						zkmFieldName = fin.name;
+						multiZKM = false;
+					}
 				}
 			}
 		}

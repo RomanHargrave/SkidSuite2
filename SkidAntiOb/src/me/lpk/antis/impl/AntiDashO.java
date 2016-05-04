@@ -29,7 +29,7 @@ public class AntiDashO extends AntiBase {
 	}
 
 	@Override
-	protected ClassNode scan(ClassNode node) {
+	public ClassNode scan(ClassNode node) {
 		for (MethodNode mnode : node.methods) {
 			replace(mnode);
 		}
