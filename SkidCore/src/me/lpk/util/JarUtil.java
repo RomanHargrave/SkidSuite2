@@ -90,7 +90,6 @@ public class JarUtil {
 	 * 
 	 * @param outBytes
 	 * @param fileName
-	 * @param makeMainClass
 	 */
 	public static void saveAsJar(Map<String, byte[]> outBytes, String fileName) {
 		try {

@@ -40,6 +40,9 @@ public class MappingRenamer {
 	 * @return
 	 */
 	public static Map<String, MappedClass> remapClass(MappedClass mc, Map<String, MappedClass> mappings, MappingMode mode) {
+		if (mc.isLibrary()){
+			return mappings;
+		}
 		if (mc.hasParent()) {
 			mappings = remapClass(mc.getParent(), mappings, mode);
 		}

@@ -50,6 +50,11 @@ public class SkidRemapper extends Remapper {
 		if ("()V".equals(desc)) {
 			return desc;
 		}
+		if (!desc.startsWith("(")) {
+			// Note to self: Keep this here. Helped me realize a desc I had made
+			// was invalid.
+			throw new RuntimeException();
+		}
 		return super.mapMethodDesc(StringUtil.fixDesc(desc, renamed));
 	}
 

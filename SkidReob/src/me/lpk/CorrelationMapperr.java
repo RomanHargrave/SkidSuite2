@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.FieldInsnNode;
+import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 
@@ -67,27 +69,26 @@ public class CorrelationMapperr {
 			// Attempt to hop to target field's type
 			List<MappedClass> targetFieldTypes = getTypesFromMember(targetField, targetMap);
 			if (targetFieldTypes == null) {
-				// Method types not found.
+				// Field types not found.
 				continue;
 			}
-			List<MappedClass> cleanMethodTypes = getTypesFromMember(cleanField, cleanMap);
-			if (cleanMethodTypes == null) {
-				// Method types not found.
+			List<MappedClass> cleanFieldTypes = getTypesFromMember(cleanField, cleanMap);
+			if (cleanFieldTypes == null) {
+				// Field types not found.
 				continue;
 			}
-			// Map the method's class types
+			// Map the field's type class
 			for (int i = 0; i < targetFieldTypes.size(); i++) {
 				MappedClass targetType = targetFieldTypes.get(i);
-				if (i >= cleanMethodTypes.size()) {
+				if (i >= cleanFieldTypes.size()) {
 					break;
 				}
-				MappedClass cleanType = cleanMethodTypes.get(i);
+				MappedClass cleanType = cleanFieldTypes.get(i);
 				if (targetType == null || cleanType == null) {
 					continue;
 				}
 				targetMap = correlate(targetType, cleanType, targetMap, cleanMap);
 			}
-			// Map the field's type class
 		}
 		// Methods
 		Map<Integer, MappedMember> targetMethods = targetClass.getMethodMap();
@@ -121,9 +122,12 @@ public class CorrelationMapperr {
 			}
 			// Map the method's class types
 			int offset = 0;
-			for (int i = 0; i < targetMethodTypes.size(); i++) {
+			for (int i = 0; i < targetMethodTypes.size() - offset; i++) {
+				if (i >= targetMethodTypes.size()){
+					break;
+				}
 				MappedClass targetType = targetMethodTypes.get(i);
-				if (targetType.getOriginalName().equals(targetClass.getOriginalName())) {
+				if (targetType.getOriginalName().equals(targetClass.getOriginalName())) {					
 					continue;
 				}
 				if (i + offset >= cleanMethodTypes.size()) {
@@ -134,7 +138,7 @@ public class CorrelationMapperr {
 					continue;
 				}
 				if (!areSimiliar(targetType, cleanType)) {
-					offset -= 1;
+					//offset -= 1;
 					continue;
 				}
 				targetMap = correlate(targetType, cleanType, targetMap, cleanMap);
@@ -290,16 +294,17 @@ public class CorrelationMapperr {
 		double f1 = c1.getFieldIndex();
 		double f2 = c2.getFieldIndex();
 		double percDiffFields = (Math.abs(f1 - f2) / ((f1 + f2) / 2)) * 100;
-		double maxDiffLevelField = Math.min(23, 52 * (Math.pow(f2, -0.5)));
+		double maxDiffLevelField = Math.min(35, 52 * (Math.pow(f2, -0.5)));
 		if (percDiffFields > maxDiffLevelField) {
 			return false;
 		}
+
 		// Must have a similar # of methods. Change is porportionate to class
 		// size.
 		double m1 = c1.getMethodIndex();
 		double m2 = c2.getMethodIndex();
 		double percDiffMethods = (Math.abs(m1 - m2) / ((m1 + m2) / 2)) * 100;
-		double maxDiffLevelMethod = Math.min(23, 52 * (Math.pow(m2, -0.5)));
+		double maxDiffLevelMethod = Math.min(35, 52 * (Math.pow(m2, -0.5)));
 		if (percDiffMethods > maxDiffLevelMethod) {
 			return false;
 		}
@@ -328,6 +333,13 @@ public class CorrelationMapperr {
 				} else if (ain.getType() == AbstractInsnNode.TYPE_INSN) {
 					TypeInsnNode tin = (TypeInsnNode) ain;
 					names.addAll(Regexr.matchDescriptionClasses(tin.desc));
+				}
+				else if (ain.getType() == AbstractInsnNode.LDC_INSN) {
+					LdcInsnNode ldc = (LdcInsnNode) ain;
+					if (ldc.cst instanceof Type){
+						Type t= (Type) ldc.cst;
+						names.add(t.getClassName().replace(".", "/"));
+					}
 				}
 			}
 		}

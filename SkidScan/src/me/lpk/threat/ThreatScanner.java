@@ -76,7 +76,7 @@ public class ThreatScanner {
 				+ "h3 {margin-bottom: 0px; font-weight: bold; text-decoration: underline;}" 
 				+ "table{width=90%;} th, td{border:1px solid black;}"
 				+ ".centTxt{text-align: center;}" 
-				+ ".shaded{background: #999;}"
+				+ ".shaded{background: #afd0db;}"
 				+ ".tmain{margin-left:auto;margin-right:auto; }";
 		StringBuilder tableEntries = new StringBuilder("<table class=\"tmain\">");
 		for (String className : threatsByClass.keySet()) {
