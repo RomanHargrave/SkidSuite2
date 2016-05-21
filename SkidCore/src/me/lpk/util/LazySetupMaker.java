@@ -4,8 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.objectweb.asm.tree.ClassNode;
@@ -27,6 +29,7 @@ public class LazySetupMaker {
 	private final Map<String, MappedClass> mappings;
 	private final Map<String, ClassNode> libNodes;
 	private final Map<String, MappedClass> libMappings;
+	private static final Set<File> libraries = new HashSet<File>();
 
 	public LazySetupMaker(String name, Map<String, ClassNode> nodes, Map<String, MappedClass> mappings) {
 		this.name = name;
@@ -45,19 +48,27 @@ public class LazySetupMaker {
 		this.libMappings = libMappings;
 	}
 
-	public static LazySetupMaker get(String jarIn, boolean readLibraries) {
-		Logger.logLow("Loading: " + jarIn + " (Reading Libraries: " + readLibraries + ")");
+	public static LazySetupMaker get(String jarIn, boolean readDefaultLibraries, boolean readExtraLibs) {
+		Logger.logLow("Loading: " + jarIn + " (Reading Libraries: " + readDefaultLibraries + ")");
 		File in = new File(jarIn);
 		Map<String, ClassNode> nodes = null;
 		Map<String, ClassNode> libNodes = new HashMap<String, ClassNode>();
-		if (readLibraries) {
+		if (readExtraLibs) {
+			try {
+				for (File lib : getExtraLibs()) {
+					libNodes.putAll(JarUtil.loadClasses(lib));
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		if (readDefaultLibraries) {
 			try {
 				for (File lib : getLibraries()) {
 					libNodes.putAll(JarUtil.loadClasses(lib));
 				}
-
-			} catch (IOException e1) {
-				e1.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 		nodes = loadNodes(in);
@@ -66,7 +77,7 @@ public class LazySetupMaker {
 		Logger.logLow("Generating nodes");
 		Map<String, MappedClass> mappings = MappingGen.mappingsFromNodesNoLinking(nodes);
 		Map<String, MappedClass> libMappings = new HashMap<String, MappedClass>();
-		if (readLibraries) {
+		if (readDefaultLibraries || readExtraLibs) {
 			Logger.logLow("Marking library nodes as read-only...");
 			libMappings.putAll(MappingGen.mappingsFromNodesNoLinking(libNodes));
 			for (MappedClass mc : libMappings.values()) {
@@ -82,7 +93,7 @@ public class LazySetupMaker {
 		//
 		//
 		Logger.logLow("Merging target jar and library nodes");
-		if (readLibraries) {
+		if (readDefaultLibraries  || readExtraLibs) {
 			mappings.putAll(libMappings);
 		}
 		Logger.logLow("Linking node structures");
@@ -91,6 +102,18 @@ public class LazySetupMaker {
 		}
 		Logger.logLow("Completed loading from: " + jarIn);
 		return new LazySetupMaker(jarIn, nodes, mappings, libNodes, libMappings);
+	}
+
+	public static void addExtraLibraryJar(File lib) {
+		libraries.add(lib);
+	}
+
+	public static void clearExtraLibraries() {
+		libraries.clear();
+	}
+
+	public static Set<File> getExtraLibs() {
+		return libraries;
 	}
 
 	public String getName() {
@@ -113,15 +136,15 @@ public class LazySetupMaker {
 		return libMappings;
 	}
 
-	private static Map<String, ClassNode> loadNodes(File night) {
+	private static Map<String, ClassNode> loadNodes(File file) {
 		Map<String, ClassNode> nodes = null;
 		try {
-			nodes = JarUtil.loadClasses(night);
-		} catch (IOException e1) {
-			e1.printStackTrace();
+			nodes = JarUtil.loadClasses(file);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 		if (nodes == null) {
-			System.err.println("COULD NOT READ CLASSES FROM " + night.getAbsolutePath());
+			System.err.println("COULD NOT READ CLASSES FROM " + file.getAbsolutePath());
 			return null;
 		}
 		return nodes;
@@ -138,5 +161,4 @@ public class LazySetupMaker {
 		}
 		return files;
 	}
-
 }

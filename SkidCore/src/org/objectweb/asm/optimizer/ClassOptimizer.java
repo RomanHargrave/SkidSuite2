@@ -50,7 +50,7 @@ public class ClassOptimizer extends ClassRemapper {
     public void visit(final int version, final int access, final String name,
             final String signature, final String superName,
             final String[] interfaces) {
-        super.visit(Opcodes.V1_2, access, name, null, superName, interfaces);
+        super.visit(Opcodes.V1_8, access, name, null, superName, interfaces);
         int index = name.lastIndexOf('/');
         if (index > 0) {
             pkgName = name.substring(0, index);

@@ -6,7 +6,9 @@ import java.util.Set;
 
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.IntInsnNode;
+import org.objectweb.asm.tree.LdcInsnNode;
 
 public class OpUtil implements org.objectweb.asm.Opcodes {
 	private static Map<Integer, String> opcodes = new HashMap<Integer, String>(getCodes());
@@ -505,5 +507,35 @@ public class OpUtil implements org.objectweb.asm.Opcodes {
 			index += 1;
 		}
 		return index;
+	}
+
+	/**
+	 * Given an integer, returns an InsnNode that will properly represent the
+	 * int.
+	 * 
+	 * @param i
+	 * @return
+	 */
+	public static AbstractInsnNode toInt(int i) {
+		switch (i) {
+		case -1:
+			return new InsnNode(Opcodes.ICONST_M1);
+		case 0:
+			return new InsnNode(Opcodes.ICONST_0);
+		case 1:
+			return new InsnNode(Opcodes.ICONST_1);
+		case 2:
+			return new InsnNode(Opcodes.ICONST_2);
+		case 3:
+			return new InsnNode(Opcodes.ICONST_3);
+		case 4:
+			return new InsnNode(Opcodes.ICONST_4);
+		case 5:
+			return new InsnNode(Opcodes.ICONST_5);
+		}
+		if (i > -129 && i < 128) {
+			return new IntInsnNode(Opcodes.BIPUSH, i);
+		}
+		return new LdcInsnNode(i);
 	}
 }
