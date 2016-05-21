@@ -5,7 +5,7 @@ package me.lpk.log;
  */
 public class Logger {
 	public static final int VERY_HIGH = 0, HIGH = 1, MEDIUM = 2, LOW = 3;
-	private static int level = VERY_HIGH;
+	private static int level = HIGH;
 
 	public static void logVeryHigh(String s) {
 		log(s, VERY_HIGH);

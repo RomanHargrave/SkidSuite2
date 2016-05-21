@@ -22,12 +22,12 @@ public class MappingProcessor {
 	 * @param mappings
 	 * @return
 	 */
-	public static Map<String, byte[]> process(Map<String, ClassNode> nodes, Map<String, MappedClass> mappings) {
+	public static Map<String, byte[]> process(Map<String, ClassNode> nodes, Map<String, MappedClass> mappings, boolean useMaxs) {
 		Map<String, byte[]> out = new HashMap<String, byte[]>();
 		int workIndex = 1;
 		SkidRemapper mapper = new SkidRemapper(mappings);
 		for (ClassNode cn : nodes.values()) {
-			ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+			ClassWriter cw = new ClassWriter(useMaxs ? ClassWriter.COMPUTE_MAXS : ClassWriter.COMPUTE_FRAMES);
 			ClassVisitor remapper = new ClassRemapper(cw, mapper);
 			cn.accept(remapper);
 			boolean isRenamed = mappings.containsKey(cn.name);

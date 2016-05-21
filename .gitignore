@@ -12,26 +12,24 @@ $RECYCLE.BIN/
 .TemporaryItems
 .Trashes
 .VolumeIcon.icns
-.metadata/**
-.recommenders/**
-**/bin/**
-*.jar
-*.project
-*.classpath
-*.prefs
 .AppleDB
 .AppleDesktop
 Network Trash Folder
 Temporary Items
 .apdisk
+.metadata/**
+.recommenders/**
+**/bin/**
 *.lock
-*.log
-SkidReob/filename.txt
-SkidReob/fuck.txt
-SkidObfuscator/**
+*.lo
+*.jar
+*.project
+*.classpath
+*.prefs
 *.map
 *.zip
 *.sha
 *.sha
 *.MF
+*.bat
 *.dox

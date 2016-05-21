@@ -24,6 +24,8 @@ import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
+import me.lpk.log.Logger;
+
 /**
  * A Jar file optimizer.
  * 
@@ -63,7 +65,7 @@ public class JarOptimizer {
         optimize(new File(args[argIndex]));
     }
 
-    static void optimize(final File f) throws IOException {
+    public static void optimize(final File f) throws IOException {
         if (nodebug && f.getName().contains("debug")) {
             return;
         }
@@ -197,7 +199,7 @@ public class JarOptimizer {
                     }
                     o = HIERARCHY.get(o);
                 }
-                System.out.println("WARNING: " + owner + ' ' + member
+                Logger.logVeryHigh("WARNING: " + owner + ' ' + member
                         + " called in " + this.owner + ' ' + method
                         + " is not defined in JDK 1.3 API");
             }

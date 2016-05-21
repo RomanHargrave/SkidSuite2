@@ -12,6 +12,9 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.TypePath;
 import org.objectweb.asm.commons.Remapper;
+
+import me.lpk.log.Logger;
+
 import org.objectweb.asm.commons.ClassRemapper;
 
 /**
@@ -104,11 +107,7 @@ public class ClassOptimizer extends ClassRemapper {
         if ((access & (Opcodes.ACC_PUBLIC | Opcodes.ACC_PROTECTED)) == 0) {
             if ((access & Opcodes.ACC_FINAL) != 0
                     && (access & Opcodes.ACC_STATIC) != 0 && desc.length() == 1) {
-                return null;
-            }
-            if ("org/objectweb/asm".equals(pkgName) && s.equals(name)) {
-                System.out.println("INFO: " + clsName + "." + s
-                        + " could be renamed");
+            	Logger.logVeryHigh("ClassOptimizer: Would have deleted field!");
             }
             super.visitField(access, name, desc, null, value);
         } else {
@@ -125,12 +124,15 @@ public class ClassOptimizer extends ClassRemapper {
     public MethodVisitor visitMethod(final int access, final String name,
             final String desc, final String signature, final String[] exceptions) {
         String s = remapper.mapMethodName(className, name, desc);
+       
         if ("-".equals(s)) {
             return null;
         }
         if (name.equals("<clinit>") && !isInterface) {
             hasClinitMethod = true;
-            MethodVisitor mv = super.visitMethod(access, name, desc, null,
+            MethodVisitor mv = 
+            		
+            		super.visitMethod(access, name, desc, null,
                     exceptions);
             return new MethodVisitor(Opcodes.ASM5, mv) {
                 @Override
@@ -143,11 +145,6 @@ public class ClassOptimizer extends ClassRemapper {
         }
 
         if ((access & (Opcodes.ACC_PUBLIC | Opcodes.ACC_PROTECTED)) == 0) {
-            if ("org/objectweb/asm".equals(pkgName) && !name.startsWith("<")
-                    && s.equals(name)) {
-                System.out.println("INFO: " + clsName + "." + s
-                        + " could be renamed");
-            }
             return super.visitMethod(access, name, desc, null, exceptions);
         } else {
             if (!s.equals(name)) {

@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -106,4 +107,13 @@ public class JarUtil {
 		}
 	}
 
+	@SuppressWarnings("resource")
+	public static String getManifestMainClass(File jar) {
+		try {
+			return new JarFile(jar.getAbsolutePath()).getManifest().getMainAttributes().getValue("Main-class").replace(".", "/");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 }

@@ -164,7 +164,7 @@ public class WindowObfu {
 				mappings.get("net/minecraft/client/main/Main").setNewName("Main");
 				try {
 					Map<String, byte[]> out = JarUtil.loadNonClassEntries(file);
-					out.putAll(MappingProcessor.process(nodes, mappings));
+					out.putAll(MappingProcessor.process(nodes, mappings, true));
 					JarUtil.saveAsJar(out, file.getName() + "-Obf.jar");
 					String data = "";
 					for (MappedClass mc : mappings.values()) {

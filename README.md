@@ -21,6 +21,9 @@ A tool used for finding object usage in a program.
 ## SkidAntiOb
 Automated removal of known obfuscators such as ZKM / Allatori / DashO
 
+## SkidObfuscator
+...
+
 # Libraries used:
 *(Included in SkidCore src)*
 * [ASM 5](http://asm.ow2.org/)

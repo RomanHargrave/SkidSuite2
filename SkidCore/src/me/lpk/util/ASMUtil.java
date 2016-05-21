@@ -35,10 +35,10 @@ public class ASMUtil {
 		ClassReader cr = new ClassReader(bytez);
 		ClassNode cn = new ClassNode();
 		try {
-			cr.accept(cn, ClassReader.EXPAND_FRAMES);
+			cr.accept(cn, ClassReader.EXPAND_FRAMES | ClassReader.SKIP_DEBUG);
 		} catch (Exception e) {
 			try {
-				cr.accept(cn, ClassReader.SKIP_FRAMES);
+				cr.accept(cn, ClassReader.SKIP_FRAMES | ClassReader.SKIP_DEBUG);
 			} catch (Exception e2) {
 				// e2.printStackTrace();
 			}

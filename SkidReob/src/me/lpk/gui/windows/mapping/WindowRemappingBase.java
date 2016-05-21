@@ -114,7 +114,7 @@ public abstract class WindowRemappingBase {
 
 	protected void saveJar(File nonEntriesJar, Map<String, ClassNode> nodes, Map<String, MappedClass> mappedClasses, String name) {
 		Map<String, byte[]> out = null;
-		out = MappingProcessor.process(nodes, mappedClasses);
+		out = MappingProcessor.process(nodes, mappedClasses, true);
 		try {
 			out.putAll(JarUtil.loadNonClassEntries(nonEntriesJar));
 		} catch (IOException e) {
