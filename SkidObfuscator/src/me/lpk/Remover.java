@@ -34,7 +34,6 @@ public class Remover {
 	}
 
 	/**
-	 * TODO: Optimize this. It's real fuckin slow. Running it on Minecraft takes upwards of 30 minutes.
 	 * 
 	 * @param node
 	 * @param nodes
