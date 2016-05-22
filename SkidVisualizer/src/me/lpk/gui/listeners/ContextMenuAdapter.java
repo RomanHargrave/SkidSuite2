@@ -11,7 +11,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 
 import me.lpk.MainWindow;
-import me.lpk.gui.component.ASMDecompileSelection;
+import me.lpk.gui.component.DecompileSelection;
 import me.lpk.gui.component.MethodSimulatorPanel;
 import me.lpk.gui.component.SearchResultEntry;
 import me.lpk.util.SearchUtil;
@@ -21,7 +21,7 @@ public class ContextMenuAdapter extends MouseAdapter {
 		if (e.getButton() == MouseEvent.BUTTON1) {
 			return;
 		}
-		ASMDecompileSelection selection = MainWindow.instance.getASMPanel().getSelection();
+		DecompileSelection selection = MainWindow.instance.getASMPanel().getSelection();
 		if (selection == null) {
 			return;
 		}

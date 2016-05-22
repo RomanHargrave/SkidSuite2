@@ -4,14 +4,14 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.MethodNode;
 
-public class ASMDecompileSelection {
+public class DecompileSelection {
 	private final SelectionType type;
 	private final String text;
 	private final ClassNode node;
 	private final MethodNode method;
 	private final FieldNode field;
 
-	public ASMDecompileSelection(SelectionType type, String text, ClassNode node, MethodNode method, FieldNode field) {
+	public DecompileSelection(SelectionType type, String text, ClassNode node, MethodNode method, FieldNode field) {
 		this.type = type;
 		this.text = text;
 		this.node = node;
@@ -19,15 +19,15 @@ public class ASMDecompileSelection {
 		this.field = field;
 	}
 
-	public ASMDecompileSelection(SelectionType type, String text, ClassNode node) {
+	public DecompileSelection(SelectionType type, String text, ClassNode node) {
 		this(type, text, node, null, null);
 	}
 
-	public ASMDecompileSelection(SelectionType type, String text, ClassNode node, FieldNode field) {
+	public DecompileSelection(SelectionType type, String text, ClassNode node, FieldNode field) {
 		this(type, text, node, null, field);
 	}
 
-	public ASMDecompileSelection(SelectionType type, String text, ClassNode node, MethodNode method) {
+	public DecompileSelection(SelectionType type, String text, ClassNode node, MethodNode method) {
 		this(type, text, node, method, null);
 	}
 

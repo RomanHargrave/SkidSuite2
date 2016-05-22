@@ -22,4 +22,20 @@ public class Regexr {
 		}
 		return matches;
 	}
+
+	/**
+	 * Returns a list of all numbers found in a given string.
+	 * @param text
+	 * @return
+	 */
+	public static List<String> matchNumbers(String text) {
+		String pattern = "\\d+[0-9]+";
+		Pattern pat = Pattern.compile(pattern);
+		Matcher m = pat.matcher(text);
+		List<String> matches = new ArrayList<String>();
+		while (m.find()) {
+			matches.add(m.group());
+		}
+		return matches;
+	}
 }
