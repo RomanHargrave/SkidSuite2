@@ -12,6 +12,7 @@ import org.objectweb.asm.tree.MethodNode;
 import me.lpk.MainWindow;
 import me.lpk.gui.component.SearchResultEntry;
 import me.lpk.mapping.MappedClass;
+import me.lpk.mapping.MappedMember;
 import me.lpk.util.Reference;
 import me.lpk.util.ReferenceUtil;
 
@@ -135,13 +136,12 @@ public class SearchUtil {
 	public static List<SearchResultEntry> findMethods(String text) {
 		List<SearchResultEntry> results = new ArrayList<SearchResultEntry>();
 		for (MappedClass mc : MainWindow.instance.getMappings().values()) {
-			if (mc.findMethodByName(text, false) != -1) {
 				results.add(new SearchResultEntry(mc.getNode()));
 				// Class already has a result. It does not need any further
 				// results.
 				continue;
 			}
-			List<Integer> finds = mc.findMethodsByDesc(text);
+			List<MappedMember> finds = mc.findMethodsByDesc(text);
 			if (finds.size() > 0) {
 				results.add(new SearchResultEntry(mc.getNode()));
 			}
@@ -158,13 +158,12 @@ public class SearchUtil {
 	public static List<SearchResultEntry> findFields(String text) {
 		List<SearchResultEntry> results = new ArrayList<SearchResultEntry>();
 		for (MappedClass mc : MainWindow.instance.getMappings().values()) {
-			if (mc.findFieldByName(text, false) != -1) {
 				results.add(new SearchResultEntry(mc.getNode()));
 				// Class already has a result. It does not need any further
 				// results.
 				continue;
 			}
-			List<Integer> finds = mc.findFieldsByDesc(text);
+			List<MappedMember> finds = mc.findFieldsByDesc(text);
 			if (finds.size() > 0) {
 				results.add(new SearchResultEntry(mc.getNode()));
 			}

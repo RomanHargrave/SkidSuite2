@@ -81,7 +81,7 @@ public class ParentUtils {
 	 */
 	public static MappedMember findMethodParent(MappedClass owner, String name, String desc) {
 		// Check for interfaces in the method's class.
-		for (MappedClass interfaceClass : owner.getInterfacesMap().values()) {
+		for (MappedClass interfaceClass : owner.getInterfaces()) {
 			MappedMember mm = findMethod(interfaceClass, name, desc);
 			if (mm != null) {
 				return mm;
@@ -109,7 +109,7 @@ public class ParentUtils {
 	 */
 	public static MappedMember findFieldInParent(MappedClass owner, String name, String desc) {
 		// Check for interfaces in the field's class.
-		for (MappedClass interfaceClass : owner.getInterfacesMap().values()) {
+		for (MappedClass interfaceClass : owner.getInterfaces()) {
 			MappedMember mm = findField(interfaceClass, name, desc);
 			if (mm != null) {
 				return mm;

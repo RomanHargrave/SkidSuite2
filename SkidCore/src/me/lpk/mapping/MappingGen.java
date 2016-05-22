@@ -174,10 +174,10 @@ public class MappingGen {
 		if (!isRenamed) {
 			MappedClass mappedClass = new MappedClass(node, node.name);
 			for (FieldNode fn : node.fields) {
-				mappedClass.addField(new MappedMember(mappedClass, fn, mappedClass.getFieldIndex(), fn.desc, fn.name));
+				mappedClass.addField(new MappedMember(mappedClass, fn, mappedClass.getFields().size(), fn.desc, fn.name));
 			}
 			for (MethodNode mn : node.methods) {
-				mappedClass.addMethod(new MappedMember(mappedClass, mn, mappedClass.getMethodIndex(), mn.desc, mn.name));
+				mappedClass.addMethod(new MappedMember(mappedClass, mn, mappedClass.getMethods().size(), mn.desc, mn.name));
 			}
 			mappedClasses.put(node.name, mappedClass);
 		}
@@ -202,7 +202,7 @@ public class MappingGen {
 			}
 		}
 		// Adding interfaces
-		if (mappedClass.getInterfacesMap().size() == 0) {
+		if (mappedClass.getInterfaces().size() == 0) {
 			for (String interfaze : mappedClass.getNode().interfaces) {
 				MappedClass mappedInterface = mappedClasses.get(interfaze);
 				if (mappedInterface != null) {
@@ -229,9 +229,9 @@ public class MappingGen {
 				}
 			} else {
 				int synths = 0, synthID = -1;
-				for (int fieldKey : mappedClass.getFieldMap().keySet()) {
+				for (int fieldKey =0;fieldKey< mappedClass.getFields().size(); fieldKey++) {
 					// Check for synthetic fields
-					FieldNode fn = mappedClass.getFieldMap().get(fieldKey).getFieldNode();
+					FieldNode fn = mappedClass.getFields().get(fieldKey).getFieldNode();
 					if (fn == null) {
 						continue;
 					}
@@ -245,7 +245,7 @@ public class MappingGen {
 				if (synths == 1) {
 					// If there is a single synthetic field referencing a class,
 					// it's probably an anonymous inner class.
-					FieldNode fn = mappedClass.getFieldMap().get(synthID).getFieldNode();
+					FieldNode fn = mappedClass.getFields().get(synthID).getFieldNode();
 					if (fn != null && fn.desc.contains(";")) {
 						List<String> matches = Regexr.matchDescriptionClasses(fn.desc);
 						if (matches.size() > 0) {

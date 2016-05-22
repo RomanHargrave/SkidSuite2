@@ -42,17 +42,17 @@ public class CorrelationMapperr {
 			targetMap = correlate(targetClass.getParent(), cleanClass.getParent(), targetMap, cleanMap);
 		}
 		// Hop to all interfaces.
-		for (int intKey : targetClass.getInterfacesMap().keySet()) {
-			MappedClass interfaceClassTarget = targetClass.getInterfacesMap().get(intKey);
-			MappedClass interfaceClassClean = cleanClass.getInterfacesMap().get(intKey);
+		for (int key = 0; key < targetClass.getInterfaces().size(); key++) {
+			MappedClass interfaceClassTarget = targetClass.getInterfaces().get(key);
+			MappedClass interfaceClassClean = cleanClass.getInterfaces().get(key);
 			targetMap = correlate(interfaceClassTarget, interfaceClassClean, targetMap, cleanMap);
 		}
 		// Begin renaming
 		targetClass.setNewName(cleanClass.getOriginalName());
 		// Fields
-		Map<Integer, MappedMember> targetFields = targetClass.getFieldMap();
-		Map<Integer, MappedMember> cleanFields = cleanClass.getFieldMap();
-		for (int key : targetFields.keySet()) {
+		List<MappedMember> targetFields = targetClass.getFields();
+		List<MappedMember> cleanFields = cleanClass.getFields();
+		for (int key = 0; key < targetFields.size(); key++) {
 			MappedMember targetField = targetFields.get(key);
 			MappedMember cleanField = cleanFields.get(key);
 			// Extra field?
@@ -91,10 +91,10 @@ public class CorrelationMapperr {
 			}
 		}
 		// Methods
-		Map<Integer, MappedMember> targetMethods = targetClass.getMethodMap();
-		Map<Integer, MappedMember> cleanMethods = cleanClass.getMethodMap();
+		List<MappedMember> targetMethods = targetClass.getMethods();
+		List<MappedMember> cleanMethods = cleanClass.getMethods();
 		int offsetMethd = 0;
-		for (int key : targetMethods.keySet()) {
+		for (int key = 0; key < targetMethods.size(); key++) {
 			MappedMember targetMethod = targetMethods.get(key);
 			MappedMember cleanMethod = cleanMethods.get(key + offsetMethd);
 			// Extra method?
@@ -179,7 +179,7 @@ public class CorrelationMapperr {
 			return mappedClasses;
 		}
 		// Map interfaces
-		for (MappedClass interfaceClass : mappedClass.getInterfacesMap().values()) {
+		for (MappedClass interfaceClass : mappedClass.getInterfaces()) {
 			mappedClasses = fillGap(interfaceClass, mappedClasses, mode);
 		}
 		// Map the parents
@@ -217,10 +217,10 @@ public class CorrelationMapperr {
 			} else {
 				// Check for interfaces. Put them in that package if there is
 				// one or they all are in the same package.
-				if (mappedClass.getInterfacesMap().size() > 0) {
+				if (mappedClass.getInterfaces().size() > 0) {
 					String s = null;
 					boolean failed = false;
-					for (MappedClass interfaceClass : mappedClass.getInterfacesMap().values()) {
+					for (MappedClass interfaceClass : mappedClass.getInterfaces()) {
 						int index = interfaceClass.getNewName().lastIndexOf("/");
 						if (index == -1) {
 							continue;
@@ -249,8 +249,8 @@ public class CorrelationMapperr {
 			mm.setNewName(mode.getFieldName(mm.getFieldNode()));
 		}
 		// Map methods
-		for (int key : mappedClass.getMethodMap().keySet()) {
-			MappedMember mm = mappedClass.getMethodMap().get(key);
+		for (int key = 0; key < mappedClass.getMethods().size(); key++) {
+			MappedMember mm = mappedClass.getMethods().get(key);
 			// Probably shouldn't touch this.
 			if (MappingRenamer.keepName(mm)) {
 				continue;
@@ -263,7 +263,7 @@ public class CorrelationMapperr {
 			} else {
 				mm.setNewName(mode.getMethodName(mm.getMethodNode()));
 			}
-			mappedClass.getMethodMap().put(key, mm);
+			mappedClass.getMethods().set(key, mm);
 		}
 		mappedClasses.put(mappedClass.getOriginalName(), mappedClass);
 		return mappedClasses;
@@ -291,8 +291,8 @@ public class CorrelationMapperr {
 		}
 		// Must have a similar # of fields. Change is porportionate to class
 		// size.
-		double f1 = c1.getFieldIndex();
-		double f2 = c2.getFieldIndex();
+		double f1 = c1.getFields().size();
+		double f2 = c1.getFields().size();
 		double percDiffFields = (Math.abs(f1 - f2) / ((f1 + f2) / 2)) * 100;
 		double maxDiffLevelField = Math.min(35, 52 * (Math.pow(f2, -0.5)));
 		if (percDiffFields > maxDiffLevelField) {
@@ -301,8 +301,8 @@ public class CorrelationMapperr {
 
 		// Must have a similar # of methods. Change is porportionate to class
 		// size.
-		double m1 = c1.getMethodIndex();
-		double m2 = c2.getMethodIndex();
+		double m1 = c1.getMethods().size();
+		double m2 = c2.getMethods().size();
 		double percDiffMethods = (Math.abs(m1 - m2) / ((m1 + m2) / 2)) * 100;
 		double maxDiffLevelMethod = Math.min(35, 52 * (Math.pow(m2, -0.5)));
 		if (percDiffMethods > maxDiffLevelMethod) {

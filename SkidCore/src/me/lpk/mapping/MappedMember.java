@@ -52,7 +52,6 @@ public class MappedMember extends MappedObject {
 	 * @return
 	 */
 	public Object getMemberNode() {
-		// EnigmaLoader makes this null.
 		return memberNode;
 	}
 

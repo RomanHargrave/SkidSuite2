@@ -10,14 +10,6 @@ import org.objectweb.asm.tree.ClassNode;
 
 public class MappedClass extends MappedObject {
 	/**
-	 * Field index : Field
-	 */
-	private final Map<Integer, MappedMember> fieldMap = new HashMap<Integer, MappedMember>();
-	/**
-	 * Method index : Method
-	 */
-	private final Map<Integer, MappedMember> methodMap = new HashMap<Integer, MappedMember>();
-	/**
 	 * Original name : Child
 	 */
 	private final Map<String, MappedClass> children = new HashMap<String, MappedClass>();
@@ -26,95 +18,33 @@ public class MappedClass extends MappedObject {
 	 */
 	private final Map<String, MappedClass> inners = new HashMap<String, MappedClass>();
 	/**
-	 * Interface index : Interface Class
+	 * A list of interfaces implemented by the class.
 	 */
-	private final Map<Integer, MappedClass> interfaces = new HashMap<Integer, MappedClass>();
-	//
-	private int fieldIndex, methodIndex, interfaceIndex;
+	private final List<MappedClass> interfaces = new ArrayList<MappedClass>();
+	/**
+	 * A list of fields belonging to the class.
+	 */
+	private final List<MappedMember> fields = new ArrayList<MappedMember>();
+	/**
+	 * A list of methods belonging to the class.
+	 */
+	private final List<MappedMember> methods = new ArrayList<MappedMember>();
 	/**
 	 * The ClassNode associated with the current MappedClass.
 	 */
 	private final ClassNode node;
 	/**
-	 * Inheritance and access classes.
+	 * The super class.
 	 */
-	private MappedClass parent, outer;
+	private MappedClass parent;
+	/**
+	 * The outer class, if any.
+	 */
+	private MappedClass outer;
 
 	public MappedClass(ClassNode node, String nameNew) {
 		super("CLASS", node.name, nameNew);
 		this.node = node;
-	}
-
-	/**
-	 * Returns a map of field mappings. Keys are based on the index they appear
-	 * in the class.
-	 * 
-	 * @return
-	 */
-	public Map<Integer, MappedMember> getFieldMap() {
-		return fieldMap;
-	}
-
-	/**
-	 * Returns a map of method mappings. Keys are based on the index they appear
-	 * in the class.
-	 * 
-	 * @return
-	 */
-	public Map<Integer, MappedMember> getMethodMap() {
-		return methodMap;
-	}
-
-	/**
-	 * Returns a collection of fields in the MappedClass.
-	 * 
-	 * @return
-	 */
-	public Collection<MappedMember> getFields() {
-		return fieldMap.values();
-	}
-
-	/**
-	 * Returns a collection of methods in the MappedClass.
-	 * 
-	 * @return
-	 */
-	public Collection<MappedMember> getMethods() {
-		return methodMap.values();
-	}
-
-	/**
-	 * Finds a field given a name.
-	 * 
-	 * @param name
-	 * @param useOriginalName
-	 * @return
-	 */
-	public int findFieldByName(String name, boolean useOriginalName) {
-		for (int key : fieldMap.keySet()) {
-			MappedMember mm = fieldMap.get(key);
-			if (useOriginalName ? mm.getOriginalName().equals(name) : mm.getNewName().equals(name)) {
-				return key;
-			}
-		}
-		return -1;
-	}
-
-	/**
-	 * Finds a method given a name.
-	 * 
-	 * @param name
-	 * @param useOriginalName
-	 * @return
-	 */
-	public int findMethodByName(String name, boolean useOriginalName) {
-		for (int key : methodMap.keySet()) {
-			MappedMember mm = methodMap.get(key);
-			if (useOriginalName ? mm.getOriginalName().equals(name) : mm.getNewName().equals(name)) {
-				return key;
-			}
-		}
-		return -1;
 	}
 
 	/**
@@ -150,37 +80,88 @@ public class MappedClass extends MappedObject {
 	}
 
 	/**
-	 * Finds a field given a descriptor.
+	 * Returns a list of fields matching a given name.
 	 * 
-	 * @param desc
+	 * @param text
+	 * @param useOriginalName
 	 * @return
 	 */
-	public List<Integer> findFieldsByDesc(String desc) {
-		List<Integer> indecies = new ArrayList<Integer>();
-		for (int key : fieldMap.keySet()) {
-			MappedMember mm = fieldMap.get(key);
-			if (mm.getDesc().equals(desc)) {
-				indecies.add(key);
+	public List<MappedMember> findFieldsByName(String text, boolean useOriginalName) {
+		List<MappedMember> list = new ArrayList<MappedMember>();
+		for (MappedMember mm : getFields()) {
+			if (useOriginalName ? mm.getOriginalName().equals(text) : mm.getNewName().equals(text)) {
+				list.add(mm);
 			}
 		}
-		return indecies;
+		return list;
 	}
 
 	/**
-	 * Finds a method given a descriptor.
+	 * Returns a list of fields matching a given descriptor.
 	 * 
-	 * @param desc
+	 * @param text
 	 * @return
 	 */
-	public List<Integer> findMethodsByDesc(String desc) {
-		List<Integer> indecies = new ArrayList<Integer>();
-		for (int key : methodMap.keySet()) {
-			MappedMember mm = methodMap.get(key);
-			if (mm.getDesc().equals(desc)) {
-				indecies.add(key);
+	public List<MappedMember> findFieldsByDesc(String text) {
+		List<MappedMember> list = new ArrayList<MappedMember>();
+		for (MappedMember mm : getFields()) {
+			if (mm.getDesc().equals(text)) {
+				list.add(mm);
 			}
 		}
-		return indecies;
+		return list;
+	}
+
+	/**
+	 * Returns a list of methods matching a given name.
+	 * 
+	 * @param text
+	 * @param useOriginalName
+	 * @return
+	 */
+	public List<MappedMember> findMethodsByName(String text, boolean useOriginalName) {
+		List<MappedMember> list = new ArrayList<MappedMember>();
+		for (MappedMember mm : getMethods()) {
+			if (useOriginalName ? mm.getOriginalName().equals(text) : mm.getNewName().equals(text)) {
+				list.add(mm);
+			}
+		}
+		return list;
+	}
+
+	/**
+	 * Returns a list of methods matching a given descriptor.
+	 * 
+	 * @param text
+	 * @return
+	 */
+	public List<MappedMember> findMethodsByDesc(String text) {
+		List<MappedMember> list = new ArrayList<MappedMember>();
+		for (MappedMember mm : getMethods()) {
+			if (mm.getDesc().equals(text)) {
+				list.add(mm);
+			}
+		}
+		return list;
+	}
+
+	/**
+	 * Returns a map of field mappings. Keys are based on the index they appear
+	 * in the class.
+	 * 
+	 * @return
+	 */
+	public List<MappedMember> getFields() {
+		return fields;
+	}
+
+	/**
+	 * Returns a collection of methods in the MappedClass.
+	 * 
+	 * @return
+	 */
+	public List<MappedMember> getMethods() {
+		return methods;
 	}
 
 	/**
@@ -189,8 +170,8 @@ public class MappedClass extends MappedObject {
 	 * @param key
 	 * @return
 	 */
-	public MappedMember findFieldByIndex(int key) {
-		return fieldMap.get(key);
+	public MappedMember getField(int key) {
+		return fields.get(key);
 	}
 
 	/**
@@ -199,8 +180,8 @@ public class MappedClass extends MappedObject {
 	 * @param key
 	 * @return
 	 */
-	public MappedMember findMethodByIndex(int key) {
-		return methodMap.get(key);
+	public MappedMember getMethod(int key) {
+		return methods.get(key);
 	}
 
 	/**
@@ -229,8 +210,7 @@ public class MappedClass extends MappedObject {
 	 * @param interfaze
 	 */
 	private void addInterface(MappedClass interfaze) {
-		interfaces.put(interfaceIndex, interfaze);
-		interfaceIndex++;
+		interfaces.add(interfaze);
 	}
 
 	/**
@@ -249,28 +229,8 @@ public class MappedClass extends MappedObject {
 	 * @param mm
 	 * @return
 	 */
-	public int addField(MappedMember mm) {
-		fieldMap.put(fieldIndex, mm);
-		fieldIndex++;
-		return fieldIndex - 1;
-	}
-
-	/**
-	 * Returns the current method index.
-	 * 
-	 * @return
-	 */
-	public int getMethodIndex() {
-		return methodIndex;
-	}
-
-	/**
-	 * Returns the current field index.
-	 * 
-	 * @return
-	 */
-	public int getFieldIndex() {
-		return fieldIndex;
+	public void addField(MappedMember mm) {
+		fields.add(mm);
 	}
 
 	/**
@@ -279,10 +239,8 @@ public class MappedClass extends MappedObject {
 	 * @param mm
 	 * @return
 	 */
-	public int addMethod(MappedMember mm) {
-		methodMap.put(methodIndex, mm);
-		methodIndex++;
-		return methodIndex - 1;
+	public void addMethod(MappedMember mm) {
+		methods.add(mm);
 	}
 
 	/**
@@ -309,7 +267,7 @@ public class MappedClass extends MappedObject {
 	 * 
 	 * @return
 	 */
-	public Map<Integer, MappedClass> getInterfacesMap() {
+	public List<MappedClass> getInterfaces() {
 		return interfaces;
 	}
 
@@ -395,7 +353,7 @@ public class MappedClass extends MappedObject {
 		if (parent.equals(this)) {
 			return true;
 		}
-		for (MappedClass interfaze : interfaces.values()) {
+		for (MappedClass interfaze : interfaces) {
 			if (interfaze.equals(parent)) {
 				return true;
 			}

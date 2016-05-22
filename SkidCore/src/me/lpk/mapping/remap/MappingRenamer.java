@@ -46,7 +46,7 @@ public class MappingRenamer {
 		if (mc.hasParent()) {
 			mappings = remapClass(mc.getParent(), mappings, mode);
 		}
-		for (MappedClass interfaze : mc.getInterfacesMap().values()) {
+		for (MappedClass interfaze : mc.getInterfaces()) {
 			mappings = remapClass(interfaze, mappings, mode);
 		}
 		if (mc.isInnerClass()) {
