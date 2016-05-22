@@ -136,14 +136,16 @@ public class SearchUtil {
 	public static List<SearchResultEntry> findMethods(String text) {
 		List<SearchResultEntry> results = new ArrayList<SearchResultEntry>();
 		for (MappedClass mc : MainWindow.instance.getMappings().values()) {
-				results.add(new SearchResultEntry(mc.getNode()));
+			List<MappedMember> methodList = mc.findMethodsByName(text, false);
+			if (methodList.size() > 0) {
+				results.add(new SearchResultEntry(mc.getNode(), methodList.get(0).getMethodNode(), -1));
 				// Class already has a result. It does not need any further
 				// results.
 				continue;
 			}
-			List<MappedMember> finds = mc.findMethodsByDesc(text);
-			if (finds.size() > 0) {
-				results.add(new SearchResultEntry(mc.getNode()));
+			methodList = mc.findMethodsByDesc(text);
+			if (methodList.size() > 0) {
+				results.add(new SearchResultEntry(mc.getNode(), methodList.get(0).getMethodNode(), -1));
 			}
 		}
 		return results;
@@ -158,6 +160,7 @@ public class SearchUtil {
 	public static List<SearchResultEntry> findFields(String text) {
 		List<SearchResultEntry> results = new ArrayList<SearchResultEntry>();
 		for (MappedClass mc : MainWindow.instance.getMappings().values()) {
+			if (mc.findFieldsByName(text, false).size() > 0) {
 				results.add(new SearchResultEntry(mc.getNode()));
 				// Class already has a result. It does not need any further
 				// results.
