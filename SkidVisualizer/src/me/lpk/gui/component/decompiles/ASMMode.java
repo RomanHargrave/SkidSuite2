@@ -25,6 +25,7 @@ import org.objectweb.asm.util.TraceClassVisitor;
 
 import me.lpk.MainWindow;
 import me.lpk.gui.component.DecompileSelection;
+import me.lpk.gui.component.SearchResultEntry;
 import me.lpk.mapping.MappedClass;
 import me.lpk.mapping.MappedMember;
 import me.lpk.util.ASMUtil;
@@ -39,7 +40,7 @@ public class ASMMode extends DecompileMode {
 	public ASMMode(DecompileMode mode) {
 		super(mode);
 	}
-
+	
 	@Override
 	public void decompile(ClassNode cn, JTextPane txtEdit, StyledDocument doc) {
 		ClassReader cr = new ClassReader(ASMUtil.getNodeBytes(cn));
@@ -253,6 +254,30 @@ public class ASMMode extends DecompileMode {
 			} else {
 				return new DecompileSelection(DecompileSelection.SelectionType.Field, text, currNode, fieldFromLine(tmp));
 			}
+		}
+	}
+	
+	@Override
+	public  void find(SearchResultEntry result, JTextPane txtEdit) {
+		String name = result.getMethod().name;
+		String desc = result.getMethod().desc;
+		int foundIndex = txtEdit.getText().indexOf(name + desc);
+		if (foundIndex >= 0){
+			txtEdit.setCaretPosition(txtEdit.getText().length() - 1);
+			// Again with the threading shit becase setting the caret positon
+			// instantly after another set doesn't work.
+			// This delay will force the found result to the top of the page.
+			new Thread() {
+				@Override
+				public void run() {
+					try {
+						sleep(10);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					txtEdit.setCaretPosition(foundIndex);
+				}
+			}.start();
 		}
 	}
 

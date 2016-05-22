@@ -41,8 +41,8 @@ public class DecompilePanel extends JPanel {
 	private JTextPane txtEdit = new JTextPane(doc);
 	private JScrollPane scrollEdit = new JScrollPane();
 	private Map<String, ClassNode> nodes = new HashMap<String, ClassNode>();
-	private Map<String, Map<String, Integer>> methodIndecies = new HashMap<String, Map<String, Integer>>();
-	private Map<String, Map<String, Integer>> fieldIndecies = new HashMap<String, Map<String, Integer>>();
+	//private Map<String, Map<String, Integer>> methodIndecies = new HashMap<String, Map<String, Integer>>();
+	//private Map<String, Map<String, Integer>> fieldIndecies = new HashMap<String, Map<String, Integer>>();
 	private ClassNode currNode;
 	private ActionListener jarOpenListner;
 	private MouseAdapter mouseListener;
@@ -195,8 +195,6 @@ public class DecompilePanel extends JPanel {
 		mode.updateCurrentNode(cn);
 		mode.decompile(cn, txtEdit, doc);
 		// TODO: Setup method/field indecies based on 'output'
-		methodIndecies.clear();
-		fieldIndecies.clear();
 		txtEdit.setCaretPosition(0);
 	}
 
@@ -211,19 +209,9 @@ public class DecompilePanel extends JPanel {
 
 	public void setIndex(SearchResultEntry result) {
 		if (result.getMethod() != null) {
-			System.out.println(methodIndecies.size());
-			Map<String, Integer> map = methodIndecies.get(result.getMethod().desc);
-			if (map != null) {
-				String name = result.getMethod().name;
-				if (map.containsKey(name)) {
-					int index = map.get(name);
-					System.out.println(index);
-					txtEdit.grabFocus();
-					txtEdit.setCaretPosition(index);
-					txtEdit.setSelectionStart(index);
-					txtEdit.setSelectionEnd(index + name.length());
-				}
-			}
+			mode.find(result, txtEdit);
+		}else{
+			System.out.println(result.toString());
 		}
 	}
 

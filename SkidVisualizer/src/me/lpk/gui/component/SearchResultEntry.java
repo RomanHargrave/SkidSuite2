@@ -17,7 +17,7 @@ public class SearchResultEntry {
 		this.target = target;
 		this.method = method;
 		this.opcodeIndex = opcodeIndex;
-		this.display = method != null ? target.name + "#" + method.name + "@" + opcodeIndex :  target.name;
+		this.display = method != null ? target.name + "#" + method.name + (opcodeIndex == -1 ? "" : "@" + opcodeIndex) :  target.name;
 	}
 
 	public MethodNode getMethod() {

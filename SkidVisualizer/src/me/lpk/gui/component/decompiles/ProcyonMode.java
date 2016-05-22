@@ -19,6 +19,7 @@ import com.strobel.decompiler.DecompilerSettings;
 import com.strobel.decompiler.PlainTextOutput;
 
 import me.lpk.gui.component.DecompileSelection;
+import me.lpk.gui.component.SearchResultEntry;
 import me.lpk.util.Regexr;
 
 public class ProcyonMode extends DecompileMode {
@@ -55,8 +56,8 @@ public class ProcyonMode extends DecompileMode {
 			StyleConstants.setForeground(attribClass, new Color(160, 140, 40));
 
 			String[] keywords = new String[] { "class", "public", "private", "protected", "static", "final", "volatile", "abstract", "synthetic", "bridge", "implements",
-					"try", "catch", "default", "for", "while", "case", "switch", "if", "else", "extends", "byte", "enum", "interface", "true", "false", "null", "int",
-					"double", "float", "boolean", "char", "long", "this", "new", "return", "break", "continue", "import" };
+					"void", "try", "catch", "default", "for", "while", "case", "switch", "if", "else", "extends", "byte", "enum", "interface", "true", "false", "null",
+					"int", "double", "float", "boolean", "char", "long", "this", "new", "return", "break", "continue", "import" };
 			for (String target : keywords) {
 				int index = output.indexOf(target);
 				while (index >= 0) {
@@ -145,13 +146,6 @@ public class ProcyonMode extends DecompileMode {
 		}
 	}
 
-	private boolean isNotAlphabetic(char charAt) {
-		String s = charAt + "";
-		Pattern regex = Pattern.compile("[^A-Za-z0-9]");
-		Matcher m = regex.matcher(s);
-		return m.find();
-	}
-
 	@Override
 	public DecompileSelection getSelection(JTextPane txtEdit) {
 		// Since for the most part you just can't easily get what class a field
@@ -159,6 +153,82 @@ public class ProcyonMode extends DecompileMode {
 		//
 		// TODO: Use black magic to get this working like the ASM mode.
 		return null;
+	}
+
+	@Override
+	public void find(SearchResultEntry result, JTextPane txtEdit) {
+		String desc = result.getMethod().desc;
+		desc = desc.substring(desc.lastIndexOf(")") + 1);
+		if (desc.length() == 1) {
+			int arraySize = desc.length() - desc.replace("[", "").length();
+			switch (desc) {
+			case "V":
+				desc = "void";
+				break;
+			case "J":
+				desc = "long";
+				break;
+			case "Z":
+				desc = "boolean";
+				break;
+			case "I":
+				desc = "int";
+				break;
+			case "D":
+				desc = "double";
+				break;
+			case "F":
+				desc = "float";
+				break;
+			case "B":
+				desc = "byte";
+				break;
+			case "C":
+				desc = "char";
+				break;
+			case "S":
+				desc = "short";
+				break;
+			}
+			for (int i = 0; i < arraySize; i++) {
+				desc += "[]";
+			}
+		} else {
+			List<String> matches = Regexr.matchDescriptionClasses(desc);
+			if (matches.size() > 0){
+				desc = matches.get(0);
+				desc = desc.substring(desc.lastIndexOf("/") + 1);
+			}
+		}
+		String name = result.getMethod().name;
+		Pattern pattern = Pattern.compile("(" + desc + ").*(" + name + ")");
+		Matcher m = pattern.matcher(txtEdit.getText());
+		boolean found = m.find();
+		int foundIndex = found ? m.start() : -1;
+		if (foundIndex >= 0) {
+			txtEdit.setCaretPosition(txtEdit.getText().length() - 1);
+			// Again with the threading shit becase setting the caret positon
+			// instantly after another set doesn't work.
+			// This delay will force the found result to the top of the page.
+			new Thread() {
+				@Override
+				public void run() {
+					try {
+						sleep(10);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					txtEdit.setCaretPosition(foundIndex);
+				}
+			}.start();
+		}
+	}
+
+	private boolean isNotAlphabetic(char charAt) {
+		String s = charAt + "";
+		Pattern regex = Pattern.compile("[^A-Za-z0-9]");
+		Matcher m = regex.matcher(s);
+		return m.find();
 	}
 
 }

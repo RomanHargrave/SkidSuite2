@@ -10,6 +10,7 @@ import javax.swing.text.StyledDocument;
 import org.objectweb.asm.tree.ClassNode;
 
 import me.lpk.gui.component.DecompileSelection;
+import me.lpk.gui.component.SearchResultEntry;
 
 public abstract class DecompileMode {
 	protected ClassNode currNode;
@@ -25,8 +26,8 @@ public abstract class DecompileMode {
 	}
 	
 	public abstract void decompile(ClassNode cn, JTextPane txtEdit, StyledDocument doc);
-
 	public abstract DecompileSelection getSelection(JTextPane txtEdit);
+	public abstract void find(SearchResultEntry result, JTextPane txtEdit);
 	
 	public void updateNodes(Map<String, ClassNode> nodes) {
 		this.nodes.clear();
