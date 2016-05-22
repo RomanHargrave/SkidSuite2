@@ -276,6 +276,8 @@ public class ASMMode extends DecompileMode {
 						e.printStackTrace();
 					}
 					txtEdit.setCaretPosition(foundIndex);
+					txtEdit.setSelectionStart(foundIndex);
+					txtEdit.setSelectionEnd(foundIndex + name.length()); 
 				}
 			}.start();
 		}

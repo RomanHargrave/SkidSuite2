@@ -55,9 +55,9 @@ public class ProcyonMode extends DecompileMode {
 			StyleConstants.setForeground(attribConst, new Color(90, 130, 180));
 			StyleConstants.setForeground(attribClass, new Color(160, 140, 40));
 
-			String[] keywords = new String[] { "class", "public", "private", "protected", "static", "final", "volatile", "abstract", "synthetic", "bridge", "implements",
-					"void", "try", "catch", "default", "for", "while", "case", "switch", "if", "else", "extends", "byte", "enum", "interface", "true", "false", "null",
-					"int", "double", "float", "boolean", "char", "long", "this", "new", "return", "break", "continue", "import" };
+			String[] keywords = new String[] { "class", "instanceof", "public", "private", "protected", "static", "final", "volatile", "abstract", "synthetic", "bridge",
+					"implements", "void", "try", "catch", "default", "for", "while", "case", "switch", "if", "else", "extends", "byte", "enum", "interface", "true",
+					"false", "null", "int", "double", "float", "boolean", "char", "long", "this", "new", "return", "break", "continue", "import" };
 			for (String target : keywords) {
 				int index = output.indexOf(target);
 				while (index >= 0) {
@@ -158,9 +158,8 @@ public class ProcyonMode extends DecompileMode {
 	@Override
 	public void find(SearchResultEntry result, JTextPane txtEdit) {
 		String desc = result.getMethod().desc;
-		desc = desc.substring(desc.lastIndexOf(")") + 1);
+		desc = desc.substring(desc.lastIndexOf(")") + 1).replace("[", "");
 		if (desc.length() == 1) {
-			int arraySize = desc.length() - desc.replace("[", "").length();
 			switch (desc) {
 			case "V":
 				desc = "void";
@@ -190,17 +189,16 @@ public class ProcyonMode extends DecompileMode {
 				desc = "short";
 				break;
 			}
-			for (int i = 0; i < arraySize; i++) {
-				desc += "[]";
-			}
 		} else {
 			List<String> matches = Regexr.matchDescriptionClasses(desc);
-			if (matches.size() > 0){
+			if (matches.size() > 0) {
 				desc = matches.get(0);
 				desc = desc.substring(desc.lastIndexOf("/") + 1);
 			}
 		}
 		String name = result.getMethod().name;
+		// Copy so the anonymous thread can access it...
+		String desc2 = desc;
 		Pattern pattern = Pattern.compile("(" + desc + ").*(" + name + ")");
 		Matcher m = pattern.matcher(txtEdit.getText());
 		boolean found = m.find();
@@ -219,6 +217,8 @@ public class ProcyonMode extends DecompileMode {
 						e.printStackTrace();
 					}
 					txtEdit.setCaretPosition(foundIndex);
+					txtEdit.setSelectionStart(foundIndex  + desc2.length() + 1);
+					txtEdit.setSelectionEnd(foundIndex  + desc2.length() + 1 + name.length()); 
 				}
 			}.start();
 		}
