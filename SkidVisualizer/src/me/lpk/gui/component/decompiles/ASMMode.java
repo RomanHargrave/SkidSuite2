@@ -324,6 +324,9 @@ public class ASMMode extends DecompileMode {
 
 	protected MethodNode methodFromLine(String tmp) {
 		// Clean the input and split by spaces
+		if (tmp.contains("throws")){
+			tmp = tmp.substring(0, tmp.lastIndexOf(" throws"));
+		}
 		String[] split = tmp.trim().split(" ");
 		if (split.length < 2) {
 			return null;

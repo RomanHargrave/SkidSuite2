@@ -748,6 +748,14 @@ public class InsnInterpreter extends Interpreter<InsnValue> implements Opcodes {
 				}
 				Logger.logHigh("Emulating: " + node.name + "#" + methn.name + methn.desc);
 				List<? extends InsnValue> list = values.subList(values.size() - Type.getArgumentTypes(methn.desc).length, values.size());
+				int parameterIndex = 0;
+				for (InsnValue value : list){
+					if (value.getValue() == null){
+						Logger.logHigh("Emulation Aborted, Parameter["+parameterIndex+"] without a value: " + value.toString());
+						return retVal;
+					}
+					parameterIndex++;
+				}
 				InsnValue ret = (InsnValue) InsnHandler.getFrameExec(methn, nodes, list).pop();
 				if (ret == null) {
 					Logger.errHigh("Emulation Failed!");
