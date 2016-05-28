@@ -2,14 +2,14 @@ package me.lpk.gui.component;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Font;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
-public class MethodCellRenderer extends JLabel implements ListCellRenderer {
+public class MethodCellRenderer extends JLabel implements ListCellRenderer<Object> {
+	private static final long serialVersionUID = 123454321L;
 	private static final Color COL_NORMAL = new Color(245, 245, 255);
 	private static final Color COL_SELECTED = new Color(180, 180, 200);
 	//
@@ -26,7 +26,7 @@ public class MethodCellRenderer extends JLabel implements ListCellRenderer {
 	}
 
 	@Override
-	public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+	public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 		String s = value.toString();
 		if (parent.doColorOpcodes() && s.length() > 1) {
 			setBackground(COL_NORMAL);

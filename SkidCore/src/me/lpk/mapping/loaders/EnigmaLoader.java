@@ -1,4 +1,4 @@
-package me.lpk.mapping;
+package me.lpk.mapping.loaders;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -9,16 +9,18 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.MethodNode;
 
-class EnigmaLoader {
-	private final Map<String, ClassNode> nodes;
+import me.lpk.mapping.MappedClass;
+import me.lpk.mapping.MappedMember;
+import me.lpk.mapping.MappingGen;
 
+public class EnigmaLoader extends MappingLoader{
 	/**
 	 * Instantiates the loader with a map of classnodes to be mapped.
 	 * 
 	 * @param nodes
 	 */
 	public EnigmaLoader(Map<String, ClassNode> nodes) {
-		this.nodes = nodes;
+		super(nodes);
 	}
 
 	/**
@@ -29,6 +31,7 @@ class EnigmaLoader {
 	 *            FileReader of the Enigma mappings file
 	 * @return
 	 */
+	@Override
 	public Map<String, MappedClass> read(FileReader in) {
 		try {
 			return read(new BufferedReader(in));
@@ -45,6 +48,7 @@ class EnigmaLoader {
 	 * @return
 	 * @throws Exception
 	 */
+	@Override
 	public Map<String, MappedClass> read(BufferedReader fileReader) throws Exception {
 		Map<String, MappedClass> remap = new HashMap<String, MappedClass>();
 		int lineNumber = 0;

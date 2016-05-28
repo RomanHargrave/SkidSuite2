@@ -3,6 +3,7 @@ package me.lpk;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JComboBox;
@@ -13,7 +14,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 
 import org.objectweb.asm.tree.ClassNode;
-import me.lpk.gui.component.ASMDecompilePanel;
+import me.lpk.gui.component.DecompilePanel;
 import me.lpk.gui.component.SearchResultPanel;
 import me.lpk.gui.listeners.ContextMenuAdapter;
 import me.lpk.gui.listeners.SearchKeyListener;
@@ -29,7 +30,8 @@ public class MainWindow extends JFrame {
 	private final JMenuBar menuBar;
 	private final JTextField txtMenuSearch;
 	private final JComboBox<String> searchType;
-	private final ASMDecompilePanel asmPanel;
+	private final JComboBox<String> decompileMode;
+	private final DecompilePanel decompilePanel;
 	private final SearchResultPanel searchResults;
 	public static MainWindow instance;
 
@@ -42,7 +44,8 @@ public class MainWindow extends JFrame {
 		menuBar = new JMenuBar();
 		txtMenuSearch = new JTextField();
 		searchType = new JComboBox<String>();
-		asmPanel = new ASMDecompilePanel();
+		decompileMode = new JComboBox<String>();
+		decompilePanel = new DecompilePanel();
 		searchResults = new SearchResultPanel();
 		setup();
 	}
@@ -63,24 +66,34 @@ public class MainWindow extends JFrame {
 		searchType.addItem("Class");
 		searchType.addItem("Field");
 		searchType.addItem("Method");
+		decompileMode.addItem("ASM");
+		decompileMode.addItem("Procyon");
+		decompileMode.addActionListener (new ActionListener () {
+		    public void actionPerformed(ActionEvent e) {
+		    	decompilePanel.setMode(decompileMode.getSelectedItem().toString());
+		    }
+		});
 		txtMenuSearch.addKeyListener(new SearchKeyListener());
 		menuBar.add(searchLbl);
 		menuBar.add(txtMenuSearch);
 		menuBar.add(searchType);
-		asmPanel.setJarListener(new JarLoadListener());
-		asmPanel.setMouseListener(new ContextMenuAdapter());
+		menuBar.add(decompileMode);
+		decompilePanel.setJarListener(new JarLoadListener());
+		decompilePanel.setMouseListener(new ContextMenuAdapter());
 		searchResults.setup();
 
 		// asmPanel // searchResults
 		JSplitPane splitPane = new JSplitPane();
-		splitPane.setLeftComponent(asmPanel);
+		splitPane.setLeftComponent(decompilePanel);
 		splitPane.setRightComponent(searchResults);
 		splitPane.setDividerLocation(INIT_WIDTH - 250);
 		add(menuBar, BorderLayout.NORTH);
 		add(splitPane, BorderLayout.CENTER);
 		
 		// Hardcoding because fuck doing this on my own every time:
-		//asmPanel.openJar(new File("Base.jar"));
+		decompilePanel.openJar(new File("SkidASM.jar"));
+		//setState(Frame.ICONIFIED);
+		//MethodSimulatorPanel.load(asmPanel.getNodes().get("me/lpk/MainWindow").methods.get(2));
 	}
 
 	/**
@@ -90,15 +103,15 @@ public class MainWindow extends JFrame {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			setTitle("Loading classes...");
-			nodes = asmPanel.getNodes();
+			nodes = decompilePanel.getNodes();
 			setTitle("Generating class connections...");
 			mappings = MappingGen.mappingsFromNodes(nodes);
 			setTitle(TITLE);
 		}
 	}
 
-	public ASMDecompilePanel getASMPanel() {
-		return asmPanel;
+	public DecompilePanel getASMPanel() {
+		return decompilePanel;
 	}
 
 	public SearchResultPanel getResultPanel() {

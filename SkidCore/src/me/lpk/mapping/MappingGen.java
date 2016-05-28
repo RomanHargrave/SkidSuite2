@@ -12,12 +12,37 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.MethodNode;
 
+import me.lpk.mapping.loaders.EnigmaLoader;
+import me.lpk.mapping.loaders.MappingLoader;
+import me.lpk.mapping.loaders.ProguardLoader;
+import me.lpk.mapping.loaders.SRGLoader;
 import me.lpk.util.AccessHelper;
 import me.lpk.util.JarUtil;
 import me.lpk.util.ParentUtils;
 import me.lpk.util.Regexr;
 
 public class MappingGen {
+	/**
+	 * 
+	 * @param map
+	 * @param nodes
+	 * @return
+	 */
+	public static Map<String, MappedClass> mappingsFromSRG(File file, Map<String, ClassNode> nodes) {
+		Map<String, MappedClass> base = mappingsFromNodes(nodes);
+		MappingLoader loader = new SRGLoader(nodes);
+		try {
+			Map<String, MappedClass> newMappings = loader.read(new FileReader(file));
+			for (MappedClass mappedClass : newMappings.values()) {
+				newMappings = linkMappings(mappedClass, newMappings);
+			}
+			base = fixFromMappingsText(base, newMappings);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		return base;
+	}
+	
 	/**
 	 * Returns a map of class names to mapped classes given an Engima mapping
 	 * file.
@@ -27,7 +52,7 @@ public class MappingGen {
 	 */
 	public static Map<String, MappedClass> mappingsFromEnigma(File file, Map<String, ClassNode> nodes) {
 		Map<String, MappedClass> base = mappingsFromNodes(nodes);
-		EnigmaLoader loader = new EnigmaLoader(nodes);
+		MappingLoader loader = new EnigmaLoader(nodes);
 		try {
 			Map<String, MappedClass> newMappings = loader.read(new FileReader(file));
 			for (MappedClass mappedClass : newMappings.values()) {
@@ -49,7 +74,7 @@ public class MappingGen {
 	 */
 	public static Map<String, MappedClass> mappingsFromProguard(File file, Map<String, ClassNode> nodes) {
 		Map<String, MappedClass> base = mappingsFromNodes(nodes);
-		ProguardLoader loader = new ProguardLoader(nodes);
+		MappingLoader loader = new ProguardLoader(nodes);
 		try {
 			Map<String, MappedClass> newMappings = loader.read(new FileReader(file));
 			for (MappedClass mappedClass : newMappings.values()) {

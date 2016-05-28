@@ -10,7 +10,6 @@ import org.objectweb.asm.tree.analysis.AnalyzerException;
 
 import me.lpk.analysis.execution.ExecutionAnalyzer;
 import me.lpk.log.Logger;
-import me.lpk.util.OpUtil;
 
 public class InsnHandler {
 	public static InsnFrame[] getFrames(MethodNode mn, Map<String, ClassNode> nodes, List<? extends InsnValue> list ) {

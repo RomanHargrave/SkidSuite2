@@ -1,4 +1,4 @@
-package me.lpk.mapping;
+package me.lpk.mapping.loaders;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -9,10 +9,12 @@ import java.util.Set;
 
 import org.objectweb.asm.tree.ClassNode;
 
+import me.lpk.mapping.MappedClass;
+import me.lpk.mapping.MappedMember;
+import me.lpk.mapping.MappingGen;
 import me.lpk.util.StringUtil;
 
-class ProguardLoader {
-	private final Map<String, ClassNode> nodes;
+public class ProguardLoader  extends MappingLoader{
 	private final static Map<String, String> primitives;
 
 	static {
@@ -39,7 +41,7 @@ class ProguardLoader {
 	 * @param nodes
 	 */
 	public ProguardLoader(Map<String, ClassNode> nodes) {
-		this.nodes = nodes;
+		super(nodes);
 	}
 
 	/**
@@ -50,6 +52,7 @@ class ProguardLoader {
 	 *            FileReader of the Proguard mappings file
 	 * @return
 	 */
+	@Override
 	public Map<String, MappedClass> read(FileReader in) {
 		try {
 			return read(new BufferedReader(in));
@@ -66,6 +69,7 @@ class ProguardLoader {
 	 * @return
 	 * @throws Exception
 	 */
+	@Override
 	public Map<String, MappedClass> read(BufferedReader fileReader) throws Exception {
 		Map<String, MappedClass> origNameMap = new HashMap<String, MappedClass>();
 		Map<String, MappedClass> newNameMap = new HashMap<String, MappedClass>();

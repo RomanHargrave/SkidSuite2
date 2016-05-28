@@ -52,9 +52,13 @@ public class CorrelationMapperr {
 		// Fields
 		List<MappedMember> targetFields = targetClass.getFields();
 		List<MappedMember> cleanFields = cleanClass.getFields();
+		int offsetField = 0;
 		for (int key = 0; key < targetFields.size(); key++) {
+			if (key >= cleanFields.size()){
+				continue;
+			}
 			MappedMember targetField = targetFields.get(key);
-			MappedMember cleanField = cleanFields.get(key);
+			MappedMember cleanField = cleanFields.get(key + offsetField);
 			// Extra field?
 			if (cleanField == null) {
 				continue;
@@ -63,7 +67,22 @@ public class CorrelationMapperr {
 			if (!fix(targetField.getDesc()).equals(fix(cleanField.getDesc()))) {
 				// Field insertion? Make next pass for the clean field (key - x)
 				// x++
+				offsetField -= 1;
 				continue;
+			}else{
+				if (targetField.getDesc().length() > 4 && cleanField.getDesc().length() > 4){
+				String n1 = Regexr.matchDescriptionClasses(targetField.getDesc()).get(0);
+				String n2 = Regexr.matchDescriptionClasses(cleanField.getDesc()).get(0);
+				MappedClass c1 =  targetMap.get(n1);
+				MappedClass c2 =  targetMap.get(n2);
+				if (c1 != null && c2 != null){
+					boolean flag = areSimiliar(c1, c2);
+					if (!flag){
+						offsetField -= 1;
+						continue;
+					}
+				}
+				}
 			}
 			targetField.setNewName(cleanField.getOriginalName());
 			// Attempt to hop to target field's type
@@ -95,7 +114,10 @@ public class CorrelationMapperr {
 		List<MappedMember> cleanMethods = cleanClass.getMethods();
 		int offsetMethd = 0;
 		for (int key = 0; key < targetMethods.size(); key++) {
-			MappedMember targetMethod = targetMethods.get(key);
+			if (key >= cleanMethods.size()){
+				continue;
+			}
+			MappedMember targetMethod = targetMethods.get(key);	
 			MappedMember cleanMethod = cleanMethods.get(key + offsetMethd);
 			// Extra method?
 			if (cleanMethod == null) {
@@ -213,6 +235,9 @@ public class CorrelationMapperr {
 				// Move next to parent. Organizes packages and is less likely to
 				// cass AccessErrors for non-public methods.
 				String newNamePackage = parent.getNewName().substring(0, parent.getNewName().lastIndexOf("/") + 1);
+				if (newNameClass.contains("/")){
+					newNameClass = newNameClass.substring(newNameClass.lastIndexOf("/") + 1);
+				}
 				mappedClass.setNewName(newNamePackage + newNameClass);
 			} else {
 				// Check for interfaces. Put them in that package if there is
@@ -237,6 +262,10 @@ public class CorrelationMapperr {
 					if (failed || s == null) {
 						mappedClass.setNewName(newNameClass);
 					} else {
+						if (newNameClass.contains("/")){
+							newNameClass = newNameClass.substring(newNameClass.lastIndexOf("/") + 1);
+
+						}
 						mappedClass.setNewName(s + "/" + newNameClass);
 					}
 				} else if (!mappedClass.isRenamed()) {
@@ -289,12 +318,18 @@ public class CorrelationMapperr {
 		if (c1.getNode().interfaces.size() != c2.getNode().interfaces.size()) {
 			return false;
 		}
+		if (c1.getOriginalName().contains("me/seriexcode/hasureclient/aW")
+				&& c2.getOriginalName().contains("net/")
+	
+				){
+			return false;
+		}
 		// Must have a similar # of fields. Change is porportionate to class
 		// size.
 		double f1 = c1.getFields().size();
 		double f2 = c1.getFields().size();
 		double percDiffFields = (Math.abs(f1 - f2) / ((f1 + f2) / 2)) * 100;
-		double maxDiffLevelField = Math.min(35, 52 * (Math.pow(f2, -0.5)));
+		double maxDiffLevelField = Math.min(25, 52 * (Math.pow(f2, -0.5)));
 		if (percDiffFields > maxDiffLevelField) {
 			return false;
 		}
@@ -304,7 +339,7 @@ public class CorrelationMapperr {
 		double m1 = c1.getMethods().size();
 		double m2 = c2.getMethods().size();
 		double percDiffMethods = (Math.abs(m1 - m2) / ((m1 + m2) / 2)) * 100;
-		double maxDiffLevelMethod = Math.min(35, 52 * (Math.pow(m2, -0.5)));
+		double maxDiffLevelMethod = Math.min(25, 52 * (Math.pow(m2, -0.5)));
 		if (percDiffMethods > maxDiffLevelMethod) {
 			return false;
 		}
