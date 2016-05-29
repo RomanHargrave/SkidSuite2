@@ -6,7 +6,7 @@ import org.objectweb.asm.tree.analysis.Value;
 
 import org.objectweb.asm.Opcodes;
 
-import me.lpk.util.OpUtil;
+import me.lpk.util.OpUtils;
 
 /**
  * A {@link Value} that is represented by its type in a seven types type system.
@@ -101,7 +101,7 @@ public class InsnValue implements Value {
 	}
 
 	public static InsnValue intValue(AbstractInsnNode opcode) {
-		return new InsnValue(Type.INT_TYPE, OpUtil.getIntValue(opcode));
+		return new InsnValue(Type.INT_TYPE, OpUtils.getIntValue(opcode));
 	}
 
 	public static InsnValue longValue(int opcode) {

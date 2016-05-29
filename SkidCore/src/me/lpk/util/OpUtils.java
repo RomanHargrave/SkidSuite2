@@ -10,7 +10,7 @@ import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.IntInsnNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 
-public class OpUtil implements org.objectweb.asm.Opcodes {
+public class OpUtils implements org.objectweb.asm.Opcodes {
 	private static Map<Integer, String> opcodes = new HashMap<Integer, String>(getCodes());
 	private static Map<String, Integer> reopcodes = new HashMap<String, Integer>(getReCodes());
 

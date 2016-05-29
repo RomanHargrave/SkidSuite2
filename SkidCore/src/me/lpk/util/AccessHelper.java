@@ -3,7 +3,7 @@ package me.lpk.util;
 import static org.objectweb.asm.Opcodes.*;
 
 /**
- * @author Audrey
+ * @author <a href="https://github.com/notaudrey/">Audrey</a>
  * @since 4/30/15
  */
 public class AccessHelper {

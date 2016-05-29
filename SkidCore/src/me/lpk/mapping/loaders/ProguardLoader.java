@@ -12,7 +12,7 @@ import org.objectweb.asm.tree.ClassNode;
 import me.lpk.mapping.MappedClass;
 import me.lpk.mapping.MappedMember;
 import me.lpk.mapping.MappingGen;
-import me.lpk.util.StringUtil;
+import me.lpk.util.StringUtils;
 
 public class ProguardLoader  extends MappingLoader{
 	private final static Map<String, String> primitives;
@@ -111,10 +111,10 @@ public class ProguardLoader  extends MappingLoader{
 		for (String className : origMapSet) {
 			MappedClass mappedClass = origNameMap.get(className);
 			for (MappedMember field : mappedClass.getFields()) {
-				field.setDesc(StringUtil.fixDescReverse(field.getDesc(), origNameMap, newNameMap));
+				field.setDesc(StringUtils.fixDescReverse(field.getDesc(), origNameMap, newNameMap));
 			}
 			for (MappedMember method : mappedClass.getMethods()) {
-				method.setDesc(StringUtil.fixDescReverse(method.getDesc(), origNameMap, newNameMap));
+				method.setDesc(StringUtils.fixDescReverse(method.getDesc(), origNameMap, newNameMap));
 			}
 			origNameMap.put(className, mappedClass);
 		}

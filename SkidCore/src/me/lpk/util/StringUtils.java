@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 import me.lpk.mapping.MappedClass;
 
-public class StringUtil {
+public class StringUtils {
 	/**
 	 * Given an obfuscated description, finds the new values for class names and
 	 * updates the description.
@@ -55,7 +55,7 @@ public class StringUtil {
 		}
 		if (description.contains("L") && description.contains(";")) {
 			if (description.startsWith("(") || (description.startsWith("L") || description.startsWith("[")) && description.endsWith(";")) {
-				List<String> findClasses = Regexr.matchDescriptionClasses(description);
+				List<String> findClasses = RegexUtils.matchDescriptionClasses(description);
 				for (String found : findClasses) {
 					MappedClass mc = newNamesToClasses.get(found);
 					if (mc != null) {

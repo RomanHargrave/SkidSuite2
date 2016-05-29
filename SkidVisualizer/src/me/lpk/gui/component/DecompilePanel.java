@@ -13,7 +13,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +30,8 @@ import org.objectweb.asm.tree.ClassNode;
 import me.lpk.gui.component.decompilers.ASMMode;
 import me.lpk.gui.component.decompilers.DecompileMode;
 import me.lpk.gui.component.decompilers.ProcyonMode;
-import me.lpk.util.JarUtil;
+import me.lpk.util.JarUtils;
+import me.lpk.util.SwingUtils;
 
 public class DecompilePanel extends JPanel {
 	private static final long serialVersionUID = 1L;
@@ -41,7 +41,7 @@ public class DecompilePanel extends JPanel {
 	private StyledDocument doc = new DefaultStyledDocument();
 	private JTextPane txtEdit = new JTextPane(doc);
 	private JScrollPane scrollEdit = new JScrollPane();
-	private Map<String, ClassNode> nodes = new HashMap<String, ClassNode>();
+	private Map<String, ClassNode> nodes;
 	//private Map<String, Map<String, Integer>> methodIndecies = new HashMap<String, Map<String, Integer>>();
 	//private Map<String, Map<String, Integer>> fieldIndecies = new HashMap<String, Map<String, Integer>>();
 	private ClassNode currNode;
@@ -92,7 +92,7 @@ public class DecompilePanel extends JPanel {
 		txtEdit.setEditable(false);
 		splitPane.setRightComponent(scrollEdit);
 		DefaultMutableTreeNode root = new DefaultMutableTreeNode(supportDrag ? "Drag and drop a file!" : "Open a file!");
-		tree = new JTree(root);
+		tree = new JTree(SwingUtils.sort(root));
 		tree.setEditable(true);
 		scrollFiles.setViewportView(tree);
 		splitPane.setLeftComponent(scrollFiles);
@@ -112,7 +112,7 @@ public class DecompilePanel extends JPanel {
 		// entries.iterator();
 		final StringTreeNode root = new StringTreeNode(file.getName(), "");
 		try {
-			nodes = JarUtil.loadClasses(file);
+			nodes = JarUtils.loadClasses(file);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}

@@ -161,7 +161,7 @@ public class ParentUtils {
 				// Generic info is saved in the signature so if there is data in
 				// the signature, check for generics.
 				if (mm.getOwner().getNode().signature != null) {
-					List<String> classes = Regexr.matchDescriptionClasses(desc);
+					List<String> classes = RegexUtils.matchDescriptionClasses(desc);
 					String descCopy = desc + "";
 					for (String detection : classes) {
 						descCopy = descCopy.replace(detection, o);

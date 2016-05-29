@@ -10,22 +10,22 @@ import me.lpk.antis.AntiBase;
 import me.lpk.antis.impl.AntiZKM5;
 import me.lpk.antis.impl.AntiZKM8;
 import me.lpk.mapping.MappingProcessor;
-import me.lpk.util.JarUtil;
+import me.lpk.util.JarUtils;
 
 public class Main {
 
 	public static void main(String[] args) {
 		File file = new File("Nigger.jar");
 		try {
-			Map<String, ClassNode> nodes =	JarUtil.loadClasses(file);
+			Map<String, ClassNode> nodes =	JarUtils.loadClasses(file);
 			for (String className : nodes.keySet()) {
 				AntiBase anti = new AntiZKM5();
 				ClassNode node = nodes.get(className);
 				nodes.put(className, anti.scan(node));
 			}
 			Map<String, byte[]> out = MappingProcessor.process(nodes);
-			out.putAll(JarUtil.loadNonClassEntries(file));
-			JarUtil.saveAsJar(out, "Nigger-re.jar");
+			out.putAll(JarUtils.loadNonClassEntries(file));
+			JarUtils.saveAsJar(out, "Nigger-re.jar");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

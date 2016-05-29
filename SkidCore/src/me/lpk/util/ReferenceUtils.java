@@ -11,7 +11,7 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 
-public class ReferenceUtil {
+public class ReferenceUtils {
 
 	/**
 	 * Finds references to the target class in the second class.

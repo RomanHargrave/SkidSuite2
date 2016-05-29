@@ -14,7 +14,7 @@ import org.apache.commons.io.IOUtils;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 
-public class JarUtil {
+public class JarUtils {
 	/**
 	 * Creates a map of <String(Class name), ClassNode> for a given jar file
 	 * 
@@ -35,7 +35,7 @@ public class JarUtil {
 					String cafebabe = String.format("%02X%02X%02X%02X", bytes[0], bytes[1], bytes[2], bytes[3]);
 					if (cafebabe.toLowerCase().equals("cafebabe")) {
 						try {
-							final ClassNode cn = ASMUtil.getNode(bytes);
+							final ClassNode cn = ASMUtils.getNode(bytes);
 							if (cn != null && cn.superName != null) {
 								for (MethodNode mn : cn.methods) {
 									mn.owner = cn.name;

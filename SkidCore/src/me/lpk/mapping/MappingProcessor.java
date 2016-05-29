@@ -8,7 +8,7 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.commons.ClassRemapper;
 import org.objectweb.asm.tree.ClassNode;
 
-import me.lpk.util.ASMUtil;
+import me.lpk.util.ASMUtils;
 
 public class MappingProcessor {
 	public static boolean PRINT;
@@ -37,7 +37,7 @@ public class MappingProcessor {
 		Map<String, byte[]> out = new HashMap<String, byte[]>();
 		int workIndex = 1;
 		for (ClassNode cn : nodes.values()) {
-			out.put(cn.name, ASMUtil.getNodeBytes(cn));
+			out.put(cn.name, ASMUtils.getNodeBytes(cn));
 			//
 			if (PRINT) {
 				String percentStr = "" + ((workIndex + 0.000000001f) / (nodes.size() - 0.00001f)) * 100;

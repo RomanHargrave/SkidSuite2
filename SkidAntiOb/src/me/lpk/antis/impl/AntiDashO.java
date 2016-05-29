@@ -10,7 +10,7 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
 import me.lpk.antis.AntiBase;
-import me.lpk.util.OpUtil;
+import me.lpk.util.OpUtils;
 
 public class AntiDashO extends AntiBase {
 
@@ -56,7 +56,7 @@ public class AntiDashO extends AntiBase {
 					continue;
 				}
 				String inText = ((LdcInsnNode) ain).cst.toString();
-				int inNum = OpUtil.getIntValue(ain.getNext());
+				int inNum = OpUtils.getIntValue(ain.getNext());
 				String out = deobfuscate(inText, inNum);
 				method.instructions.remove(ain.getNext().getNext());
 				method.instructions.remove(ain.getNext());

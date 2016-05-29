@@ -17,9 +17,9 @@ import me.lpk.mapping.loaders.MappingLoader;
 import me.lpk.mapping.loaders.ProguardLoader;
 import me.lpk.mapping.loaders.SRGLoader;
 import me.lpk.util.AccessHelper;
-import me.lpk.util.JarUtil;
+import me.lpk.util.JarUtils;
 import me.lpk.util.ParentUtils;
-import me.lpk.util.Regexr;
+import me.lpk.util.RegexUtils;
 
 public class MappingGen {
 	/**
@@ -129,7 +129,7 @@ public class MappingGen {
 	public static Map<String, MappedClass> mappingsFromJar(File file) {
 		Map<String, ClassNode> nodes = null;
 		try {
-			nodes = JarUtil.loadClasses(file);
+			nodes = JarUtils.loadClasses(file);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -272,7 +272,7 @@ public class MappingGen {
 					// it's probably an anonymous inner class.
 					FieldNode fn = mappedClass.getFields().get(synthID).getFieldNode();
 					if (fn != null && fn.desc.contains(";")) {
-						List<String> matches = Regexr.matchDescriptionClasses(fn.desc);
+						List<String> matches = RegexUtils.matchDescriptionClasses(fn.desc);
 						if (matches.size() > 0) {
 							outerClass = matches.get(0);
 						}

@@ -11,7 +11,7 @@ import org.objectweb.asm.tree.MethodNode;
 import me.lpk.threat.handlers.MethodHandler;
 
 import me.lpk.threat.result.ThreatResult;
-import me.lpk.util.StringUtil;
+import me.lpk.util.StringUtils;
 
 public class MNetworkRef extends MethodHandler {
 
@@ -27,7 +27,7 @@ public class MNetworkRef extends MethodHandler {
 				}
 			} else if (ain.getType() == AbstractInsnNode.LDC_INSN) {
 				LdcInsnNode ldc = (LdcInsnNode) ain;
-				if (StringUtil.isIP(ldc.cst.toString()) || StringUtil.isLink(ldc.cst.toString())) {
+				if (StringUtils.isIP(ldc.cst.toString()) || StringUtils.isLink(ldc.cst.toString())) {
 					methods.add(toLocation(opIndex, mn.name, ldc));
 				}
 			}

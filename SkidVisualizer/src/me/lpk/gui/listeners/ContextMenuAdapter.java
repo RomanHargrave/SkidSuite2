@@ -6,6 +6,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
 
+import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -13,6 +14,7 @@ import javax.swing.JScrollPane;
 import me.lpk.MainWindow;
 import me.lpk.gui.component.DecompileSelection;
 import me.lpk.gui.component.MethodSimulatorPanel;
+import me.lpk.gui.component.RelationshipPanel;
 import me.lpk.gui.component.SearchResultEntry;
 import me.lpk.util.SearchUtil;
 
@@ -21,7 +23,7 @@ public class ContextMenuAdapter extends MouseAdapter {
 		if (e.getButton() == MouseEvent.BUTTON1) {
 			return;
 		}
-		DecompileSelection selection = MainWindow.instance.getASMPanel().getSelection();
+		DecompileSelection selection = MainWindow.instance.getDecompilePanel().getSelection();
 		if (selection == null) {
 			return;
 		}
@@ -29,8 +31,8 @@ public class ContextMenuAdapter extends MouseAdapter {
 		if (selection.getNode() == null) {
 			JMenuItem contextError = new JMenuItem("<html>Could not find the owner class for the selection: <i>" + selection.getSelection() + "</i></html>");
 			context.add(contextError);
-			JScrollPane scroll = MainWindow.instance.getASMPanel().getTextScroll();
-			context.show(MainWindow.instance.getASMPanel(), e.getX() + scroll.getX(), e.getY() - scroll.getVerticalScrollBar().getValue());
+			JScrollPane scroll = MainWindow.instance.getDecompilePanel().getTextScroll();
+			context.show(MainWindow.instance.getDecompilePanel(), e.getX() + scroll.getX(), e.getY() - scroll.getVerticalScrollBar().getValue());
 			return;
 		}
 		String typeData = selection.isClass() ? selection.getNode().name
@@ -53,7 +55,7 @@ public class ContextMenuAdapter extends MouseAdapter {
 			searchParent.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					MainWindow.instance.getASMPanel().decompile(selection.getNode().superName);
+					MainWindow.instance.getDecompilePanel().decompile(selection.getNode().superName);
 				}
 			});
 			JMenuItem searchChildren = new JMenuItem("Find children of " + (selection.getNode().name));
@@ -78,6 +80,18 @@ public class ContextMenuAdapter extends MouseAdapter {
 					}
 				}
 			});
+			JMenuItem showRelations = new JMenuItem("Show relationships of " + (selection.getNode().name));
+			showRelations.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					RelationshipPanel rp = new RelationshipPanel(MainWindow.instance.getNodes(), selection.getNode().name); 
+					JFrame frame = new JFrame();
+					frame.setSize(1000, 555);
+					frame.setContentPane(rp);
+					frame.setVisible(true);
+					frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+				}
+			});
 			if (selection.getNode().superName == null || (selection.getNode().superName != null && selection.getNode().superName.equals("java/lang/Object"))) {
 				searchParent.setToolTipText("The parent of '" + selection.getNode().name + "' could not be found.");
 				searchParent.setEnabled(false);
@@ -89,13 +103,14 @@ public class ContextMenuAdapter extends MouseAdapter {
 				searchOuter.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						MainWindow.instance.getASMPanel().decompile(outer);
+						MainWindow.instance.getDecompilePanel().decompile(outer);
 					}
 				});
 				context.add(searchOuter);
 			}
 			context.add(searchChildren);
 			context.add(searchReferences);
+			context.add(showRelations);
 		} else if (selection.isField()) {
 			if (selection.getField() != null) {
 				JMenuItem searchReferences = new JMenuItem("Find references to " + selection.getField().name);
@@ -160,7 +175,7 @@ public class ContextMenuAdapter extends MouseAdapter {
 			context.add(searchContaining);
 			context.add(searchSimiliar);
 		}
-		JScrollPane scroll = MainWindow.instance.getASMPanel().getTextScroll();
-		context.show(MainWindow.instance.getASMPanel(), e.getX() + scroll.getX(), e.getY() - scroll.getVerticalScrollBar().getValue());
+		JScrollPane scroll = MainWindow.instance.getDecompilePanel().getTextScroll();
+		context.show(MainWindow.instance.getDecompilePanel(), e.getX() + scroll.getX(), e.getY() - scroll.getVerticalScrollBar().getValue());
 	}
 }

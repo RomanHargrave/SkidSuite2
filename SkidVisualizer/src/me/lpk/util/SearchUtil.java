@@ -14,7 +14,7 @@ import me.lpk.gui.component.SearchResultEntry;
 import me.lpk.mapping.MappedClass;
 import me.lpk.mapping.MappedMember;
 import me.lpk.util.Reference;
-import me.lpk.util.ReferenceUtil;
+import me.lpk.util.ReferenceUtils;
 
 public class SearchUtil {
 	/**
@@ -42,7 +42,7 @@ public class SearchUtil {
 				for (AbstractInsnNode ain : mn.instructions.toArray()) {
 					if (ain.getType() == AbstractInsnNode.LDC_INSN) {
 						if (((LdcInsnNode) ain).cst.toString().toLowerCase().contains(text.toLowerCase())) {
-							results.add(new SearchResultEntry(cn, mn, OpUtil.getIndex(ain)));
+							results.add(new SearchResultEntry(cn, mn, OpUtils.getIndex(ain)));
 						}
 					}
 				}
@@ -62,10 +62,10 @@ public class SearchUtil {
 		List<SearchResultEntry> results = findChildren(node);
 		List<Reference> references = new ArrayList<Reference>();
 		for (ClassNode cn : MainWindow.instance.getNodes().values()) {
-			references.addAll(ReferenceUtil.getReferences(node, method, cn));
+			references.addAll(ReferenceUtils.getReferences(node, method, cn));
 		}
 		for (Reference reference : references) {
-			results.add(new SearchResultEntry(reference.getNode(), reference.getMethod(), OpUtil.getIndex(reference.getAin())));
+			results.add(new SearchResultEntry(reference.getNode(), reference.getMethod(), OpUtils.getIndex(reference.getAin())));
 		}
 		return results;
 	}
@@ -81,10 +81,10 @@ public class SearchUtil {
 		List<SearchResultEntry> results = findChildren(node);
 		List<Reference> references = new ArrayList<Reference>();
 		for (ClassNode cn : MainWindow.instance.getNodes().values()) {
-			references.addAll(ReferenceUtil.getReferences(node, field, cn));
+			references.addAll(ReferenceUtils.getReferences(node, field, cn));
 		}
 		for (Reference reference : references) {
-			results.add(new SearchResultEntry(reference.getNode(), reference.getMethod(), OpUtil.getIndex(reference.getAin())));
+			results.add(new SearchResultEntry(reference.getNode(), reference.getMethod(), OpUtils.getIndex(reference.getAin())));
 		}
 		return results;
 	}
@@ -99,10 +99,10 @@ public class SearchUtil {
 		List<SearchResultEntry> results = findChildren(node);
 		List<Reference> references = new ArrayList<Reference>();
 		for (ClassNode cn : MainWindow.instance.getNodes().values()) {
-			references.addAll(ReferenceUtil.getReferences(node, cn));
+			references.addAll(ReferenceUtils.getReferences(node, cn));
 		}
 		for (Reference reference : references) {
-			results.add(new SearchResultEntry(reference.getNode(), reference.getMethod(), OpUtil.getIndex(reference.getAin())));
+			results.add(new SearchResultEntry(reference.getNode(), reference.getMethod(), OpUtils.getIndex(reference.getAin())));
 		}
 		return results;
 	}

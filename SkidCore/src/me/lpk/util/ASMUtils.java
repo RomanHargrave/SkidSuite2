@@ -11,7 +11,7 @@ import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
-public class ASMUtil {
+public class ASMUtils {
 	/**
 	 * Gets the bytes of a given ClassNode
 	 * 

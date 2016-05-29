@@ -27,7 +27,8 @@ import me.lpk.threat.handlers.methods.MNativeInterface;
 import me.lpk.threat.handlers.methods.MNetworkRef;
 import me.lpk.threat.handlers.methods.MRuntime;
 import me.lpk.threat.handlers.methods.MWebcam;
-import me.lpk.util.JarUtil;
+import me.lpk.util.JarUtils;
+import me.lpk.util.SwingUtils;
 
 import javax.swing.JPanel;
 import java.io.File;
@@ -109,7 +110,7 @@ public class Gui {
 		// Left side (JTree)
 		JPanel pnlTree = new JPanel();
 		File dir = new File(System.getProperty("user.dir"));
-		treeFiles = new JTree(sort(getTreeFromDir(dir)));
+		treeFiles = new JTree(SwingUtils.sort(getTreeFromDir(dir)));
 		treeFiles.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 		treeFiles.addTreeSelectionListener(new TreeSelectionListener() {
 			@Override
@@ -148,7 +149,7 @@ public class Gui {
 	private void scan(File file) {
 		Map<String, ClassNode> nodes = null;
 		try {
-			nodes = JarUtil.loadClasses(file);
+			nodes = JarUtils.loadClasses(file);
 		} catch (IOException e1) {
 			txtpntesttitle.setText("<html><body><span style=\" color: red;  \">" + e1.toString() + "</span></body></html>");
 		}
@@ -222,43 +223,5 @@ public class Gui {
 		return false;
 	}
 
-	/**
-	 * Method by Adrian: [
-	 * <a href="http://stackoverflow.com/a/15704264/5620200">StackOverflow</a> ]
-	 * 
-	 * @param node
-	 * @return
-	 */
-	public DefaultMutableTreeNode sort(DefaultMutableTreeNode node) {
-		// sort alphabetically
-		for (int i = 0; i < node.getChildCount() - 1; i++) {
-			DefaultMutableTreeNode child = (DefaultMutableTreeNode) node.getChildAt(i);
-			String nt = child.getUserObject().toString();
-			for (int j = i + 1; j <= node.getChildCount() - 1; j++) {
-				DefaultMutableTreeNode prevNode = (DefaultMutableTreeNode) node.getChildAt(j);
-				String np = prevNode.getUserObject().toString();
-				System.out.println(nt + " " + np);
-				if (nt.compareToIgnoreCase(np) > 0) {
-					node.insert(child, j);
-					node.insert(prevNode, i);
-				}
-			}
-			if (child.getChildCount() > 0) {
-				sort(child);
-			}
-		}
-		// put folders first - normal on Windows and some flavors of Linux but
-		// not on Mac OS X.
-		for (int i = 0; i < node.getChildCount() - 1; i++) {
-			DefaultMutableTreeNode child = (DefaultMutableTreeNode) node.getChildAt(i);
-			for (int j = i + 1; j <= node.getChildCount() - 1; j++) {
-				DefaultMutableTreeNode prevNode = (DefaultMutableTreeNode) node.getChildAt(j);
-				if (!prevNode.isLeaf() && child.isLeaf()) {
-					node.insert(child, j);
-					node.insert(prevNode, i);
-				}
-			}
-		}
-		return node;
-	}
+	
 }

@@ -16,7 +16,7 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 
-import me.lpk.util.Regexr;
+import me.lpk.util.RegexUtils;
 
 public class Remover {
 	private final static Set<String> visited = new HashSet<String>();
@@ -56,7 +56,7 @@ public class Remover {
 			}
 		}
 		for (FieldNode fn : node.fields) {
-			for (String name : Regexr.matchDescriptionClasses(fn.desc)) {
+			for (String name : RegexUtils.matchDescriptionClasses(fn.desc)) {
 				keep.add(name);
 				if (!visited.contains(name) && nodes.containsKey(name)) {
 					keep.addAll(check(nodes.get(name), nodes));
@@ -64,7 +64,7 @@ public class Remover {
 			}
 		}
 		for (MethodNode mn : node.methods) {
-			for (String name : Regexr.matchDescriptionClasses(mn.desc)) {
+			for (String name : RegexUtils.matchDescriptionClasses(mn.desc)) {
 				keep.add(name);
 				if (!visited.contains(name) && nodes.containsKey(name)) {
 					keep.addAll(check(nodes.get(name), nodes));
@@ -73,7 +73,7 @@ public class Remover {
 			for (AbstractInsnNode ain : mn.instructions.toArray()) {
 				if (ain.getType() == AbstractInsnNode.FIELD_INSN) {
 					FieldInsnNode fin = (FieldInsnNode) ain;
-					for (String name : Regexr.matchDescriptionClasses(fin.desc)) {
+					for (String name : RegexUtils.matchDescriptionClasses(fin.desc)) {
 						keep.add(name);
 						if (!visited.contains(name) && nodes.containsKey(name)) {
 							keep.addAll(check(nodes.get(name), nodes));
@@ -85,7 +85,7 @@ public class Remover {
 					}
 				} else if (ain.getType() == AbstractInsnNode.METHOD_INSN) {
 					MethodInsnNode min = (MethodInsnNode) ain;
-					for (String name : Regexr.matchDescriptionClasses(min.desc)) {
+					for (String name : RegexUtils.matchDescriptionClasses(min.desc)) {
 						keep.add(name);
 						if (!visited.contains(name) && nodes.containsKey(name)) {
 							keep.addAll(check(nodes.get(name), nodes));
@@ -107,7 +107,7 @@ public class Remover {
 					}
 				} else if (ain.getType() == AbstractInsnNode.TYPE_INSN) {
 					TypeInsnNode tin = (TypeInsnNode) ain;
-					for (String name : Regexr.matchDescriptionClasses(tin.desc)) {
+					for (String name : RegexUtils.matchDescriptionClasses(tin.desc)) {
 						keep.add(name);
 						if (!visited.contains(name) && nodes.containsKey(name)) {
 							keep.addAll(check(nodes.get(name), nodes));

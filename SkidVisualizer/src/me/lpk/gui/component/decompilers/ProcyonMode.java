@@ -20,7 +20,7 @@ import com.strobel.decompiler.PlainTextOutput;
 
 import me.lpk.gui.component.DecompileSelection;
 import me.lpk.gui.component.SearchResultEntry;
-import me.lpk.util.Regexr;
+import me.lpk.util.RegexUtils;
 
 public class ProcyonMode extends DecompileMode {
 	public ProcyonMode() {
@@ -133,7 +133,7 @@ public class ProcyonMode extends DecompileMode {
 				i = output.indexOf(multiComment, i + quoteLen + 1);
 			}
 
-			List<String> numbers = Regexr.matchNumbers(output);
+			List<String> numbers = RegexUtils.matchNumbers(output);
 			for (String target : numbers) {
 				int index = output.indexOf(target);
 				while (index >= 0) {
@@ -190,7 +190,7 @@ public class ProcyonMode extends DecompileMode {
 				break;
 			}
 		} else {
-			List<String> matches = Regexr.matchDescriptionClasses(desc);
+			List<String> matches = RegexUtils.matchDescriptionClasses(desc);
 			if (matches.size() > 0) {
 				desc = matches.get(0);
 				desc = desc.substring(desc.lastIndexOf("/") + 1);

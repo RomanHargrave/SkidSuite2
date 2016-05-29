@@ -13,7 +13,7 @@ import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
 import me.lpk.antis.AntiBase;
-import me.lpk.util.OpUtil;
+import me.lpk.util.OpUtils;
 
 public class AntiZKM5 extends AntiBase {
 	private final Map<Integer, String> strings = new HashMap<Integer, String>();
@@ -69,7 +69,7 @@ public class AntiZKM5 extends AntiBase {
 						if (fin.name.equals(zkmFieldName) && fin.desc.equals("[Ljava/lang/String;")) {
 							// If the value has already been decrypted, swap out
 							// the value.
-							String value = strings.get(OpUtil.getIntValue(iin));
+							String value = strings.get(OpUtils.getIntValue(iin));
 							if (value != null && !value.equals("null")) {
 								method.instructions.set(fin, new LdcInsnNode(value));
 								method.instructions.remove(iin);
@@ -159,7 +159,7 @@ public class AntiZKM5 extends AntiBase {
 					// Match is valid, populate the modifiers.
 					if (lastInsns.size() > 8) {
 						for (int i = 0; i < 5; i++) {
-							int v = OpUtil.getIntValue(lastInsns.get(i * 2));
+							int v = OpUtils.getIntValue(lastInsns.get(i * 2));
 							modifiers.put(i, v);
 						}
 						possibleMatch = false;

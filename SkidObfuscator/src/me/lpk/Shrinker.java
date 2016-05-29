@@ -48,7 +48,7 @@ import me.lpk.log.Logger;
 import me.lpk.mapping.MappedClass;
 import me.lpk.mapping.SkidRemapper;
 import me.lpk.util.Classpather;
-import me.lpk.util.JarUtil;
+import me.lpk.util.JarUtils;
 import me.lpk.util.LazySetupMaker;
 
 import javax.swing.ListSelectionModel;
@@ -117,11 +117,11 @@ public class Shrinker {
 		LazySetupMaker lsm = LazySetupMaker.get(jar.getAbsolutePath(), false, true);
 		Map<String, byte[]> out = new HashMap<String, byte[]>();
 		try {
-			out.putAll(JarUtil.loadNonClassEntries(jar));
+			out.putAll(JarUtils.loadNonClassEntries(jar));
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		String mainClass = JarUtil.getManifestMainClass(jar);
+		String mainClass = JarUtils.getManifestMainClass(jar);
 		boolean isLibrary = chkNoRemoval.isSelected() || mainClass == null;
 		Logger.logLow("Compting classes to ignore... (Processing time scales exponentially with file size)");
 		Set<String> keep = isLibrary ? null : Remover.evaluate(mainClass, lsm.getNodes());
@@ -154,7 +154,7 @@ public class Shrinker {
 
 		Logger.logLow("Saving...");
 		File newJar = new File(jar.getName().substring(0, jar.getName().indexOf(".")) + "-opti.jar");
-		JarUtil.saveAsJar(out, newJar.getName());
+		JarUtils.saveAsJar(out, newJar.getName());
 		try {
 			Thread.sleep(25);
 		} catch (InterruptedException e) {

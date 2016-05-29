@@ -39,10 +39,10 @@ public class SearchResultPanel extends JPanel {
 				if (list.getSelectedIndex() == lastIndex) {
 					String path = getPath();
 					if (path != null) {
-						if (MainWindow.instance.getASMPanel().getCurrentNode() == null || !MainWindow.instance.getASMPanel().getCurrentNode().name.equals(path)) {
-							MainWindow.instance.getASMPanel().decompile(path);
+						if (MainWindow.instance.getDecompilePanel().getCurrentNode() == null || !MainWindow.instance.getDecompilePanel().getCurrentNode().name.equals(path)) {
+							MainWindow.instance.getDecompilePanel().decompile(path);
 						}
-						MainWindow.instance.getASMPanel().setIndex(getSelectedSearchEntry());
+						MainWindow.instance.getDecompilePanel().setIndex(getSelectedSearchEntry());
 						// TODO: Have text indexes in the ASMPanel saved where
 						// fields/methods are located
 						// SearchResultEntry can then find the correct index

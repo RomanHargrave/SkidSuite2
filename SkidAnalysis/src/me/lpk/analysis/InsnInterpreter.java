@@ -27,7 +27,7 @@ import org.objectweb.asm.tree.analysis.AnalyzerException;
 import org.objectweb.asm.tree.analysis.Interpreter;
 
 import me.lpk.log.Logger;
-import me.lpk.util.OpUtil;
+import me.lpk.util.OpUtils;
 
 /**
  * An {@link Interpreter} for {@link InsnValue} values.
@@ -379,7 +379,7 @@ public class InsnInterpreter extends Interpreter<InsnValue> implements Opcodes {
 
 	private InsnValue doUnaryInt(AbstractInsnNode insn, InsnValue value) {
 		if (value.getValue() == null) {
-			System.err.println("FUUUGGGG: " + OpUtil.getOpcodeText(insn.getOpcode()));
+			System.err.println("FUUUGGGG: " + OpUtils.getOpcodeText(insn.getOpcode()));
 			return InsnValue.INT_VALUE;
 		}
 		switch (insn.getOpcode()) {

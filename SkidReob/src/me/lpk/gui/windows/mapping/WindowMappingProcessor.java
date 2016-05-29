@@ -12,7 +12,7 @@ import org.objectweb.asm.tree.ClassNode;
 import me.lpk.mapping.MappedClass;
 import me.lpk.mapping.MappingGen;
 import me.lpk.mapping.MappingProcessor;
-import me.lpk.util.JarUtil;
+import me.lpk.util.JarUtils;
 
 import javax.swing.JTextPane;
 import java.awt.event.ActionListener;
@@ -112,11 +112,11 @@ public class WindowMappingProcessor {
 		txtLog = new JTextPane();
 		scrollPane.setViewportView(txtLog);
 
-		JComboBox<String> list = new JComboBox<String>(new String[] { "Proguard", "Enigma", "SRG" });
-		list.addActionListener(new ActionListener() {
+		JComboBox<String> combo = new JComboBox<String>(new String[] { "Proguard", "Enigma", "SRG" });
+		combo.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String s = list.getSelectedItem().toString();
+				String s = combo.getSelectedItem().toString();
 				btnUndo.removeActionListener(currentAction);
 				if (s.equals("Proguard")) {
 					currentAction = new ProguardAction();
@@ -132,19 +132,19 @@ public class WindowMappingProcessor {
 			}
 		});
 
-		list.setBounds(140, 79, 120, 23);
-		frame.getContentPane().add(list);
+		combo.setBounds(140, 79, 120, 23);
+		frame.getContentPane().add(combo);
 	}
 
 	private void saveJar(File nonEntriesJar, Map<String, ClassNode> nodes, Map<String, MappedClass> mappedClasses, String name) {
 		Map<String, byte[]> out = null;
 		out = MappingProcessor.process(nodes, mappedClasses, true);
 		try {
-			out.putAll(JarUtil.loadNonClassEntries(nonEntriesJar));
+			out.putAll(JarUtils.loadNonClassEntries(nonEntriesJar));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		JarUtil.saveAsJar(out, name);
+		JarUtils.saveAsJar(out, name);
 	}
 
 	private void log(String s) {
@@ -165,7 +165,7 @@ public class WindowMappingProcessor {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			try {
-				Map<String, ClassNode> nodes = JarUtil.loadClasses(jar);
+				Map<String, ClassNode> nodes = JarUtils.loadClasses(jar);
 				log("Loaded nodes from jar: " + jar.getAbsolutePath());
 				Map<String, MappedClass> mappedClasses = MappingGen.mappingsFromEnigma(map, nodes);
 				log("Loaded mappings from engima mappings: " + map.getAbsolutePath());
@@ -182,7 +182,7 @@ public class WindowMappingProcessor {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			try {
-				Map<String, ClassNode> nodes = JarUtil.loadClasses(jar);
+				Map<String, ClassNode> nodes = JarUtils.loadClasses(jar);
 				log("Loaded nodes from jar: " + jar.getAbsolutePath());
 				Map<String, MappedClass> mappedClasses = MappingGen.mappingsFromSRG(map, nodes);
 				log("Loaded mappings from engima mappings: " + map.getAbsolutePath());
@@ -199,7 +199,7 @@ public class WindowMappingProcessor {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			try {
-				Map<String, ClassNode> nodes = JarUtil.loadClasses(jar);
+				Map<String, ClassNode> nodes = JarUtils.loadClasses(jar);
 				log("Loaded nodes from jar: " + jar.getAbsolutePath());
 				Map<String, MappedClass> mappedClasses = MappingGen.mappingsFromProguard(map, nodes);
 				log("Loaded mappings from proguard mappings: " + map.getAbsolutePath());

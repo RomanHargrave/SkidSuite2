@@ -16,7 +16,7 @@ import me.lpk.mapping.MappedMember;
 import me.lpk.mapping.remap.MappingRenamer;
 import me.lpk.mapping.remap.MappingMode;
 import me.lpk.util.ParentUtils;
-import me.lpk.util.Regexr;
+import me.lpk.util.RegexUtils;
 
 public class CorrelationMapperr {
 	/**
@@ -71,8 +71,8 @@ public class CorrelationMapperr {
 				continue;
 			}else{
 				if (targetField.getDesc().length() > 4 && cleanField.getDesc().length() > 4){
-				String n1 = Regexr.matchDescriptionClasses(targetField.getDesc()).get(0);
-				String n2 = Regexr.matchDescriptionClasses(cleanField.getDesc()).get(0);
+				String n1 = RegexUtils.matchDescriptionClasses(targetField.getDesc()).get(0);
+				String n2 = RegexUtils.matchDescriptionClasses(cleanField.getDesc()).get(0);
 				MappedClass c1 =  targetMap.get(n1);
 				MappedClass c2 =  targetMap.get(n2);
 				if (c1 != null && c2 != null){
@@ -354,20 +354,20 @@ public class CorrelationMapperr {
 	 * @return
 	 */
 	private static List<MappedClass> getTypesFromMember(MappedMember member, Map<String, MappedClass> map) {
-		List<String> names = Regexr.matchDescriptionClasses(member.getDesc());
+		List<String> names = RegexUtils.matchDescriptionClasses(member.getDesc());
 		if (member.isMethod()) {
 			for (AbstractInsnNode ain : member.getMethodNode().instructions.toArray()) {
 				if (ain.getType() == AbstractInsnNode.INVOKE_DYNAMIC_INSN || ain.getType() == AbstractInsnNode.METHOD_INSN) {
 					MethodInsnNode min = (MethodInsnNode) ain;
-					names.addAll(Regexr.matchDescriptionClasses(min.desc));
+					names.addAll(RegexUtils.matchDescriptionClasses(min.desc));
 					names.add(min.owner);
 				} else if (ain.getType() == AbstractInsnNode.FIELD_INSN) {
 					FieldInsnNode fin = (FieldInsnNode) ain;
-					names.addAll(Regexr.matchDescriptionClasses(fin.desc));
+					names.addAll(RegexUtils.matchDescriptionClasses(fin.desc));
 					names.add(fin.owner);
 				} else if (ain.getType() == AbstractInsnNode.TYPE_INSN) {
 					TypeInsnNode tin = (TypeInsnNode) ain;
-					names.addAll(Regexr.matchDescriptionClasses(tin.desc));
+					names.addAll(RegexUtils.matchDescriptionClasses(tin.desc));
 				}
 				else if (ain.getType() == AbstractInsnNode.LDC_INSN) {
 					LdcInsnNode ldc = (LdcInsnNode) ain;

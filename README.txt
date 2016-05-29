@@ -1,1 +1,0 @@
-Requires Java 8 to run. Shrunk files will also be compiled to Java 8.

@@ -56,7 +56,7 @@ public class LazySetupMaker {
 		if (readExtraLibs) {
 			try {
 				for (File lib : getExtraLibs()) {
-					libNodes.putAll(JarUtil.loadClasses(lib));
+					libNodes.putAll(JarUtils.loadClasses(lib));
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -65,7 +65,7 @@ public class LazySetupMaker {
 		if (readDefaultLibraries) {
 			try {
 				for (File lib : getLibraries()) {
-					libNodes.putAll(JarUtil.loadClasses(lib));
+					libNodes.putAll(JarUtils.loadClasses(lib));
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -139,7 +139,7 @@ public class LazySetupMaker {
 	private static Map<String, ClassNode> loadNodes(File file) {
 		Map<String, ClassNode> nodes = null;
 		try {
-			nodes = JarUtil.loadClasses(file);
+			nodes = JarUtils.loadClasses(file);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

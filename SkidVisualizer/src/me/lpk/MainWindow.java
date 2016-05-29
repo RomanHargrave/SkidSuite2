@@ -3,7 +3,6 @@ package me.lpk;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JComboBox;
@@ -23,7 +22,7 @@ import me.lpk.mapping.MappingGen;
 
 public class MainWindow extends JFrame {
 	private static final long serialVersionUID = 1L;
-	private static final String TITLE = "SkidASM";
+	private static final String TITLE = "SkidVisualizer";
 	private static final int INIT_WIDTH = 1080, INIT_HEIGHT = 800;
 	private Map<String, ClassNode> nodes = new HashMap<String, ClassNode>();
 	private Map<String, MappedClass> mappings;
@@ -90,10 +89,10 @@ public class MainWindow extends JFrame {
 		add(menuBar, BorderLayout.NORTH);
 		add(splitPane, BorderLayout.CENTER);
 		
-		// Hardcoding because fuck doing this on my own every time:
-		decompilePanel.openJar(new File("SkidASM.jar"));
-		//setState(Frame.ICONIFIED);
-		//MethodSimulatorPanel.load(asmPanel.getNodes().get("me/lpk/MainWindow").methods.get(2));
+		// Hardcoding because screw doing this on my own every time:
+		// decompilePanel.openJar(new File("SkidASM.jar"));
+		// setState(Frame.ICONIFIED);
+		// MethodSimulatorPanel.load(asmPanel.getNodes().get("me/lpk/MainWindow").methods.get(2));
 	}
 
 	/**
@@ -110,7 +109,7 @@ public class MainWindow extends JFrame {
 		}
 	}
 
-	public DecompilePanel getASMPanel() {
+	public DecompilePanel getDecompilePanel() {
 		return decompilePanel;
 	}
 

@@ -10,7 +10,7 @@ import org.objectweb.asm.tree.analysis.*;
 
 import me.lpk.analysis.*;
 import me.lpk.log.Logger;
-import me.lpk.util.OpUtil;
+import me.lpk.util.OpUtils;
 
 /**
  * Used to emulate the stack of a method. 
@@ -88,11 +88,11 @@ public class ExecutionAnalyzer<V extends Value> implements Opcodes {
 			}
 			insn = insn.getNext();
 			if (current.doJump) {
-				int curIndex = OpUtil.getIndex(insn);
-				int labelIndex = OpUtil.getIndex(current.jin);
+				int curIndex = OpUtils.getIndex(insn);
+				int labelIndex = OpUtils.getIndex(current.jin);
 				insn = m.instructions.get(labelIndex);
 				current.doJump = false;
-				Logger.logVeryHigh("Jumping[" + OpUtil.getOpcodeText(insn.getOpcode()) + "]: " + curIndex + " --> " + labelIndex);
+				Logger.logVeryHigh("Jumping[" + OpUtils.getOpcodeText(insn.getOpcode()) + "]: " + curIndex + " --> " + labelIndex);
 			}
 		}
 		current.ain = new InsnNode(Opcodes.RETURN);

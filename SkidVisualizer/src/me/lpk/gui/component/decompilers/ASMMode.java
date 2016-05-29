@@ -28,10 +28,10 @@ import me.lpk.gui.component.DecompileSelection;
 import me.lpk.gui.component.SearchResultEntry;
 import me.lpk.mapping.MappedClass;
 import me.lpk.mapping.MappedMember;
-import me.lpk.util.ASMUtil;
-import me.lpk.util.OpUtil;
+import me.lpk.util.ASMUtils;
+import me.lpk.util.OpUtils;
 import me.lpk.util.ParentUtils;
-import me.lpk.util.StringUtil;
+import me.lpk.util.StringUtils;
 
 public class ASMMode extends DecompileMode {
 	public ASMMode() {
@@ -43,7 +43,7 @@ public class ASMMode extends DecompileMode {
 	
 	@Override
 	public void decompile(ClassNode cn, JTextPane txtEdit, StyledDocument doc) {
-		ClassReader cr = new ClassReader(ASMUtil.getNodeBytes(cn));
+		ClassReader cr = new ClassReader(ASMUtils.getNodeBytes(cn));
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		PrintStream ps = new PrintStream(os);
 		cr.accept(new TraceClassVisitor(null, new Textifier(), new PrintWriter(ps)), 0);
@@ -79,7 +79,7 @@ public class ASMMode extends DecompileMode {
 			for (String target : signatures) {
 				int index = output.indexOf(target);
 				while (index >= 0) {
-					if (target.equals("L") && (StringUtil.isNumeric(output.substring(index + 1, index + 2)) || output.substring(index - 1, index).equals("/"))) {
+					if (target.equals("L") && (StringUtils.isNumeric(output.substring(index + 1, index + 2)) || output.substring(index - 1, index).equals("/"))) {
 						index = output.indexOf(target, index + 1);
 						continue;
 					}
@@ -93,7 +93,7 @@ public class ASMMode extends DecompileMode {
 			}
 			Set<String> extraOpcodes = new HashSet<String>();
 			extraOpcodes.addAll(Arrays.asList("LINENUMBER", "MAXSTACK", "MAXLOCALS", "FRAME", "LOCALVARIABLE", "TRYCATCHBLOCK"));
-			extraOpcodes.addAll(OpUtil.getOpcodes());
+			extraOpcodes.addAll(OpUtils.getOpcodes());
 			for (String opcode : extraOpcodes) {
 				int i = output.indexOf(opcode);
 				while (i >= 0) {

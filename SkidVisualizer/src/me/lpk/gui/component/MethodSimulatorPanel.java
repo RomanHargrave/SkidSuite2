@@ -34,7 +34,7 @@ import org.objectweb.asm.tree.VarInsnNode;
 import me.lpk.MainWindow;
 import me.lpk.analysis.InsnFrame;
 import me.lpk.analysis.InsnHandler;
-import me.lpk.util.OpUtil;
+import me.lpk.util.OpUtils;
 
 public class MethodSimulatorPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
@@ -129,7 +129,7 @@ public class MethodSimulatorPanel extends JPanel {
 	
 
 	private static String toText(AbstractInsnNode ain) {
-		String base = OpUtil.getOpcodeText(ain.getOpcode());
+		String base = OpUtils.getOpcodeText(ain.getOpcode());
 		switch (ain.getType()) {
 		case AbstractInsnNode.FIELD_INSN:
 			FieldInsnNode fin = (FieldInsnNode) ain;
@@ -139,11 +139,11 @@ public class MethodSimulatorPanel extends JPanel {
 			return base + "[local " + iin.var + "] +" + iin.incr;
 		case AbstractInsnNode.INSN:
 			if (ain.getOpcode() >= Opcodes.ICONST_0 && ain.getOpcode() <= Opcodes.ICONST_M1) {
-				return base + " " + OpUtil.getIntValue(ain);
+				return base + " " + OpUtils.getIntValue(ain);
 			}
 			return base;
 		case AbstractInsnNode.INT_INSN:
-			return base + " " + OpUtil.getIntValue(ain);
+			return base + " " + OpUtils.getIntValue(ain);
 		case AbstractInsnNode.INVOKE_DYNAMIC_INSN:
 			InvokeDynamicInsnNode idin = (InvokeDynamicInsnNode) ain;
 			return base + idin.name + " " + idin.desc;

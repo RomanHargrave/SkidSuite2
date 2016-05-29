@@ -5,7 +5,7 @@ import java.util.Map;
 import org.objectweb.asm.commons.Remapper;
 
 import me.lpk.util.ParentUtils;
-import me.lpk.util.StringUtil;
+import me.lpk.util.StringUtils;
 
 /**
  * An implementation of ASM's Remapper. Given a map of MappedClasses in the
@@ -26,7 +26,7 @@ public class SkidRemapper extends Remapper {
 
 	@Override
 	public String mapDesc(String desc) {
-		return super.mapDesc(StringUtil.fixDesc(desc, renamed));
+		return super.mapDesc(StringUtils.fixDesc(desc, renamed));
 	}
 
 	@Override
@@ -34,13 +34,13 @@ public class SkidRemapper extends Remapper {
 		if (type == null) {
 			return null;
 		}
-		return super.mapType(StringUtil.fixDesc(type, renamed));
+		return super.mapType(StringUtils.fixDesc(type, renamed));
 	}
 
 	@Override
 	public String[] mapTypes(String[] types) {
 		for (int i = 0; i < types.length; i++) {
-			types[i] = StringUtil.fixDesc(types[i], renamed);
+			types[i] = StringUtils.fixDesc(types[i], renamed);
 		}
 		return super.mapTypes(types);
 	}
@@ -55,7 +55,7 @@ public class SkidRemapper extends Remapper {
 			// was invalid.
 			throw new RuntimeException();
 		}
-		return super.mapMethodDesc(StringUtil.fixDesc(desc, renamed));
+		return super.mapMethodDesc(StringUtils.fixDesc(desc, renamed));
 	}
 
 	@Override
@@ -70,7 +70,7 @@ public class SkidRemapper extends Remapper {
 		}
 		String s = signature;
 		try {
-			s = super.mapSignature(StringUtil.fixDesc(signature, renamed), typeSignature);
+			s = super.mapSignature(StringUtils.fixDesc(signature, renamed), typeSignature);
 		} catch (java.lang.StringIndexOutOfBoundsException e) {
 			e.printStackTrace();
 			System.out.println(signature);
@@ -97,7 +97,7 @@ public class SkidRemapper extends Remapper {
 
 	@Override
 	public String mapInvokeDynamicMethodName(String name, String desc) {
-		MappedClass mc = renamed.get(StringUtil.getMappedFromDesc(renamed, desc));
+		MappedClass mc = renamed.get(StringUtils.getMappedFromDesc(renamed, desc));
 		if (me.lpk.mapping.remap.MappingRenamer.isNameWhitelisted(name)) {
 			return super.mapInvokeDynamicMethodName(name, desc);
 		}
@@ -126,7 +126,7 @@ public class SkidRemapper extends Remapper {
 
 	@Override
 	public String map(String typeName) {
-		typeName = StringUtil.fixDesc(typeName, renamed);
+		typeName = StringUtils.fixDesc(typeName, renamed);
 		return super.map(typeName);
 	}
 }

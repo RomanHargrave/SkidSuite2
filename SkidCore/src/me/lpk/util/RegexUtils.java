@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Regexr {
+public class RegexUtils {
 	/**
 	 * Returns a list of all class matches in a description.
 	 * 
