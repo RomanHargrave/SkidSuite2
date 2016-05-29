@@ -28,3 +28,6 @@ Automated removal of known obfuscators such as ZKM / Allatori / DashO
 *(Included in SkidCore src)*
 * [ASM 5](http://asm.ow2.org/)
 * [Commons-IO](https://commons.apache.org/proper/commons-io/)
+
+*(Not included)*
+* [Procyon](https://bitbucket.org/mstrobel/procyon/)
