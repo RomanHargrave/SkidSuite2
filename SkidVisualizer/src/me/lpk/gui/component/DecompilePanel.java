@@ -137,7 +137,7 @@ public class DecompilePanel extends JPanel {
 				dirPath.remove(0);
 			}
 		}
-		tree = new JTree(root);
+		tree = new JTree(SwingUtils.sort(root));
 		tree.addMouseListener(new MouseListener() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
