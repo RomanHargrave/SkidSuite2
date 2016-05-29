@@ -27,9 +27,10 @@ import javax.swing.text.StyledDocument;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.objectweb.asm.tree.ClassNode;
-import me.lpk.gui.component.decompiles.ASMMode;
-import me.lpk.gui.component.decompiles.DecompileMode;
-import me.lpk.gui.component.decompiles.ProcyonMode;
+
+import me.lpk.gui.component.decompilers.ASMMode;
+import me.lpk.gui.component.decompilers.DecompileMode;
+import me.lpk.gui.component.decompilers.ProcyonMode;
 import me.lpk.util.JarUtil;
 
 public class DecompilePanel extends JPanel {

@@ -1,4 +1,4 @@
-package me.lpk.gui.component.decompiles;
+package me.lpk.gui.component.decompilers;
 
 import java.io.File;
 import java.util.HashMap;
