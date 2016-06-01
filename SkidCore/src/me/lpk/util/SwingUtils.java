@@ -33,9 +33,15 @@ public class SwingUtils {
 			}
 		}
 		Collections.sort(cNames);
+		int lastIndx = -1;
 		for (String name : cNames) {
 			int indx = orgCnames.indexOf(name);
-			node.insert(children.get(indx), node.getChildCount());
+			int insertIndex =  node.getChildCount();
+			if (indx == lastIndx){
+				continue;
+			}
+			lastIndx = indx;
+			node.insert(children.get(indx), insertIndex);
 		}
 		// Fixing folder placement
 		for (int i = 0; i < node.getChildCount() - 1; i++) {
