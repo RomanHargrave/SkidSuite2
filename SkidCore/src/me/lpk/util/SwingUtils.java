@@ -26,21 +26,23 @@ public class SwingUtils {
 		for (DefaultMutableTreeNode child : children) {
 			DefaultMutableTreeNode ch = (DefaultMutableTreeNode) child;
 			temParent.insert(ch, 0);
-			cNames.add(ch.toString().toUpperCase());
-			orgCnames.add(ch.toString().toUpperCase());
+			String uppser = ch.toString().toUpperCase();
+			// Not dependent on package name, so if duplicates are found
+			// they will later on be confused. Adding this is of
+			// very little consequence and fixes the issue.
+			if (cNames.contains(uppser)){
+				uppser += "$COPY";
+			}
+			cNames.add(uppser);
+			orgCnames.add(uppser);
 			if (!child.isLeaf()) {
 				sort(child);
 			}
 		}
 		Collections.sort(cNames);
-		int lastIndx = -1;
 		for (String name : cNames) {
 			int indx = orgCnames.indexOf(name);
-			int insertIndex =  node.getChildCount();
-			if (indx == lastIndx){
-				continue;
-			}
-			lastIndx = indx;
+			int insertIndex = node.getChildCount();
 			node.insert(children.get(indx), insertIndex);
 		}
 		// Fixing folder placement
