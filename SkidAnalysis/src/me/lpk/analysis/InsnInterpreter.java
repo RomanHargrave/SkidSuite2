@@ -2,7 +2,6 @@ package me.lpk.analysis;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -221,7 +220,6 @@ public class InsnInterpreter extends Interpreter<InsnValue> implements Opcodes {
 					return InsnValue.intValue(len);
 				}
 			}
-			System.err.println("ARRAYLENGTH");
 			return InsnValue.INT_VALUE;
 		case ATHROW:
 			return null;
@@ -229,7 +227,6 @@ public class InsnInterpreter extends Interpreter<InsnValue> implements Opcodes {
 			desc = ((TypeInsnNode) insn).desc;
 			return newValue(Type.getObjectType(desc));
 		case INSTANCEOF:
-			System.err.println("INSTANCEOF");
 			return InsnValue.INT_VALUE;
 		case MONITORENTER:
 		case MONITOREXIT:
@@ -378,8 +375,7 @@ public class InsnInterpreter extends Interpreter<InsnValue> implements Opcodes {
 	}
 
 	private InsnValue doUnaryInt(AbstractInsnNode insn, InsnValue value) {
-		if (value.getValue() == null) {
-			System.err.println("FUUUGGGG: " + OpUtils.getOpcodeText(insn.getOpcode()));
+		if (value == null || value.getValue() == null) {
 			return InsnValue.INT_VALUE;
 		}
 		switch (insn.getOpcode()) {
@@ -389,14 +385,13 @@ public class InsnInterpreter extends Interpreter<InsnValue> implements Opcodes {
 		case IINC:
 			int i2 = (int) value.getValue();
 			IincInsnNode iinc = (IincInsnNode) insn;
-
 			return new InsnValue(InsnValue.INT_VALUE.getType(), i2 + iinc.incr);
 		case L2I:
 		case F2I:
 		case D2I:
 			return new InsnValue(InsnValue.INT_VALUE.getType(), value.getValue());
 		case I2B:
-			byte b = (byte) value.getValue();
+			byte b = ((Number) value.getValue()).byteValue();
 			return new InsnValue(InsnValue.BYTE_VALUE.getType(), b);
 		case I2S:
 			int s = (int) value.getValue();
@@ -404,9 +399,7 @@ public class InsnInterpreter extends Interpreter<InsnValue> implements Opcodes {
 		case I2C:
 			char c = (char) ((Number) value.getValue()).intValue();
 			return new InsnValue(InsnValue.CHAR_VALUE.getType(), c);
-
 		}
-		System.err.println("doUnaryInt: FAILSAFE");
 		return InsnValue.INT_VALUE;
 	}
 
@@ -450,15 +443,20 @@ public class InsnInterpreter extends Interpreter<InsnValue> implements Opcodes {
 			} else if (value1.getValue() instanceof Character) {
 				i1 = ((Character) value1.getValue()).charValue();
 			} else {
-				System.err.println("MATH BUT NOT A INT --> " + value1.getValue().toString());
+				Logger.errVeryHigh("MATH BUT STACK DOES NOT HAVE NUMBERS!");
+				//
+				// Math but not a number.
 				return InsnValue.INT_VALUE;
 			}
+
 			if (value2.getValue() instanceof Number) {
 				i2 = (int) value2.getValue();
 			} else if (value2.getValue() instanceof Character) {
 				i2 = ((Character) value2.getValue()).charValue();
 			} else {
-				System.err.println("MATH BUT NOT A INT --> " + value2.getValue().toString());
+				Logger.errVeryHigh("MATH BUT STACK DOES NOT HAVE NUMBERS!");
+				//
+				// Math but not a number.
 				return InsnValue.INT_VALUE;
 			}
 			return doBinaryInt(insn, i1, i2);
@@ -635,13 +633,13 @@ public class InsnInterpreter extends Interpreter<InsnValue> implements Opcodes {
 			return new InsnValue(InsnValue.INT_VALUE.getType(), i2 * i1);
 		case IDIV:
 			if (i1 == 0) {
-				System.err.println("IDIV BY ZERO");
+				// Divide by zero
 				return InsnValue.INT_VALUE;
 			}
 			return new InsnValue(InsnValue.INT_VALUE.getType(), i2 / i1);
 		case IREM:
 			if (i1 == 0) {
-				System.err.println("IREM BY ZERO");
+				// Divide by zero
 				return InsnValue.INT_VALUE;
 			}
 			return new InsnValue(InsnValue.INT_VALUE.getType(), i2 % i1);
@@ -658,22 +656,18 @@ public class InsnInterpreter extends Interpreter<InsnValue> implements Opcodes {
 		case IXOR:
 			return new InsnValue(InsnValue.INT_VALUE.getType(), i2 ^ i1);
 		}
-		System.err.println("doBinaryInt: FAILSAFE");
 		return InsnValue.INT_VALUE;
 	}
 
 	@Override
 	public InsnValue ternaryOperation(final AbstractInsnNode insn, final InsnValue arrayRef, final InsnValue index, final InsnValue value) throws AnalyzerException {
 		if (arrayRef.getValue() == null) {
-			System.err.println("ArrayRef null");
 			return null;
 		}
 		if (index.getValue() == null) {
-			System.err.println("ArrayIndex null");
 			return null;
 		}
 		if (value.getValue() == null) {
-			System.err.println("ArrayNewValue null");
 			return null;
 		}
 		int i = (int) index.getValue();
@@ -749,14 +743,15 @@ public class InsnInterpreter extends Interpreter<InsnValue> implements Opcodes {
 				Logger.logHigh("Emulating: " + node.name + "#" + methn.name + methn.desc);
 				List<? extends InsnValue> list = values.subList(values.size() - Type.getArgumentTypes(methn.desc).length, values.size());
 				int parameterIndex = 0;
-				for (InsnValue value : list){
-					if (value.getValue() == null){
-						Logger.logHigh("Emulation Aborted, Parameter["+parameterIndex+"] without a value: " + value.toString());
+				for (InsnValue value : list) {
+					if (value.getValue() == null) {
+						Logger.logHigh("Emulation Aborted, Parameter[" + parameterIndex + "] without a value: " + value.toString());
 						return retVal;
 					}
 					parameterIndex++;
 				}
-				InsnValue ret = (InsnValue) InsnHandler.getFrameExec(methn, nodes, list).pop();
+				InsnFrame lastFrame = InsnHandler.getFrameExec(methn, nodes, list);
+				InsnValue ret = lastFrame.getStackSize() == 0 ? null : (InsnValue) lastFrame.pop();
 				if (ret == null) {
 					Logger.errHigh("Emulation Failed!");
 					return retVal;
@@ -806,7 +801,8 @@ public class InsnInterpreter extends Interpreter<InsnValue> implements Opcodes {
 	}
 
 	private InsnValue doFieldStatic(FieldInsnNode insn) {
-		//Logger.logVeryHigh("\tGETSTATIC: " + insn.owner + ":" + insn.name + ":" + insn.desc);
+		// Logger.logVeryHigh("\tGETSTATIC: " + insn.owner + ":" + insn.name +
+		// ":" + insn.desc);
 		return newValue(Type.getType(insn.desc));
 	}
 

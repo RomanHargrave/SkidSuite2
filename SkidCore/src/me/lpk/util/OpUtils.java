@@ -6,9 +6,15 @@ import java.util.Set;
 
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.FieldInsnNode;
+import org.objectweb.asm.tree.IincInsnNode;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.IntInsnNode;
+import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LdcInsnNode;
+import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.TypeInsnNode;
+import org.objectweb.asm.tree.VarInsnNode;
 
 public class OpUtils implements org.objectweb.asm.Opcodes {
 	private static Map<Integer, String> opcodes = new HashMap<Integer, String>(getCodes());
@@ -537,5 +543,38 @@ public class OpUtils implements org.objectweb.asm.Opcodes {
 			return new IntInsnNode(Opcodes.BIPUSH, i);
 		}
 		return new LdcInsnNode(i);
+	}
+
+	public static String toString(AbstractInsnNode ain) {
+		String s = getOpcodeText(ain.getOpcode());
+		switch (ain.getType()) {
+		case AbstractInsnNode.FIELD_INSN:
+			FieldInsnNode fin = (FieldInsnNode) ain;
+			return s + " " + fin.owner + "#" + fin.name + " " + fin.desc;
+		case AbstractInsnNode.METHOD_INSN:
+			MethodInsnNode min = (MethodInsnNode) ain;
+			return s + " " + min.owner + "#" + min.name + min.desc;
+		case AbstractInsnNode.VAR_INSN:
+			VarInsnNode vin = (VarInsnNode) ain;
+			return s + " " + vin.var;
+		case AbstractInsnNode.TYPE_INSN:
+			TypeInsnNode tin = (TypeInsnNode) ain;
+			return s + " " + tin.desc;
+		case AbstractInsnNode.JUMP_INSN:
+			JumpInsnNode jin = (JumpInsnNode) ain;
+			return s + " " + getIndex(jin.label);
+		case AbstractInsnNode.LDC_INSN:
+			LdcInsnNode ldc = (LdcInsnNode) ain;
+			return s + " " + ldc.cst.toString();
+		case AbstractInsnNode.INT_INSN:
+			return s + " " +  getIntValue(ain);
+		case AbstractInsnNode.IINC_INSN:
+			IincInsnNode iinc = (IincInsnNode) ain;
+			return s  + " " + iinc.var + " +" + iinc.incr;
+		case AbstractInsnNode.LOOKUPSWITCH_INSN:
+		case AbstractInsnNode.TABLESWITCH_INSN:
+
+		}
+		return s;
 	}
 }

@@ -21,6 +21,7 @@ import org.objectweb.asm.tree.analysis.Interpreter;
 import org.objectweb.asm.tree.analysis.Value;
 
 import me.lpk.log.Logger;
+import me.lpk.util.OpUtils;
 
 /**
  * @editor Matt
@@ -121,9 +122,9 @@ public class InsnFrame extends Frame {
 			value1 = interpreter.ternaryOperation(insn, value1, value2, value3);
 			// arrayRef, index, value)
 			if (value1 != null) {
-				Logger.logVeryHigh("\tUpdated array value: " + before + " --> " + value1.toString());
+				Logger.logVeryHigh("\tUpdated array value: " + before + " --> " + value1);
 			} else {
-				Logger.errVeryHigh("\tFailed updating array value: " + before + " --> " + value1.toString());
+				Logger.errVeryHigh("\tFailed updating array value: " + before + " --> " + value1);
 			}
 			break;
 		case Opcodes.POP:
