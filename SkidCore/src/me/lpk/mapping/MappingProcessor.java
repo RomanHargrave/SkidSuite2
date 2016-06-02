@@ -28,23 +28,7 @@ public class MappingProcessor {
 			ClassWriter cw = new ClassWriter(useMaxs ? ClassWriter.COMPUTE_MAXS : ClassWriter.COMPUTE_FRAMES);
 			ClassVisitor remapper = new ClassRemapper(cw, mapper);
 			cn.accept(remapper);
-			out.put(mappings.get(cn.name).getNewName(), cw.toByteArray());
-		}
-		return out;
-	}
-
-	public static Map<String, byte[]> process(Map<String, ClassNode> nodes) {
-		Map<String, byte[]> out = new HashMap<String, byte[]>();
-		int workIndex = 1;
-		for (ClassNode cn : nodes.values()) {
-			out.put(cn.name, ASMUtils.getNodeBytes(cn));
-			//
-			if (PRINT) {
-				String percentStr = "" + ((workIndex + 0.000000001f) / (nodes.size() - 0.00001f)) * 100;
-				percentStr = percentStr.substring(0, percentStr.length() > 5 ? 5 : percentStr.length());
-				System.out.println("	" + workIndex + "/" + nodes.size() + " [" + percentStr + "%]");
-			}
-			workIndex++;
+				out.put(mappings.containsKey(cn.name) ? mappings.get(cn.name).getNewName() : cn.name, cw.toByteArray());
 		}
 		return out;
 	}

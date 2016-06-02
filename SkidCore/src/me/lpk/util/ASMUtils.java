@@ -19,7 +19,7 @@ public class ASMUtils {
 	 * @return
 	 */
 	public static byte[] getNodeBytes(ClassNode cn) {
-		ClassWriter cw = new ClassWriter(0);
+		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
 		cn.accept(cw);
 		byte[] b = cw.toByteArray();
 		return b;
