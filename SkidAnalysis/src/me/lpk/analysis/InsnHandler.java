@@ -11,6 +11,7 @@ import org.objectweb.asm.tree.analysis.AnalyzerException;
 import me.lpk.analysis.execution.ExecutionAnalyzer;
 import me.lpk.log.Logger;
 
+@Deprecated
 public class InsnHandler {
 	public static InsnFrame[] getFrames(MethodNode mn, Map<String, ClassNode> nodes, List<? extends InsnValue> list ) {
 		try {
@@ -63,11 +64,11 @@ public class InsnHandler {
 
 	@SuppressWarnings({ "rawtypes" })
 	private static InsnAnalyzer<?> makeAnalyzer(Map<String, ClassNode> nodes) {
-		return new InsnAnalyzer(new InsnInterpreter(nodes));
+		return new InsnAnalyzer(new InsnInterpreter(nodes, false));
 	}
 	@SuppressWarnings({ "rawtypes" })
 	private static ExecutionAnalyzer<?> makeExecAnalyzer(Map<String, ClassNode> nodes) {
-		return new ExecutionAnalyzer(new InsnInterpreter(nodes));
+		return new ExecutionAnalyzer(new InsnInterpreter(nodes, false));
 	}
 
 	public static InsnValue getReturn(InsnFrame[] frames) {

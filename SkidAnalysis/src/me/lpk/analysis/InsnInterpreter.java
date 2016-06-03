@@ -38,10 +38,12 @@ import me.lpk.util.OpUtils;
  */
 public class InsnInterpreter extends Interpreter<InsnValue> implements Opcodes {
 	private final Map<String, ClassNode> nodes;
+	private final boolean uglyHacks;
 
-	public InsnInterpreter(Map<String, ClassNode> nodes) {
+	public InsnInterpreter(Map<String, ClassNode> nodes, boolean skipMethodEvaluation) {
 		super(ASM5);
 		this.nodes = nodes;
+		this.uglyHacks = skipMethodEvaluation;
 	}
 
 	@Override
@@ -720,7 +722,7 @@ public class InsnInterpreter extends Interpreter<InsnValue> implements Opcodes {
 		} else {
 			MethodInsnNode min = ((MethodInsnNode) insn);
 			InsnValue retVal = newValue(Type.getReturnType(min.desc));
-			if (nodes == null || min.desc.endsWith("V")) {
+			if (uglyHacks || nodes == null || min.desc.endsWith("V")) {
 				return retVal;
 			} else {
 				ClassNode node = nodes.get(min.owner);

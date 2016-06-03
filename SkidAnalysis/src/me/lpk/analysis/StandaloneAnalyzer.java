@@ -49,6 +49,7 @@ public class StandaloneAnalyzer {
 			return frame;
 		}
 		AbstractInsnNode ain = m.instructions.getFirst();
+		System.out.println(owner + ":" + m.name + m.desc);
 		while (ain.getNext() != null) {
 			if (ain == end) {
 				break;
@@ -57,9 +58,9 @@ public class StandaloneAnalyzer {
 			if (frame.doJump) {
 				int curIndex = OpUtils.getIndex(ain);
 				int labelIndex = OpUtils.getIndex(frame.jin);
+				//Logger.logHigh("Jumping[" + OpUtils.toString(ain) + "]: " + curIndex + " --> " + labelIndex);
 				ain = m.instructions.get(labelIndex);
 				frame.doJump = false;
-				Logger.logVeryHigh("Jumping[" + OpUtils.getOpcodeText(ain.getOpcode()) + "]: " + curIndex + " --> " + labelIndex);
 			} else {
 				ain = ain.getNext();
 			}
@@ -113,7 +114,7 @@ public class StandaloneAnalyzer {
 		// + 1 stack fixes some crashes... Gotta figure out what causes it to
 		// crash otherwise and fix that,
 		//
-		InsnFrame current = new InsnFrame(m.maxLocals, m.maxStack + 1);
+		InsnFrame current = new InsnFrame(m.maxLocals, m.maxStack + 10);
 		current.setReturn(interpreter.newValue(Type.getReturnType(m.desc)));
 		Type[] args = Type.getArgumentTypes(m.desc);
 		int local = 0;

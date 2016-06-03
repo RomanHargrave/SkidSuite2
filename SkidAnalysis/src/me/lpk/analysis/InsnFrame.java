@@ -502,6 +502,14 @@ public class InsnFrame extends Frame {
 			throw new RuntimeException("Illegal opcode " + insn.getOpcode());
 		}
 	}
+	
+	@Override
+	public Value pop(){
+		if (getStackSize() == 0){
+			push(InsnValue.INT_VALUE);
+		}
+		return super.pop();
+	}
 
 	private int getInt(Object value) {
 		try {
