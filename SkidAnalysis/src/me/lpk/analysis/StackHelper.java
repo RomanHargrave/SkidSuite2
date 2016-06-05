@@ -145,8 +145,6 @@ public class StackHelper {
 
 	public InsnValue doMath(AbstractInsnNode insn, InsnValue value1, InsnValue value2) {
 		Object o1 = value1.getValue(), o2 = value2.getValue();
-		// Opps! Forgot this last push, it's 5:20 AM and I REALLY gotta go to bed.
-		// Will finish later.
 		switch (insn.getOpcode()) {
 		case Opcodes.IADD:
 		case Opcodes.ISUB:
@@ -159,9 +157,34 @@ public class StackHelper {
 		case Opcodes.IAND:
 		case Opcodes.IOR:
 		case Opcodes.IXOR:
-			//if (o1 == null || o2 == null) {
+			if (o1 == null || o2 == null) {
 				return InsnValue.INT_VALUE;
-			//}
+			}
+			int i1 = (int) o1, i2 = (int) o2;
+			switch (insn.getOpcode()) {
+			case Opcodes.IADD:
+				return InsnValue.intValue(i2 + i1);
+			case Opcodes.ISUB:
+				return InsnValue.intValue(i2 - i1);
+			case Opcodes.IMUL:
+				return InsnValue.intValue(i2 * i1);
+			case Opcodes.IDIV:
+				return InsnValue.intValue(i2 / i1);
+			case Opcodes.IREM:
+				return InsnValue.intValue(i2 % i1);
+			case Opcodes.ISHL:
+				return InsnValue.intValue(i2 << i1);
+			case Opcodes.ISHR:
+				return InsnValue.intValue(i2 >> i1);
+			case Opcodes.IUSHR:
+				return InsnValue.intValue(i2 >>> i1);
+			case Opcodes.IAND:
+				return InsnValue.intValue(i2 & i1);
+			case Opcodes.IOR:
+				return InsnValue.intValue(i2 | i1);
+			case Opcodes.IXOR:
+				return InsnValue.intValue(i2 ^ i1);
+			}
 		case Opcodes.LADD:
 		case Opcodes.LSUB:
 		case Opcodes.LMUL:
@@ -173,32 +196,77 @@ public class StackHelper {
 		case Opcodes.LAND:
 		case Opcodes.LOR:
 		case Opcodes.LXOR:
-			//if (o1 == null || o2 == null) {
+			if (o1 == null || o2 == null) {
 				return InsnValue.LONG_VALUE;
-			//}
+			}
+			long l1 = (long) o1, l2 = (long) o2;
+			switch (insn.getOpcode()) {
+			case Opcodes.LADD:
+				return InsnValue.longValue(l2 + l1);
+			case Opcodes.LSUB:
+				return InsnValue.longValue(l2 - l1);
+			case Opcodes.LMUL:
+				return InsnValue.longValue(l2 * l1);
+			case Opcodes.LDIV:
+				return InsnValue.longValue(l2 / l1);
+			case Opcodes.LREM:
+				return InsnValue.longValue(l2 % l1);
+			case Opcodes.LSHL:
+				return InsnValue.longValue(l2 << l1);
+			case Opcodes.LSHR:
+				return InsnValue.longValue(l2 >> l1);
+			case Opcodes.LUSHR:
+				return InsnValue.longValue(l2 >>> l1);
+			case Opcodes.LAND:
+				return InsnValue.longValue(l2 & l1);
+			case Opcodes.LOR:
+				return InsnValue.longValue(l2 | l1);
+			case Opcodes.LXOR:
+				return InsnValue.longValue(l2 ^ l1);
+			}
 		case Opcodes.FADD:
 		case Opcodes.FSUB:
 		case Opcodes.FMUL:
 		case Opcodes.FDIV:
 		case Opcodes.FREM:
-			//if (o1 == null || o2 == null) {
+			if (o1 == null || o2 == null) {
 				return InsnValue.FLOAT_VALUE;
-			//}
+			}
+			float f1 = (float) o1, f2 = (float) o2;
+			switch (insn.getOpcode()) {
+			case Opcodes.FADD:
+				return InsnValue.floatValue(f2 + f1);
+			case Opcodes.FSUB:
+				return InsnValue.floatValue(f2 - f1);
+			case Opcodes.FMUL:
+				return InsnValue.floatValue(f2 * f1);
+			case Opcodes.FDIV:
+				return InsnValue.floatValue(f2 / f1);
+			case Opcodes.FREM:
+				return InsnValue.floatValue(f2 % f1);
+			}
 		case Opcodes.DADD:
 		case Opcodes.DSUB:
 		case Opcodes.DMUL:
 		case Opcodes.DDIV:
 		case Opcodes.DREM:
-			//if (o1 == null || o2 == null) {
+			if (o1 == null || o2 == null) {
 				return InsnValue.DOUBLE_VALUE;
-			//d}
-				
-
-
-	
+			}
+			double d1 = (double) o1, d2 = (double) o2;
+			switch (insn.getOpcode()) {
+			case Opcodes.DADD:
+				return InsnValue.doubleValue(d2 + d1);
+			case Opcodes.DSUB:
+				return InsnValue.doubleValue(d2 - d1);
+			case Opcodes.DMUL:
+				return InsnValue.doubleValue(d2 * d1);
+			case Opcodes.DDIV:
+				return InsnValue.doubleValue(d2 / d1);
+			case Opcodes.DREM:
+				return InsnValue.doubleValue(d2 % d1);
+			}
 		}
-		
-		
 		return null;
 	}
 
