@@ -63,17 +63,17 @@ public class Frame<V extends Value> {
 	/**
 	 * The local variables and operand stack of this frame.
 	 */
-	private V[] values;
+	protected V[] values;
 
 	/**
 	 * The number of local variables of this frame.
 	 */
-	private int locals;
+	protected int locals;
 
 	/**
 	 * The number of elements in the operand stack.
 	 */
-	private int top;
+	protected int top;
 
 	/**
 	 * Constructs a new frame with the given size.

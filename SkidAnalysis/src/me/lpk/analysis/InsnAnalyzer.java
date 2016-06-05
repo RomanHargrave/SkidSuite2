@@ -29,9 +29,9 @@ import org.objectweb.asm.tree.analysis.*;
  * @author Eric Bruneton
  * @editor Matt
  */
-public class InsnAnalyzer<V extends Value> implements Opcodes {
+public class InsnAnalyzer implements Opcodes {
 
-	private final InsnInterpreter interpreter;
+	private final StackHelper interpreter;
 
 	private int n;
 
@@ -39,7 +39,7 @@ public class InsnAnalyzer<V extends Value> implements Opcodes {
 
 	private List<TryCatchBlockNode>[] handlers;
 
-	private InsnFrame[] frames;
+	private StackFrame[] frames;
 
 	private Subroutine[] subroutines;
 
@@ -56,11 +56,11 @@ public class InsnAnalyzer<V extends Value> implements Opcodes {
 	 *            the interpreter to be used to symbolically interpret the
 	 *            bytecode instructions.
 	 */
-	public InsnAnalyzer(final InsnInterpreter interpreter) {
+	public InsnAnalyzer(final StackHelper interpreter) {
 		this.interpreter = interpreter;
 	}
 
-	public InsnFrame[] analyze(final String owner, final MethodNode m) throws AnalyzerException {
+	public StackFrame[] analyze(final String owner, final MethodNode m) throws AnalyzerException {
 		return analyze(owner, m, null);
 	}
 
@@ -82,15 +82,15 @@ public class InsnAnalyzer<V extends Value> implements Opcodes {
 	 *             if a problem occurs during the analysis.
 	 */
 	@SuppressWarnings("unchecked")
-	public InsnFrame[] analyze(final String owner, final MethodNode m, List<? extends InsnValue> list) throws AnalyzerException {
+	public StackFrame[] analyze(final String owner, final MethodNode m, List<? extends InsnValue> list) throws AnalyzerException {
 		if ((m.access & (ACC_ABSTRACT | ACC_NATIVE)) != 0) {
-			frames = (InsnFrame[]) new InsnFrame[0];
+			frames = (StackFrame[]) new StackFrame[0];
 			return frames;
 		}
 		n = m.instructions.size();
 		insns = m.instructions;
 		handlers = (List<TryCatchBlockNode>[]) new List<?>[n];
-		frames = (InsnFrame[]) new InsnFrame[n];
+		frames = (StackFrame[]) new StackFrame[n];
 		subroutines = new Subroutine[n];
 		queued = new boolean[n];
 		queue = new int[n];
@@ -134,8 +134,8 @@ public class InsnAnalyzer<V extends Value> implements Opcodes {
 		}
 
 		// initializes the data structures for the control flow analysis
-		InsnFrame current = newFrame(m.maxLocals, m.maxStack);
-		InsnFrame handler = newFrame(m.maxLocals, m.maxStack);
+		StackFrame current = newFrame(m.maxLocals, m.maxStack);
+		StackFrame handler = newFrame(m.maxLocals, m.maxStack);
 		current.setReturn(interpreter.newValue(Type.getReturnType(m.desc)));
 		Type[] args = Type.getArgumentTypes(m.desc);
 		int local = 0;
@@ -163,7 +163,7 @@ public class InsnAnalyzer<V extends Value> implements Opcodes {
 		// control flow analysis
 		while (top > 0) {
 			int insn = queue[--top];
-			InsnFrame f = frames[insn];
+			StackFrame f = frames[insn];
 			Subroutine subroutine = subroutines[insn];
 			queued[insn] = false;
 
@@ -348,7 +348,7 @@ public class InsnAnalyzer<V extends Value> implements Opcodes {
 	 *         cannot be reached, or if an error occured during the analysis of
 	 *         the method.
 	 */
-	public InsnFrame[] getFrames() {
+	public StackFrame[] getFrames() {
 		return frames;
 	}
 
@@ -388,8 +388,8 @@ public class InsnAnalyzer<V extends Value> implements Opcodes {
 	 *            the maximum stack size of the frame.
 	 * @return the created frame.
 	 */
-	protected InsnFrame newFrame(final int nLocals, final int nStack) {
-		return new InsnFrame(nLocals, nStack);
+	protected StackFrame newFrame(final int nLocals, final int nStack) {
+		return new StackFrame(nLocals, nStack);
 	}
 
 	/**
@@ -399,8 +399,8 @@ public class InsnAnalyzer<V extends Value> implements Opcodes {
 	 *            a frame.
 	 * @return the created frame.
 	 */
-	protected InsnFrame newFrame(final Frame<? extends V> src, AbstractInsnNode ain) {
-		return new InsnFrame(src, ain);
+	protected StackFrame newFrame(final Frame src, AbstractInsnNode ain) {
+		return new StackFrame(src, ain);
 	}
 
 	/**
@@ -462,8 +462,8 @@ public class InsnAnalyzer<V extends Value> implements Opcodes {
 	// -------------------------------------------------------------------------
 
 	@SuppressWarnings("unchecked")
-	private void merge(final int insn, final InsnFrame frame, final Subroutine subroutine) throws AnalyzerException {
-		InsnFrame oldFrame = frames[insn];
+	private void merge(final int insn, final StackFrame frame, final Subroutine subroutine) throws AnalyzerException {
+		StackFrame oldFrame = frames[insn];
 		Subroutine oldSubroutine = subroutines[insn];
 		boolean changes;
 
@@ -471,7 +471,8 @@ public class InsnAnalyzer<V extends Value> implements Opcodes {
 			frames[insn] = newFrame(frame, insns.get(insn));
 			changes = true;
 		} else {
-			changes = oldFrame.merge(frame, interpreter);
+			changes = false;
+			interpreter.isMergeCompatible(oldFrame, frame);
 		}
 
 		if (oldSubroutine == null) {
@@ -491,9 +492,9 @@ public class InsnAnalyzer<V extends Value> implements Opcodes {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void merge(final int insn, final InsnFrame beforeJSR, final InsnFrame afterRET, final Subroutine subroutineBeforeJSR, final boolean[] access)
+	private void merge(final int insn, final StackFrame beforeJSR, final StackFrame afterRET, final Subroutine subroutineBeforeJSR, final boolean[] access)
 			throws AnalyzerException {
-		InsnFrame oldFrame = frames[insn];
+		StackFrame oldFrame = frames[insn];
 		Subroutine oldSubroutine = subroutines[insn];
 		boolean changes;
 
@@ -503,7 +504,7 @@ public class InsnAnalyzer<V extends Value> implements Opcodes {
 			frames[insn] = newFrame(afterRET, insns.get(insn));
 			changes = true;
 		} else {
-			changes = oldFrame.merge(afterRET, interpreter);
+			changes = interpreter.isMergeCompatible(oldFrame, afterRET);
 		}
 
 		if (oldSubroutine != null && subroutineBeforeJSR != null) {

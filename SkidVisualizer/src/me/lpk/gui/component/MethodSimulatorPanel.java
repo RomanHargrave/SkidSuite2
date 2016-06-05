@@ -32,8 +32,8 @@ import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import me.lpk.MainWindow;
-import me.lpk.analysis.InsnFrame;
-import me.lpk.analysis.InsnHandler;
+import me.lpk.analysis.StackFrame;
+import me.lpk.analysis.StackUtil;
 import me.lpk.util.OpUtils;
 
 public class MethodSimulatorPanel extends JPanel {
@@ -42,7 +42,7 @@ public class MethodSimulatorPanel extends JPanel {
 	private final JTextArea txtBefore = new JTextArea();
 	private final JTextArea txtAfter = new JTextArea();
 	private InsnList insns;
-	private InsnFrame[] frames;
+	private StackFrame[] frames;
 
 	public MethodSimulatorPanel() {
 		setup();
@@ -116,7 +116,7 @@ public class MethodSimulatorPanel extends JPanel {
 		}
 		msp.listOpcodes.setListData(opcodesText.toArray(new String[0]));
 		// Setting up Stack
-		msp.frames = InsnHandler.getFrames(mn, MainWindow.instance.getNodes());
+		msp.frames = StackUtil.getFrames(mn, MainWindow.instance.getNodes());
 		// Making the frame
 		JFrame frame = new JFrame();
 		frame.setSize(1000, 555);

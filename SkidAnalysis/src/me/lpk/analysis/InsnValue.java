@@ -9,9 +9,10 @@ import org.objectweb.asm.Opcodes;
 import me.lpk.util.OpUtils;
 
 /**
- * A {@link Value} that is represented by its type in a seven types type system.
- * This type system distinguishes the UNINITIALZED, INT, FLOAT, LONG, DOUBLE,
- * REFERENCE and RETURNADDRESS types.
+ * A {@link Value} that is represented by types with a possibly null value. This
+ * type system distinguishes the UNINITIALZED, INT, FLOAT, LONG, DOUBLE, CHAR,
+ * SHORT REFERENCE and RETURNADDRESS types. Arrays for these types are also
+ * included.
  * 
  * @author Eric Bruneton
  * @editor Matt
@@ -25,7 +26,10 @@ public class InsnValue implements Value {
 	public static final InsnValue DOUBLE_VALUE = new InsnValue(Type.DOUBLE_TYPE);
 	public static final InsnValue BYTE_VALUE = new InsnValue(Type.BYTE_TYPE);
 	public static final InsnValue CHAR_VALUE = new InsnValue(Type.CHAR_TYPE);
+	public static final InsnValue SHORT_VALUE = new InsnValue(Type.SHORT_TYPE);
 	public static final InsnValue REFERENCE_VALUE = new InsnValue(Type.getObjectType("java/lang/Object"));
+	public static final InsnValue NULL_REFERENCE_VALUE = new InsnValue(Type.getType("java/lang/Object"));
+
 	//
 	public static final InsnValue CHAR_ARR_VALUE = new InsnValue(Type.getObjectType("[C"));
 	public static final InsnValue DOUBLE_ARR_VALUE = new InsnValue(Type.getObjectType("[D"));
@@ -33,6 +37,8 @@ public class InsnValue implements Value {
 	public static final InsnValue FLOAT_ARR_VALUE = new InsnValue(Type.getObjectType("[F"));
 	public static final InsnValue BOOLEAN_ARR_VALUE = new InsnValue(Type.getObjectType("[Z"));
 	public static final InsnValue LONG_ARR_VALUE = new InsnValue(Type.getObjectType("[J"));
+	public static final InsnValue SHORT_ARR_VALUE = new InsnValue(Type.getObjectType("[S"));
+	public static final InsnValue BYTE_ARR_VALUE = new InsnValue(Type.getObjectType("[B"));
 	//
 	public static final InsnValue RETURNADDRESS_VALUE = new InsnValue(Type.VOID_TYPE);
 
@@ -89,14 +95,20 @@ public class InsnValue implements Value {
 		if (value != null) {
 			return type.getDescriptor() + " " + (value.toString()).trim();
 		}
-		if (this == UNINITIALIZED_VALUE) {
+		if (type == null || this == UNINITIALIZED_VALUE) {
 			return "Uninitialized Null";
 		} else if (this == RETURNADDRESS_VALUE) {
 			return "Return Address";
 		} else if (this == REFERENCE_VALUE) {
 			return "Misc. Ref Value";
-		} else {
+			
+		} else if (this == NULL_REFERENCE_VALUE){
+			return "Null";
+		}
+		else if (type != null) {
 			return type.getDescriptor();
+		} else {
+			return "ERROR";
 		}
 	}
 
@@ -135,9 +147,17 @@ public class InsnValue implements Value {
 		}
 		return InsnValue.FLOAT_VALUE;
 	}
-
+	
 	public static InsnValue intValue(Object cst) {
 		return new InsnValue(Type.INT_TYPE, cst);
+	}
+
+	public static InsnValue charValue(Object cst) {
+		return new InsnValue(Type.CHAR_TYPE, cst);
+	}
+
+	public static InsnValue byteValue(Object cst) {
+		return new InsnValue(Type.BYTE_TYPE, cst);
 	}
 
 	public static InsnValue longValue(Object cst) {
@@ -150,6 +170,10 @@ public class InsnValue implements Value {
 
 	public static InsnValue floatValue(Object cst) {
 		return new InsnValue(Type.FLOAT_TYPE, cst);
+	}
+
+	public static InsnValue shortValue(Object cst) {
+		return new InsnValue(Type.SHORT_TYPE, cst);
 	}
 
 	public static InsnValue stringValue(Object cst) {
