@@ -95,8 +95,19 @@ public class MethodSimulatorPanel extends JPanel {
 				if (indexBefore >= frames.length - 1) {
 					indexBefore = frames.length - 2;
 				}
-				String beforeText = frames[indexBefore].toString();
-				String afterText = frames[indexAfter].toString();
+				StackFrame sfBefore = frames[indexBefore];
+				StackFrame sfAfter = frames[indexAfter];
+				String beforeText = "", afterText = "";
+				if (sfBefore == null) {
+					beforeText = "ERROR RESOLVING STACK @" + indexBefore;
+				} else {
+					beforeText = sfBefore.toString();
+				}
+				if (sfAfter == null) {
+					afterText = "ERROR RESOLVING STACK @" + indexAfter;
+				} else {
+					afterText = sfAfter.toString();
+				}
 				// System.out.println(indexBefore + " : " + indexAfter);
 				txtBefore.setText("Current stack at @" + indexBefore + ":\n\n" + beforeText);
 				txtAfter.setText("Stack after @" + indexBefore + ":\n\n" + afterText);
@@ -125,8 +136,6 @@ public class MethodSimulatorPanel extends JPanel {
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.setTitle(mn.owner + "." + mn.name + mn.desc);
 	}
-
-	
 
 	private static String toText(AbstractInsnNode ain) {
 		String base = OpUtils.getOpcodeText(ain.getOpcode());

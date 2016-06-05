@@ -143,6 +143,65 @@ public class StackHelper {
 		return null;
 	}
 
+	public InsnValue doMath(AbstractInsnNode insn, InsnValue value1, InsnValue value2) {
+		Object o1 = value1.getValue(), o2 = value2.getValue();
+		// Opps! Forgot this last push, it's 5:20 AM and I REALLY gotta go to bed.
+		// Will finish later.
+		switch (insn.getOpcode()) {
+		case Opcodes.IADD:
+		case Opcodes.ISUB:
+		case Opcodes.IMUL:
+		case Opcodes.IDIV:
+		case Opcodes.IREM:
+		case Opcodes.ISHL:
+		case Opcodes.ISHR:
+		case Opcodes.IUSHR:
+		case Opcodes.IAND:
+		case Opcodes.IOR:
+		case Opcodes.IXOR:
+			//if (o1 == null || o2 == null) {
+				return InsnValue.INT_VALUE;
+			//}
+		case Opcodes.LADD:
+		case Opcodes.LSUB:
+		case Opcodes.LMUL:
+		case Opcodes.LDIV:
+		case Opcodes.LREM:
+		case Opcodes.LSHL:
+		case Opcodes.LSHR:
+		case Opcodes.LUSHR:
+		case Opcodes.LAND:
+		case Opcodes.LOR:
+		case Opcodes.LXOR:
+			//if (o1 == null || o2 == null) {
+				return InsnValue.LONG_VALUE;
+			//}
+		case Opcodes.FADD:
+		case Opcodes.FSUB:
+		case Opcodes.FMUL:
+		case Opcodes.FDIV:
+		case Opcodes.FREM:
+			//if (o1 == null || o2 == null) {
+				return InsnValue.FLOAT_VALUE;
+			//}
+		case Opcodes.DADD:
+		case Opcodes.DSUB:
+		case Opcodes.DMUL:
+		case Opcodes.DDIV:
+		case Opcodes.DREM:
+			//if (o1 == null || o2 == null) {
+				return InsnValue.DOUBLE_VALUE;
+			//d}
+				
+
+
+	
+		}
+		
+		
+		return null;
+	}
+
 	public InsnValue storeInArray(AbstractInsnNode insn, InsnValue arrayRef, InsnValue index, InsnValue value) throws AnalyzerException {
 		if (arrayRef.getValue() == null) {
 			return null;
@@ -565,5 +624,4 @@ public class StackHelper {
 		}
 		return changes;
 	}
-
 }

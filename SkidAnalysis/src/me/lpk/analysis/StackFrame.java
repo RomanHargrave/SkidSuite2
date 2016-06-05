@@ -296,16 +296,6 @@ public class StackFrame extends Frame {
 		case Opcodes.LREM:
 		case Opcodes.FREM:
 		case Opcodes.DREM:
-			value2 = pop();
-			value1 = pop();
-			push(interpreter.loadFromArray(insn, value1, value2));
-			break;
-		case Opcodes.INEG:
-		case Opcodes.LNEG:
-		case Opcodes.FNEG:
-		case Opcodes.DNEG:
-			push(interpreter.invertValue(insn, pop()));
-			break;
 		case Opcodes.ISHL:
 		case Opcodes.LSHL:
 		case Opcodes.ISHR:
@@ -320,7 +310,13 @@ public class StackFrame extends Frame {
 		case Opcodes.LXOR:
 			value2 = pop();
 			value1 = pop();
-			push(interpreter.loadFromArray(insn, value1, value2));
+			push(interpreter.doMath(insn, value1, value2));
+			break;
+		case Opcodes.INEG:
+		case Opcodes.LNEG:
+		case Opcodes.FNEG:
+		case Opcodes.DNEG:
+			push(interpreter.invertValue(insn, pop()));
 			break;
 		case Opcodes.IINC:
 			IincInsnNode iinc = (IincInsnNode) ain;

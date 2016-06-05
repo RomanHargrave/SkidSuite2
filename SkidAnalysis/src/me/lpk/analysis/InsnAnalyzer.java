@@ -157,7 +157,6 @@ public class InsnAnalyzer implements Opcodes {
 			current.setLocal(local++, interpreter.newValue(null));
 		}
 		merge(0, current, null);
-
 		init(owner, m);
 
 		// control flow analysis
@@ -166,7 +165,6 @@ public class InsnAnalyzer implements Opcodes {
 			StackFrame f = frames[insn];
 			Subroutine subroutine = subroutines[insn];
 			queued[insn] = false;
-
 			AbstractInsnNode insnNode = null;
 			try {
 				insnNode = m.instructions.get(insn);
@@ -264,9 +262,13 @@ public class InsnAnalyzer implements Opcodes {
 					}
 				}
 			} catch (AnalyzerException e) {
-				throw new AnalyzerException(e.node, "Error at instruction " + insn + ": " + e.getMessage(), e);
+				e.printStackTrace();
+				// throw new AnalyzerException(e.node, "Error at instruction " +
+				// insn + ": " + e.getMessage(), e);
 			} catch (Exception e) {
-				throw new AnalyzerException(insnNode, "Error at instruction " + insn + ": " + e.getMessage(), e);
+				e.printStackTrace();
+				// throw new AnalyzerException(insnNode, "Error at instruction "
+				// + insn + ": " + e.getMessage(), e);
 			}
 		}
 
