@@ -39,6 +39,8 @@ public class InsnValue implements Value {
 	public static final InsnValue LONG_ARR_VALUE = new InsnValue(Type.getObjectType("[J"));
 	public static final InsnValue SHORT_ARR_VALUE = new InsnValue(Type.getObjectType("[S"));
 	public static final InsnValue BYTE_ARR_VALUE = new InsnValue(Type.getObjectType("[B"));
+	public static final InsnValue REFERENCE_ARR_VALUE = new InsnValue(Type.getObjectType("[java/lang/Object"));
+
 	//
 	public static final InsnValue RETURNADDRESS_VALUE = new InsnValue(Type.VOID_TYPE);
 

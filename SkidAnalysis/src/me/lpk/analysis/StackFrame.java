@@ -34,7 +34,7 @@ public class StackFrame extends Frame {
 	public LabelNode jin;
 	public boolean doJump;
 
-	public StackFrame(Frame src, AbstractInsnNode ain2) {
+	public StackFrame(Frame src, AbstractInsnNode ain) {
 		super(src);
 		this.ain = ain;
 	}
@@ -96,7 +96,8 @@ public class StackFrame extends Frame {
 		case Opcodes.FSTORE:
 		case Opcodes.DSTORE:
 		case Opcodes.ASTORE:
-			value1 = interpreter.loadLocal(insn, pop());
+			value1 = pop();
+			value1 = interpreter.loadLocal(insn, value1);
 			var = ((VarInsnNode) insn).var;
 			setLocal(var, value1);
 			if (value1.getSize() == 2) {
@@ -319,7 +320,7 @@ public class StackFrame extends Frame {
 			push(interpreter.invertValue(insn, pop()));
 			break;
 		case Opcodes.IINC:
-			IincInsnNode iinc = (IincInsnNode) ain;
+			IincInsnNode iinc = (IincInsnNode) insn;
 			var = iinc.var;
 			setLocal(var, interpreter.incrementLocal(iinc, getLocal(var)));
 			break;
@@ -452,7 +453,7 @@ public class StackFrame extends Frame {
 			if (insn.getOpcode() != Opcodes.INVOKESTATIC) {
 				values.add(0, pop());
 			}
-			if (Type.getReturnType(desc) == Type.VOID_TYPE) {
+			if (Type.getReturnType(desc).equals(Type.VOID_TYPE)) {
 				interpreter.onMethod(insn, values);
 			} else {
 				push(interpreter.onMethod(insn, values));

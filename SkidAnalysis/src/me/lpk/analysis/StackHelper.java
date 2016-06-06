@@ -7,6 +7,7 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.IincInsnNode;
+import org.objectweb.asm.tree.IntInsnNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.LookupSwitchInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
@@ -15,6 +16,8 @@ import org.objectweb.asm.tree.TableSwitchInsnNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.analysis.AnalyzerException;
 import org.objectweb.asm.tree.analysis.Value;
+
+import me.lpk.util.OpUtils;
 
 public class StackHelper {
 
@@ -81,6 +84,7 @@ public class StackHelper {
 			// TODO: IDK if this is right.
 			return InsnValue.REFERENCE_VALUE;
 		}
+
 		return null;
 	}
 
@@ -140,6 +144,7 @@ public class StackHelper {
 			short[] sa = (short[]) arrayObj;
 			return InsnValue.intValue((short) sa[index]);
 		}
+
 		return null;
 	}
 
@@ -160,7 +165,7 @@ public class StackHelper {
 			if (o1 == null || o2 == null) {
 				return InsnValue.INT_VALUE;
 			}
-			int i1 = (int) o1, i2 = (int) o2;
+			int i1 = ((Number) o1).intValue(), i2 = ((Number) o2).intValue();
 			switch (insn.getOpcode()) {
 			case Opcodes.IADD:
 				return InsnValue.intValue(i2 + i1);
@@ -199,7 +204,7 @@ public class StackHelper {
 			if (o1 == null || o2 == null) {
 				return InsnValue.LONG_VALUE;
 			}
-			long l1 = (long) o1, l2 = (long) o2;
+			long l1 = ((Number) o1).longValue(), l2 = ((Number) o2).longValue();
 			switch (insn.getOpcode()) {
 			case Opcodes.LADD:
 				return InsnValue.longValue(l2 + l1);
@@ -267,78 +272,96 @@ public class StackHelper {
 				return InsnValue.doubleValue(d2 % d1);
 			}
 		}
+
 		return null;
 	}
 
 	public InsnValue storeInArray(AbstractInsnNode insn, InsnValue arrayRef, InsnValue index, InsnValue value) throws AnalyzerException {
-		if (arrayRef.getValue() == null) {
-			return null;
-		}
-		if (index.getValue() == null) {
-			return null;
-		}
-		if (value.getValue() == null) {
-			return null;
-		}
-		int i = ((Number) index.getValue()).intValue();
+		boolean anythingNull = arrayRef.getValue() == null || index.getValue() == null || value.getValue() == null;
+		int i = anythingNull ? -1 : ((Number) index.getValue()).intValue();
 		switch (insn.getOpcode()) {
 		case Opcodes.IASTORE:
-			int[] ia = (int[]) arrayRef.getValue();
-			ia[i] = (int) value.getValue();
-			return new InsnValue(InsnValue.INT_ARR_VALUE.getType(), ia);
+		case Opcodes.CASTORE:
+			if (anythingNull) {
+				return InsnValue.INT_ARR_VALUE;
+			}
+			if (arrayRef.getType().equals(InsnValue.INT_ARR_VALUE.getType())) {
+				// Unsure why arrayRef when IASTORE isn't always [I
+				int[] ia = (int[]) arrayRef.getValue();
+				ia[i] = (int) value.getValue();
+				return new InsnValue(InsnValue.INT_ARR_VALUE.getType(), ia);
+			} else {
+				return InsnValue.INT_ARR_VALUE;
+			}
+
 		case Opcodes.LASTORE:
+			if (anythingNull) {
+				return InsnValue.LONG_ARR_VALUE;
+			}
 			long[] la = (long[]) arrayRef.getValue();
 			la[i] = (long) value.getValue();
 			return new InsnValue(InsnValue.LONG_ARR_VALUE.getType(), la);
 		case Opcodes.FASTORE:
+			if (anythingNull) {
+				return InsnValue.FLOAT_ARR_VALUE;
+			}
 			float[] fa = (float[]) arrayRef.getValue();
 			fa[i] = (float) value.getValue();
 			return new InsnValue(InsnValue.FLOAT_ARR_VALUE.getType(), fa);
 		case Opcodes.DASTORE:
+			if (anythingNull) {
+				return InsnValue.DOUBLE_ARR_VALUE;
+			}
 			double[] da = (double[]) arrayRef.getValue();
 			da[i] = (double) value.getValue();
 			return new InsnValue(InsnValue.DOUBLE_ARR_VALUE.getType(), da);
 		case Opcodes.BASTORE:
+			if (anythingNull) {
+				return InsnValue.BYTE_ARR_VALUE;
+			}
 			boolean[] ba = (boolean[]) arrayRef.getValue();
 			ba[i] = (boolean) value.getValue();
 			return new InsnValue(InsnValue.BOOLEAN_ARR_VALUE.getType(), ba);
-		case Opcodes.CASTORE:
-			char[] ca = (char[]) arrayRef.getValue();
-			ca[i] = (char) value.getValue();
-			return new InsnValue(InsnValue.CHAR_ARR_VALUE.getType(), ca);
 		case Opcodes.SASTORE:
-			char[] sa = (char[]) arrayRef.getValue();
-			sa[i] = (char) value.getValue();
+			short[] sa = (short[]) arrayRef.getValue();
+			sa[i] = (short) value.getValue();
 			return new InsnValue(InsnValue.SHORT_ARR_VALUE.getType(), sa);
 		case Opcodes.AASTORE:
-			// Can't exactly cast anything to Object[] willy nilly...
-			//
-			// Object[] aa = (Object[]) arrayRef.getValue();
-			//
-			// aa[i] = value.getValue();
-			//
-			// return new InsnValue(InsnValue.(Find the type).getType(), ca);
+			return InsnValue.REFERENCE_ARR_VALUE;
+
+		// Can't exactly cast anything to Object[] willy nilly...
+		//
+		// Object[] aa = (Object[]) arrayRef.getValue();
+		//
+		// aa[i] = value.getValue();
+		//
+		// return new InsnValue(InsnValue.(Find the type).getType(), ca);
 		}
+
 		return null;
 	}
 
-	public InsnValue incrementLocal(IincInsnNode ain, InsnValue value) {
+	public InsnValue incrementLocal(IincInsnNode iinc, InsnValue value) {
 		Object obj = value.getValue();
-		if (value.getType().equals(Type.BYTE_TYPE)) {
-			return InsnValue.byteValue((byte) ((byte) obj + ain.incr));
-		} else if (value.getType().equals(Type.INT_TYPE)) {
-			return InsnValue.byteValue((int) ((int) obj + ain.incr));
-		} else if (value.getType().equals(Type.CHAR_TYPE)) {
-			return InsnValue.charValue((char) ((int) obj + ain.incr));
-		} else if (value.getType().equals(Type.LONG_TYPE)) {
-			return InsnValue.longValue((long) ((long) obj + ain.incr));
-		} else if (value.getType().equals(Type.DOUBLE_TYPE)) {
-			return InsnValue.doubleValue((double) ((double) obj + ain.incr));
-		} else if (value.getType().equals(Type.FLOAT_TYPE)) {
-			return InsnValue.floatValue((float) ((float) obj + ain.incr));
-		} else if (value.getType().equals(Type.SHORT_TYPE)) {
-			return InsnValue.shortValue((short) ((short) obj + ain.incr));
+		if (obj == null) {
+			return newValue(value.getType());
 		}
+		if (value.getType().equals(Type.BYTE_TYPE)) {
+			return InsnValue.byteValue((byte) (((Number) obj).byteValue() + iinc.incr));
+		} else if (value.getType().equals(Type.INT_TYPE)) {
+			return InsnValue.byteValue((int) (((Number) obj).intValue() + iinc.incr));
+		} else if (value.getType().equals(Type.CHAR_TYPE)) {
+			return InsnValue.charValue((char) (((Number) obj).intValue() + iinc.incr));
+		} else if (value.getType().equals(Type.LONG_TYPE)) {
+			return InsnValue.longValue((long) (((Number) obj).longValue() + iinc.incr));
+		} else if (value.getType().equals(Type.DOUBLE_TYPE)) {
+			return InsnValue.doubleValue((double) (((Number) obj).doubleValue() + iinc.incr));
+		} else if (value.getType().equals(Type.FLOAT_TYPE)) {
+			return InsnValue.floatValue((float) (((Number) obj).floatValue() + iinc.incr));
+		} else if (value.getType().equals(Type.SHORT_TYPE)) {
+			return InsnValue.shortValue((short) (((Number) obj).shortValue() + iinc.incr));
+		}
+
 		return null;
 	}
 
@@ -348,26 +371,48 @@ public class StackHelper {
 		case Opcodes.I2L:
 		case Opcodes.D2L:
 		case Opcodes.F2L:
-			return InsnValue.longValue((long) obj);
+			if (obj == null) {
+				return InsnValue.LONG_VALUE;
+			}
+			return InsnValue.longValue(((Number) obj).longValue());
 		case Opcodes.I2F:
 		case Opcodes.L2F:
 		case Opcodes.D2F:
-			return InsnValue.floatValue((float) obj);
+			if (obj == null) {
+				return InsnValue.FLOAT_VALUE;
+			}
+			return InsnValue.floatValue(((Number) obj).floatValue());
 		case Opcodes.L2I:
 		case Opcodes.F2I:
 		case Opcodes.D2I:
-			return InsnValue.intValue((int) obj);
+			if (obj == null) {
+				return InsnValue.INT_VALUE;
+			}
+			return InsnValue.intValue(((Number) obj).intValue());
 		case Opcodes.I2D:
 		case Opcodes.L2D:
 		case Opcodes.F2D:
-			return InsnValue.doubleValue((double) obj);
+			if (obj == null) {
+				return InsnValue.DOUBLE_VALUE;
+			}
+			return InsnValue.doubleValue(((Number) obj).doubleValue());
 		case Opcodes.I2B:
-			return InsnValue.byteValue((byte) obj);
+			if (obj == null) {
+				return InsnValue.BYTE_VALUE;
+			}
+			return InsnValue.byteValue(((Number) obj).byteValue());
 		case Opcodes.I2C:
-			return InsnValue.charValue((char) obj);
+			if (obj == null) {
+				return InsnValue.CHAR_VALUE;
+			}
+			return InsnValue.charValue(((Number) obj).intValue());
 		case Opcodes.I2S:
-			return InsnValue.shortValue((short) obj);
+			if (obj == null) {
+				return InsnValue.SHORT_VALUE;
+			}
+			return InsnValue.shortValue(((Number) obj).shortValue());
 		}
+
 		return null;
 	}
 
@@ -375,14 +420,27 @@ public class StackHelper {
 		Object obj = value.getValue();
 		switch (insn.getOpcode()) {
 		case Opcodes.INEG:
+			if (obj == null) {
+				return InsnValue.INT_VALUE;
+			}
 			return InsnValue.intValue(-1 * (int) obj);
 		case Opcodes.LNEG:
+			if (obj == null) {
+				return InsnValue.LONG_VALUE;
+			}
 			return InsnValue.longValue(-1L * (long) obj);
 		case Opcodes.FNEG:
+			if (obj == null) {
+				return InsnValue.FLOAT_VALUE;
+			}
 			return InsnValue.floatValue(-1F * (float) obj);
 		case Opcodes.DNEG:
+			if (obj == null) {
+				return InsnValue.DOUBLE_VALUE;
+			}
 			return InsnValue.doubleValue(-1D * (double) obj);
 		}
+
 		return null;
 	}
 
@@ -490,6 +548,9 @@ public class StackHelper {
 	}
 
 	public InsnValue compareConstant(AbstractInsnNode insn, InsnValue value) {
+		if (value.getValue() == null) {
+			return InsnValue.INT_VALUE;
+		}
 		int i = (int) value.getValue();
 		switch (insn.getOpcode()) {
 		case Opcodes.IFEQ:
@@ -505,6 +566,7 @@ public class StackHelper {
 		case Opcodes.IFGT:
 			return InsnValue.intValue(i > 0);
 		}
+
 		return null;
 	}
 
@@ -515,6 +577,7 @@ public class StackHelper {
 		case Opcodes.IFNONNULL:
 			return InsnValue.intValue(value.getValue() != null);
 		}
+
 		return null;
 	}
 
@@ -534,6 +597,7 @@ public class StackHelper {
 			}
 			return InsnValue.intValue(0);
 		}
+
 		return null;
 	}
 
@@ -546,6 +610,9 @@ public class StackHelper {
 	}
 
 	public InsnValue getSwitchValue(AbstractInsnNode insn, InsnValue value) {
+		if (value.getValue() == null) {
+			return InsnValue.intValue(-1);
+		}
 		int i = (int) value.getValue();
 		switch (insn.getOpcode()) {
 		case Opcodes.TABLESWITCH:
@@ -563,19 +630,68 @@ public class StackHelper {
 			}
 			return InsnValue.intValue(-1);
 		}
+
 		return null;
 	}
 
 	public InsnValue array(AbstractInsnNode insn, InsnValue value) {
 		Object obj = value.getValue();
+		int n = -1;
 		switch (insn.getOpcode()) {
 		case Opcodes.NEWARRAY:
+			IntInsnNode iin = (IntInsnNode) insn;
+			n = obj == null ? -1 : (int) obj;
+			switch (iin.operand) {
+			case Type.BOOLEAN:
+			case Type.INT:
+				if (n == -1) {
+					return InsnValue.INT_ARR_VALUE;
+				}
+				return new InsnValue(InsnValue.INT_ARR_VALUE.getType(), new int[n]);
+			case Type.CHAR:
+				if (n == -1) {
+					return InsnValue.CHAR_ARR_VALUE;
+				}
+				return new InsnValue(InsnValue.CHAR_ARR_VALUE.getType(), new int[n]);
+			case Type.BYTE:
+				if (n == -1) {
+					return InsnValue.BYTE_ARR_VALUE;
+				}
+				return new InsnValue(InsnValue.BYTE_ARR_VALUE.getType(), new byte[n]);
+			case Type.SHORT:
+				if (n == -1) {
+					return InsnValue.SHORT_ARR_VALUE;
+				}
+				return new InsnValue(InsnValue.SHORT_ARR_VALUE.getType(), new short[n]);
+			case Type.FLOAT:
+				if (n == -1) {
+					return InsnValue.FLOAT_ARR_VALUE;
+				}
+				return new InsnValue(InsnValue.FLOAT_ARR_VALUE.getType(), new float[n]);
+			case Type.LONG:
+				if (n == -1) {
+					return InsnValue.LONG_ARR_VALUE;
+				}
+				return new InsnValue(InsnValue.LONG_ARR_VALUE.getType(), new long[n]);
+			case Type.DOUBLE:
+				if (n == -1) {
+					return InsnValue.DOUBLE_ARR_VALUE;
+				}
+				return new InsnValue(InsnValue.DOUBLE_ARR_VALUE.getType(), new double[n]);
+			case Type.OBJECT:
+				if (n == -1) {
+					return InsnValue.REFERENCE_ARR_VALUE;
+				}
+				return new InsnValue(InsnValue.REFERENCE_ARR_VALUE.getType(), new Object[n]);
+			}
+			break;
 		case Opcodes.ANEWARRAY:
-			int n = obj == null ? -1 : (int) obj;
+			if (n == -1) {
+				n = obj == null ? -1 : (int) obj;
+			}
 			TypeInsnNode tin = (TypeInsnNode) insn;
 			Type t = Type.getType(tin.desc);
 			if (t.getDescriptor().length() > 1) {
-				// object
 				return new InsnValue(Type.getType("[" + tin.desc));
 			}
 			switch (t.getSort()) {
@@ -623,6 +739,7 @@ public class StackHelper {
 			}
 			return InsnValue.intValue(len);
 		}
+
 		return null;
 	}
 

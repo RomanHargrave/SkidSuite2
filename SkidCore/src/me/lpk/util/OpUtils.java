@@ -571,9 +571,6 @@ public class OpUtils implements org.objectweb.asm.Opcodes {
 		case AbstractInsnNode.IINC_INSN:
 			IincInsnNode iinc = (IincInsnNode) ain;
 			return s  + " " + iinc.var + " +" + iinc.incr;
-		case AbstractInsnNode.LOOKUPSWITCH_INSN:
-		case AbstractInsnNode.TABLESWITCH_INSN:
-
 		}
 		return s;
 	}

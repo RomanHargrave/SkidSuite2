@@ -14,7 +14,7 @@ public class StackUtil {
 		try {
 			sfs = a.analyze(mn.owner, mn);
 		} catch (AnalyzerException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		return sfs;
 	}
