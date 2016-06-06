@@ -478,7 +478,7 @@ public class StackHelper {
 		if (min.desc.endsWith("V")) {
 			return null;
 		}
-		return new InsnValue(Type.getMethodType(min.desc));
+		return new InsnValue(Type.getReturnType(min.desc));
 	}
 
 	public InsnValue compareConstants(AbstractInsnNode insn, InsnValue value1, InsnValue value2) {
