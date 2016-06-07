@@ -17,8 +17,6 @@ import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.analysis.AnalyzerException;
 import org.objectweb.asm.tree.analysis.Value;
 
-import me.lpk.util.OpUtils;
-
 public class StackHelper {
 
 	public InsnValue createConstant(AbstractInsnNode insn) throws AnalyzerException {
