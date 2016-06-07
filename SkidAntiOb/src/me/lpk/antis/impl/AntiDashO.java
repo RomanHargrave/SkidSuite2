@@ -1,38 +1,33 @@
 package me.lpk.antis.impl;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
+import me.lpk.analysis.InsnValue;
+import me.lpk.analysis.Sandbox;
+import me.lpk.analysis.StackFrame;
+import me.lpk.analysis.StackUtil;
 import me.lpk.antis.AntiBase;
 import me.lpk.util.OpUtils;
 
 public class AntiDashO extends AntiBase {
 
 	public AntiDashO(Map<String, ClassNode> nodes) {
-		// This currently only works on low/default settings for DashO (As seen in the eval copy)
-		//
-		// TODO: Improve so the anti will work for higher levels of DashO
-		// encryption (Multiple methods w/ multiple different parameters)
-		// Unsure if different methods have different decrypt patterns. Doesn't
-		// really look like they do aside from some index shifts.
-		//
-		// A decently finished stack emulator will make this super easy since
-		// the values needed for decryption are all hard-coded in the same
-		// method.
 		super(nodes);
 	}
 
 	@Override
 	public ClassNode scan(ClassNode node) {
-		for (MethodNode mnode : node.methods) {
-			replace(mnode);
-		}
 		for (MethodNode mnode : node.methods) {
 			replace(mnode);
 		}
@@ -47,64 +42,85 @@ public class AntiDashO extends AntiBase {
 	 * @param method
 	 */
 	private void replace(MethodNode method) {
-		for (AbstractInsnNode ain : method.instructions.toArray()) {
-			if (ain.getType() == AbstractInsnNode.LDC_INSN
-					&& (ain.getNext().getOpcode() == Opcodes.BIPUSH || (ain.getNext().getOpcode() >= Opcodes.ICONST_M1 && ain.getNext().getOpcode() <= Opcodes.ICONST_5))
-					&& ain.getNext().getNext().getOpcode() == Opcodes.INVOKESTATIC) {
-				String desc = ((MethodInsnNode) ain.getNext().getNext()).desc;
-				if (!desc.equals("(Ljava/lang/String;I)Ljava/lang/String;")) {
-					continue;
+		StackFrame[] frames = StackUtil.getFrames(method, getNodes());
+		AbstractInsnNode ain = method.instructions.getFirst();
+		List<String> strings = new ArrayList<String>();
+		List<Integer> argSizes = new ArrayList<Integer>();
+		List<Integer> indecies = new ArrayList<Integer>();
+		while (ain != null) {
+			if (ain.getOpcode() == Opcodes.INVOKESTATIC) {
+				String desc = ((MethodInsnNode) ain).desc;
+				if (isDashDesc(desc)) {
+					int opIndex = OpUtils.getIndex(ain);
+					Type t = Type.getMethodType(desc);
+					MethodInsnNode min = (MethodInsnNode) ain;
+					ClassNode owner = getNodes().get(min.owner);
+					Object[] args = new Object[t.getArgumentTypes().length];
+					if (opIndex < 0 || opIndex >= frames.length) {
+						ain = ain.getNext();
+						continue;
+					}
+					StackFrame frame = frames[opIndex];
+					if (frame == null) {
+						ain = ain.getNext();
+						continue;
+					}
+					if (frame.getStackSize() < args.length) {
+						// This should never happen unless there's some weird
+						// jump/flow obfuscation.
+						ain = ain.getNext();
+						continue;
+					}
+					boolean failed = false;
+					for (int i = 0; i < args.length; i++) {
+						InsnValue val = (InsnValue) frame.getStack(frame.getStackSize() - i - 1);
+						if (val.getValue() == null) {
+							failed = true;
+							break;
+						}
+						args[args.length - i - 1] = val.getValue();
+					}
+					if (failed) {
+						ain = ain.getNext();
+						continue;
+					}
+					Object o = Sandbox.getIsolatedReturn(owner, min, args);
+					if (o != null) {
+						strings.add(o.toString());
+						argSizes.add(args.length);
+						indecies.add(opIndex);
+					}
 				}
-				String inText = ((LdcInsnNode) ain).cst.toString();
-				int inNum = OpUtils.getIntValue(ain.getNext());
-				String out = deobfuscate(inText, inNum);
-				method.instructions.remove(ain.getNext().getNext());
-				method.instructions.remove(ain.getNext());
-				method.instructions.set(ain, new LdcInsnNode(out));
 			}
+			ain = ain.getNext();
+		}
+		ain = method.instructions.getFirst();
+		int offset = 0;
+		while (ain != null) {
+			if (ain.getOpcode() == Opcodes.INVOKESTATIC) {
+				MethodInsnNode min = (MethodInsnNode) ain;
+				if (isDashDesc(min.desc)) {
+					int opIndex = OpUtils.getIndex(ain);
+					if (indecies.size() > 0 && indecies.get(0) + offset == opIndex) {
+						indecies.remove(0);
+						int args = argSizes.remove(0);
+						String string = strings.remove(0);
+						for (int i = 0; i < args; i++) {
+							method.instructions.insertBefore(min, new InsnNode(Opcodes.POP));
+							offset++;
+						}
+						LdcInsnNode ldc = new LdcInsnNode(string);
+						method.instructions.set(ain, ldc);
+						ain = ldc;
+					}
+				}
+			}
+			ain = ain.getNext();
 		}
 	}
 
-	public static String deobfuscate(final String paramText, int paramIndex) {
-		final char[] inArray = paramText.toCharArray();
-		final int inLength = inArray.length;
-		final char[] array = inArray;
-		int index = 0;
-		final int mod = (4 << 5) - 1 ^ 0x20;
-		char[] outArray;
-		while (true) {
-			outArray = array;
-			if (index == inLength) {
-				break;
-			}
-			final int indexCopy = index;
-			final int charInt = (paramIndex & mod) ^ outArray[indexCopy];
-			++paramIndex;
-			++index;
-			outArray[indexCopy] = (char) charInt;
-		}
-		return String.valueOf(outArray, 0, inLength).intern();
-	}
-
-	public static String lastIndexOf(final String s, int paramIndex, final int indexCounter) {
-		paramIndex += 15;
-		final char[] charArray = s.toCharArray();
-		final int inLength = charArray.length;
-		final char[] array = charArray;
-		int index = 0;
-		final int mod = (4 << 5) - 1 ^ 0x20;
-		char[] charArrayOut;
-		while (true) {
-			charArrayOut = array;
-			if (index == inLength) {
-				break;
-			}
-			final int indexCopy = index;
-			final int charInt = (paramIndex & mod) ^ charArrayOut[indexCopy];
-			paramIndex += indexCounter;
-			++index;
-			charArrayOut[indexCopy] = (char) charInt;
-		}
-		return String.valueOf(charArrayOut, 0, inLength).intern();
+	private boolean isDashDesc(String desc) {
+		String s = "Ljava/lang/String;";
+		return desc.endsWith(s) && desc.replace("I", "").replace(s, "").length() == 2;
 	}
 }

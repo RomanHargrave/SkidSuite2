@@ -8,8 +8,6 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.commons.ClassRemapper;
 import org.objectweb.asm.tree.ClassNode;
 
-import me.lpk.util.ASMUtils;
-
 public class MappingProcessor {
 	public static boolean PRINT;
 

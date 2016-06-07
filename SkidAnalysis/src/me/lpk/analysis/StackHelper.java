@@ -8,6 +8,7 @@ import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.IincInsnNode;
 import org.objectweb.asm.tree.IntInsnNode;
+import org.objectweb.asm.tree.InvokeDynamicInsnNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.LookupSwitchInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
@@ -95,13 +96,26 @@ public class StackHelper {
 		Object indexObj = indexValue.getValue(), arrayObj = value1.getValue();
 		int index = indexObj == null ? -1 : ((Number) indexObj).intValue();
 		boolean arrayNotSimulated = arrayObj == null;
+		Type t = arrayNotSimulated ? null : Type.getType(arrayObj.getClass());
 		switch (insn.getOpcode()) {
 		case Opcodes.IALOAD:
 			if (arrayNotSimulated) {
 				return InsnValue.INT_VALUE;
 			}
-			int[] ia = (int[]) arrayObj;
-			return InsnValue.intValue(ia[index]);
+			// Sometimes Object[] contain values. Stringer obfuscator does this.
+			// TODO: Have this sort of check for others?
+			boolean oarr = t.equals(InsnValue.REFERENCE_ARR_VALUE.getType());
+			if (oarr) {
+				int[] ia = (int[]) arrayObj;
+				return InsnValue.intValue(ia[index]);
+			}else{
+				Object[] obarr = (Object[]) arrayObj;
+				Object o = obarr[index];
+				if (o == null){
+					return InsnValue.INT_VALUE;
+				}
+				return InsnValue.intValue(((Number) o).intValue());
+			}
 		case Opcodes.LALOAD:
 			if (arrayNotSimulated) {
 				return InsnValue.LONG_VALUE;
@@ -121,14 +135,27 @@ public class StackHelper {
 			double[] da = (double[]) arrayObj;
 			return InsnValue.doubleValue(da[index]);
 		case Opcodes.AALOAD:
-			// TODO: Check if it's a string?
+			// TODO: Check if it's an object array, but the contents aren't objects
 			return InsnValue.REFERENCE_VALUE;
 		case Opcodes.BALOAD:
 			if (arrayNotSimulated) {
 				return InsnValue.BYTE_VALUE;
 			}
-			byte[] bya = (byte[]) arrayObj;
-			return InsnValue.byteValue(bya[index]);
+			boolean db = t.equals(InsnValue.DOUBLE_ARR_VALUE.getType()), in = t.equals(InsnValue.INT_ARR_VALUE.getType()), saa = t.equals(InsnValue.SHORT_ARR_VALUE.getType());
+			if (db) {
+				double[] dba = (double[]) arrayObj;
+				return InsnValue.intValue(dba[index]);
+			} else if (in) {
+				int[] ina = (int[]) arrayObj;
+				return InsnValue.intValue(ina[index]);
+			} else if (saa){
+				short[] saaa = (short[]) arrayObj;
+				return InsnValue.intValue(saaa[index]);
+			} else {
+				System.err.println("UNKNOWN TYPE BALOAD: " + t);
+				throw new RuntimeException();
+			}
+
 		case Opcodes.CALOAD:
 			if (arrayNotSimulated) {
 				return InsnValue.CHAR_VALUE;
@@ -166,27 +193,27 @@ public class StackHelper {
 			int i1 = ((Number) o1).intValue(), i2 = ((Number) o2).intValue();
 			switch (insn.getOpcode()) {
 			case Opcodes.IADD:
-				return InsnValue.intValue(i2 + i1);
+				return InsnValue.intValue(i1 + i2);
 			case Opcodes.ISUB:
-				return InsnValue.intValue(i2 - i1);
+				return InsnValue.intValue(i1 - i2);
 			case Opcodes.IMUL:
-				return InsnValue.intValue(i2 * i1);
+				return InsnValue.intValue(i1 * i2);
 			case Opcodes.IDIV:
-				return InsnValue.intValue(i2 / i1);
+				return InsnValue.intValue(i1 / i2);
 			case Opcodes.IREM:
-				return InsnValue.intValue(i2 % i1);
+				return InsnValue.intValue(i1 % i2);
 			case Opcodes.ISHL:
-				return InsnValue.intValue(i2 << i1);
+				return InsnValue.intValue(i1 << i2);
 			case Opcodes.ISHR:
-				return InsnValue.intValue(i2 >> i1);
+				return InsnValue.intValue(i1 >> i2);
 			case Opcodes.IUSHR:
-				return InsnValue.intValue(i2 >>> i1);
+				return InsnValue.intValue(i1 >>> i2);
 			case Opcodes.IAND:
-				return InsnValue.intValue(i2 & i1);
+				return InsnValue.intValue(i1 & i2);
 			case Opcodes.IOR:
-				return InsnValue.intValue(i2 | i1);
+				return InsnValue.intValue(i1 | i2);
 			case Opcodes.IXOR:
-				return InsnValue.intValue(i2 ^ i1);
+				return InsnValue.intValue(i1 ^ i2);
 			}
 		case Opcodes.LADD:
 		case Opcodes.LSUB:
@@ -205,27 +232,27 @@ public class StackHelper {
 			long l1 = ((Number) o1).longValue(), l2 = ((Number) o2).longValue();
 			switch (insn.getOpcode()) {
 			case Opcodes.LADD:
-				return InsnValue.longValue(l2 + l1);
+				return InsnValue.longValue(l1 + l2);
 			case Opcodes.LSUB:
-				return InsnValue.longValue(l2 - l1);
+				return InsnValue.longValue(l1 - l2);
 			case Opcodes.LMUL:
-				return InsnValue.longValue(l2 * l1);
+				return InsnValue.longValue(l1 * l2);
 			case Opcodes.LDIV:
-				return InsnValue.longValue(l2 / l1);
+				return InsnValue.longValue(l1 / l2);
 			case Opcodes.LREM:
-				return InsnValue.longValue(l2 % l1);
+				return InsnValue.longValue(l1 % l2);
 			case Opcodes.LSHL:
-				return InsnValue.longValue(l2 << l1);
+				return InsnValue.longValue(l1 << l2);
 			case Opcodes.LSHR:
-				return InsnValue.longValue(l2 >> l1);
+				return InsnValue.longValue(l1 >> l2);
 			case Opcodes.LUSHR:
-				return InsnValue.longValue(l2 >>> l1);
+				return InsnValue.longValue(l1 >>> l2);
 			case Opcodes.LAND:
-				return InsnValue.longValue(l2 & l1);
+				return InsnValue.longValue(l1 & l2);
 			case Opcodes.LOR:
-				return InsnValue.longValue(l2 | l1);
+				return InsnValue.longValue(l1 | l2);
 			case Opcodes.LXOR:
-				return InsnValue.longValue(l2 ^ l1);
+				return InsnValue.longValue(l1 ^ l2);
 			}
 		case Opcodes.FADD:
 		case Opcodes.FSUB:
@@ -238,15 +265,15 @@ public class StackHelper {
 			float f1 = (float) o1, f2 = (float) o2;
 			switch (insn.getOpcode()) {
 			case Opcodes.FADD:
-				return InsnValue.floatValue(f2 + f1);
+				return InsnValue.floatValue(f1 + f2);
 			case Opcodes.FSUB:
-				return InsnValue.floatValue(f2 - f1);
+				return InsnValue.floatValue(f1 - f2);
 			case Opcodes.FMUL:
-				return InsnValue.floatValue(f2 * f1);
+				return InsnValue.floatValue(f1 * f2);
 			case Opcodes.FDIV:
-				return InsnValue.floatValue(f2 / f1);
+				return InsnValue.floatValue(f1 / f2);
 			case Opcodes.FREM:
-				return InsnValue.floatValue(f2 % f1);
+				return InsnValue.floatValue(f1 % f2);
 			}
 		case Opcodes.DADD:
 		case Opcodes.DSUB:
@@ -259,15 +286,15 @@ public class StackHelper {
 			double d1 = (double) o1, d2 = (double) o2;
 			switch (insn.getOpcode()) {
 			case Opcodes.DADD:
-				return InsnValue.doubleValue(d2 + d1);
+				return InsnValue.doubleValue(d1 + d2);
 			case Opcodes.DSUB:
-				return InsnValue.doubleValue(d2 - d1);
+				return InsnValue.doubleValue(d1 - d2);
 			case Opcodes.DMUL:
-				return InsnValue.doubleValue(d2 * d1);
+				return InsnValue.doubleValue(d1 * d2);
 			case Opcodes.DDIV:
-				return InsnValue.doubleValue(d2 / d1);
+				return InsnValue.doubleValue(d1 / d2);
 			case Opcodes.DREM:
-				return InsnValue.doubleValue(d2 % d1);
+				return InsnValue.doubleValue(d1 % d2);
 			}
 		}
 
@@ -311,16 +338,34 @@ public class StackHelper {
 				return InsnValue.DOUBLE_ARR_VALUE;
 			}
 			double[] da = (double[]) arrayRef.getValue();
-			da[i] = (double) value.getValue();
+			da[i] = ((Number) value.getValue()).doubleValue();
 			return new InsnValue(InsnValue.DOUBLE_ARR_VALUE.getType(), da);
 		case Opcodes.BASTORE:
 			if (anythingNull) {
-				return InsnValue.BYTE_ARR_VALUE;
+				return InsnValue.DOUBLE_ARR_VALUE;
 			}
-			boolean[] ba = (boolean[]) arrayRef.getValue();
-			ba[i] = (boolean) value.getValue();
-			return new InsnValue(InsnValue.BOOLEAN_ARR_VALUE.getType(), ba);
+			Type t = Type.getType(arrayRef.getValue().getClass());
+			boolean db = t.equals(InsnValue.DOUBLE_ARR_VALUE.getType()), in = t.equals(InsnValue.INT_ARR_VALUE.getType()), saaa = t.equals(InsnValue.SHORT_ARR_VALUE.getType());
+			if (db) {
+				double[] da2 = (double[]) arrayRef.getValue();
+				da2[i] = ((Number) value.getValue()).doubleValue();
+				return new InsnValue(InsnValue.DOUBLE_ARR_VALUE.getType(), da2);
+			} else if (in) {
+				int[] ia = (int[]) arrayRef.getValue();
+				ia[i] = (int) value.getValue();
+				return new InsnValue(InsnValue.INT_ARR_VALUE.getType(), ia);
+			} else if (saaa) {
+				short[] saa = (short[]) arrayRef.getValue();
+				saa[i] = ((Number)value.getValue()).shortValue();
+				return new InsnValue(InsnValue.SHORT_ARR_VALUE.getType(), saa);
+			} else {
+				System.err.println("UNKNOWN BASTORE TYPE: " + t);
+				throw new RuntimeException();
+			}
 		case Opcodes.SASTORE:
+			if (anythingNull) {
+				return InsnValue.SHORT_VALUE;
+			}
 			short[] sa = (short[]) arrayRef.getValue();
 			sa[i] = (short) value.getValue();
 			return new InsnValue(InsnValue.SHORT_ARR_VALUE.getType(), sa);
@@ -465,7 +510,12 @@ public class StackHelper {
 	}
 
 	public InsnValue onMethod(AbstractInsnNode insn, List<InsnValue> values) {
-		MethodInsnNode min = (MethodInsnNode) insn;
+		String desc = "V";
+		if (insn.getOpcode() == Opcodes.INVOKEDYNAMIC){
+			desc = ((InvokeDynamicInsnNode) insn).desc;
+		}else{
+			desc = ((MethodInsnNode) insn).desc;
+		}
 		// Until I'm ready to simulate method calls the opcode here really
 		// doesn't matter.
 		/*
@@ -473,10 +523,10 @@ public class StackHelper {
 		 * Opcodes.INVOKESPECIAL: case Opcodes.INVOKEINTERFACE: case
 		 * Opcodes.INVOKESTATIC: case Opcodes.INVOKEVIRTUAL: }
 		 */
-		if (min.desc.endsWith("V")) {
+		if (desc.endsWith("V")) {
 			return null;
 		}
-		return new InsnValue(Type.getReturnType(min.desc));
+		return new InsnValue(Type.getReturnType(desc));
 	}
 
 	public InsnValue compareConstants(AbstractInsnNode insn, InsnValue value1, InsnValue value2) {
@@ -549,7 +599,7 @@ public class StackHelper {
 		if (value.getValue() == null) {
 			return InsnValue.INT_VALUE;
 		}
-		int i = (int) value.getValue();
+		int i = ((Number)value.getValue()).intValue();
 		switch (insn.getOpcode()) {
 		case Opcodes.IFEQ:
 			return InsnValue.intValue(i == 0);
