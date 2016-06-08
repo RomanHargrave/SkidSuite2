@@ -9,7 +9,7 @@ import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
-import me.lpk.MainWindow;
+import me.lpk.gui.VisualizerWindow;
 import me.lpk.gui.component.SearchResultEntry;
 import me.lpk.mapping.MappedClass;
 import me.lpk.mapping.MappedMember;
@@ -37,7 +37,7 @@ public class SearchUtil {
 	 */
 	public static List<SearchResultEntry> findStringsContaining(String text) {
 		List<SearchResultEntry> results = new ArrayList<SearchResultEntry>();
-		for (ClassNode cn : MainWindow.instance.getNodes().values()) {
+		for (ClassNode cn : VisualizerWindow.instance.getNodes().values()) {
 			for (MethodNode mn : cn.methods) {
 				for (AbstractInsnNode ain : mn.instructions.toArray()) {
 					if (ain.getType() == AbstractInsnNode.LDC_INSN) {
@@ -61,7 +61,7 @@ public class SearchUtil {
 	public static List<SearchResultEntry> findReferences(ClassNode node, MethodNode method) {
 		List<SearchResultEntry> results = findChildren(node);
 		List<Reference> references = new ArrayList<Reference>();
-		for (ClassNode cn : MainWindow.instance.getNodes().values()) {
+		for (ClassNode cn : VisualizerWindow.instance.getNodes().values()) {
 			references.addAll(ReferenceUtils.getReferences(node, method, cn));
 		}
 		for (Reference reference : references) {
@@ -80,7 +80,7 @@ public class SearchUtil {
 	public static List<SearchResultEntry> findReferences(ClassNode node, FieldNode field) {
 		List<SearchResultEntry> results = findChildren(node);
 		List<Reference> references = new ArrayList<Reference>();
-		for (ClassNode cn : MainWindow.instance.getNodes().values()) {
+		for (ClassNode cn : VisualizerWindow.instance.getNodes().values()) {
 			references.addAll(ReferenceUtils.getReferences(node, field, cn));
 		}
 		for (Reference reference : references) {
@@ -98,7 +98,7 @@ public class SearchUtil {
 	public static List<SearchResultEntry> findReferences(ClassNode node) {
 		List<SearchResultEntry> results = findChildren(node);
 		List<Reference> references = new ArrayList<Reference>();
-		for (ClassNode cn : MainWindow.instance.getNodes().values()) {
+		for (ClassNode cn : VisualizerWindow.instance.getNodes().values()) {
 			references.addAll(ReferenceUtils.getReferences(node, cn));
 		}
 		for (Reference reference : references) {
@@ -116,7 +116,7 @@ public class SearchUtil {
 	public static List<SearchResultEntry> findChildren(ClassNode node) {
 		List<SearchResultEntry> results = new ArrayList<SearchResultEntry>();
 		MappedClass parent = fromNode(node);
-		for (MappedClass mc : MainWindow.instance.getMappings().values()) {
+		for (MappedClass mc : VisualizerWindow.instance.getMappings().values()) {
 			if (mc.equals(parent)) {
 				continue;
 			}
@@ -135,7 +135,7 @@ public class SearchUtil {
 	 */
 	public static List<SearchResultEntry> findMethods(String text) {
 		List<SearchResultEntry> results = new ArrayList<SearchResultEntry>();
-		for (MappedClass mc : MainWindow.instance.getMappings().values()) {
+		for (MappedClass mc : VisualizerWindow.instance.getMappings().values()) {
 			List<MappedMember> methodList = mc.findMethodsByName(text, false);
 			if (methodList.size() > 0) {
 				results.add(new SearchResultEntry(mc.getNode(), methodList.get(0).getMethodNode(), -1));
@@ -159,7 +159,7 @@ public class SearchUtil {
 	 */
 	public static List<SearchResultEntry> findFields(String text) {
 		List<SearchResultEntry> results = new ArrayList<SearchResultEntry>();
-		for (MappedClass mc : MainWindow.instance.getMappings().values()) {
+		for (MappedClass mc : VisualizerWindow.instance.getMappings().values()) {
 			if (mc.findFieldsByName(text, false).size() > 0) {
 				results.add(new SearchResultEntry(mc.getNode()));
 				// Class already has a result. It does not need any further
@@ -187,7 +187,7 @@ public class SearchUtil {
 	}
 
 	public static MappedClass fromString(String owner) {
-		return MainWindow.instance.getMappings().get(owner);
+		return VisualizerWindow.instance.getMappings().get(owner);
 	}
 
 }

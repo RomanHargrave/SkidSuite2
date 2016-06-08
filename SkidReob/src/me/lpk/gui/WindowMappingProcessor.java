@@ -1,4 +1,4 @@
-package me.lpk.gui.windows.mapping;
+package me.lpk.gui;
 
 import javax.swing.JFrame;
 import javax.swing.JTextField;

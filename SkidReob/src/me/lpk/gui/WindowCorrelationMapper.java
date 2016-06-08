@@ -1,4 +1,4 @@
-package me.lpk.gui.windows.correlation;
+package me.lpk.gui;
 
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;

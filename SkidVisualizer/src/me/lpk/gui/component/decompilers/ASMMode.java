@@ -23,7 +23,7 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.util.Textifier;
 import org.objectweb.asm.util.TraceClassVisitor;
 
-import me.lpk.MainWindow;
+import me.lpk.gui.VisualizerWindow;
 import me.lpk.gui.component.DecompileSelection;
 import me.lpk.gui.component.SearchResultEntry;
 import me.lpk.mapping.MappedClass;
@@ -295,7 +295,7 @@ public class ASMMode extends DecompileMode {
 		// should be className.object
 		// So cut everything before '.'
 		String methodStr = name.substring(name.indexOf(".") + 1);
-		Map<String, MappedClass> mappings = MainWindow.instance.getMappings();
+		Map<String, MappedClass> mappings = VisualizerWindow.instance.getMappings();
 		MappedMember member = ParentUtils.findMethod(mappings.get(owner.name), methodStr, desc);
 		if (member != null) {
 			return member.getMethodNode();
@@ -314,7 +314,7 @@ public class ASMMode extends DecompileMode {
 		// should be className.object
 		// So cut everything before '.'
 		name = name.substring(name.indexOf(".") + 1);
-		Map<String, MappedClass> mappings = MainWindow.instance.getMappings();
+		Map<String, MappedClass> mappings = VisualizerWindow.instance.getMappings();
 		MappedMember member = ParentUtils.findField(mappings.get(owner.name), name, desc);
 		if (member != null) {
 			return member.getFieldNode();
@@ -334,7 +334,7 @@ public class ASMMode extends DecompileMode {
 		String data = split[split.length - 1];
 		String name = data.substring(0, data.indexOf("("));
 		String desc = data.substring(data.indexOf("("));
-		Map<String, MappedClass> mappings = MainWindow.instance.getMappings();
+		Map<String, MappedClass> mappings = VisualizerWindow.instance.getMappings();
 		MappedMember member = ParentUtils.findMethod(mappings.get(currNode.name), name, desc);
 		if (member != null) {
 			return member.getMethodNode();
@@ -353,7 +353,7 @@ public class ASMMode extends DecompileMode {
 		String desc = split[split.length - (hasValue ? 4 : 2)];
 		// should be className.object
 		// So cut everything before '.'
-		Map<String, MappedClass> mappings = MainWindow.instance.getMappings();
+		Map<String, MappedClass> mappings = VisualizerWindow.instance.getMappings();
 		MappedMember member = ParentUtils.findField(mappings.get(currNode.name), name, desc);
 		if (member != null) {
 			return member.getFieldNode();

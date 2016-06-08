@@ -31,9 +31,9 @@ import org.objectweb.asm.tree.TableSwitchInsnNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
-import me.lpk.MainWindow;
 import me.lpk.analysis.StackFrame;
 import me.lpk.analysis.StackUtil;
+import me.lpk.gui.VisualizerWindow;
 import me.lpk.util.OpUtils;
 
 public class MethodSimulatorPanel extends JPanel {
@@ -127,7 +127,7 @@ public class MethodSimulatorPanel extends JPanel {
 		}
 		msp.listOpcodes.setListData(opcodesText.toArray(new String[0]));
 		// Setting up Stack
-		msp.frames = StackUtil.getFrames(mn, MainWindow.instance.getNodes());
+		msp.frames = StackUtil.getFrames(mn, VisualizerWindow.instance.getNodes());
 		// Making the frame
 		JFrame frame = new JFrame();
 		frame.setSize(1000, 555);

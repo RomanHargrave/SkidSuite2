@@ -11,7 +11,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 
-import me.lpk.MainWindow;
+import me.lpk.gui.VisualizerWindow;
 import me.lpk.gui.component.DecompileSelection;
 import me.lpk.gui.component.MethodSimulatorPanel;
 import me.lpk.gui.component.RelationshipPanel;
@@ -23,7 +23,7 @@ public class ContextMenuAdapter extends MouseAdapter {
 		if (e.getButton() == MouseEvent.BUTTON1) {
 			return;
 		}
-		DecompileSelection selection = MainWindow.instance.getDecompilePanel().getSelection();
+		DecompileSelection selection = VisualizerWindow.instance.getDecompilePanel().getSelection();
 		if (selection == null) {
 			return;
 		}
@@ -31,8 +31,8 @@ public class ContextMenuAdapter extends MouseAdapter {
 		if (selection.getNode() == null) {
 			JMenuItem contextError = new JMenuItem("<html>Could not find the owner class for the selection: <i>" + selection.getSelection() + "</i></html>");
 			context.add(contextError);
-			JScrollPane scroll = MainWindow.instance.getDecompilePanel().getTextScroll();
-			context.show(MainWindow.instance.getDecompilePanel(), e.getX() + scroll.getX(), e.getY() - scroll.getVerticalScrollBar().getValue());
+			JScrollPane scroll = VisualizerWindow.instance.getDecompilePanel().getTextScroll();
+			context.show(VisualizerWindow.instance.getDecompilePanel(), e.getX() + scroll.getX(), e.getY() - scroll.getVerticalScrollBar().getValue());
 			return;
 		}
 		String typeData = selection.isClass() ? selection.getNode().name
@@ -55,7 +55,7 @@ public class ContextMenuAdapter extends MouseAdapter {
 			searchParent.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					MainWindow.instance.getDecompilePanel().decompile(selection.getNode().superName);
+					VisualizerWindow.instance.getDecompilePanel().decompile(selection.getNode().superName);
 				}
 			});
 			JMenuItem searchChildren = new JMenuItem("Find children of " + (selection.getNode().name));
@@ -63,9 +63,9 @@ public class ContextMenuAdapter extends MouseAdapter {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					List<SearchResultEntry> results = SearchUtil.findChildren(selection.getNode());
-					MainWindow.instance.getResultPanel().clearResults();
+					VisualizerWindow.instance.getResultPanel().clearResults();
 					for (SearchResultEntry result : results) {
-						MainWindow.instance.getResultPanel().addResult(result);
+						VisualizerWindow.instance.getResultPanel().addResult(result);
 					}
 				}
 			});
@@ -74,9 +74,9 @@ public class ContextMenuAdapter extends MouseAdapter {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					List<SearchResultEntry> results = SearchUtil.findReferences(selection.getNode());
-					MainWindow.instance.getResultPanel().clearResults();
+					VisualizerWindow.instance.getResultPanel().clearResults();
 					for (SearchResultEntry result : results) {
-						MainWindow.instance.getResultPanel().addResult(result);
+						VisualizerWindow.instance.getResultPanel().addResult(result);
 					}
 				}
 			});
@@ -84,7 +84,7 @@ public class ContextMenuAdapter extends MouseAdapter {
 			showRelations.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					RelationshipPanel rp = new RelationshipPanel(MainWindow.instance.getNodes(), selection.getNode().name); 
+					RelationshipPanel rp = new RelationshipPanel(VisualizerWindow.instance.getNodes(), selection.getNode().name); 
 					JFrame frame = new JFrame();
 					frame.setSize(1000, 555);
 					frame.setContentPane(rp);
@@ -103,7 +103,7 @@ public class ContextMenuAdapter extends MouseAdapter {
 				searchOuter.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						MainWindow.instance.getDecompilePanel().decompile(outer);
+						VisualizerWindow.instance.getDecompilePanel().decompile(outer);
 					}
 				});
 				context.add(searchOuter);
@@ -118,9 +118,9 @@ public class ContextMenuAdapter extends MouseAdapter {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						List<SearchResultEntry> results = SearchUtil.findReferences(selection.getNode(), selection.getField());
-						MainWindow.instance.getResultPanel().clearResults();
+						VisualizerWindow.instance.getResultPanel().clearResults();
 						for (SearchResultEntry result : results) {
-							MainWindow.instance.getResultPanel().addResult(result);
+							VisualizerWindow.instance.getResultPanel().addResult(result);
 						}
 					}
 				});
@@ -133,9 +133,9 @@ public class ContextMenuAdapter extends MouseAdapter {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						List<SearchResultEntry> results = SearchUtil.findReferences(selection.getNode(), selection.getMethod());
-						MainWindow.instance.getResultPanel().clearResults();
+						VisualizerWindow.instance.getResultPanel().clearResults();
 						for (SearchResultEntry result : results) {
-							MainWindow.instance.getResultPanel().addResult(result);
+							VisualizerWindow.instance.getResultPanel().addResult(result);
 						}
 					}
 				});
@@ -155,9 +155,9 @@ public class ContextMenuAdapter extends MouseAdapter {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					List<SearchResultEntry> results = SearchUtil.findStringsContaining(selection.getSelection());
-					MainWindow.instance.getResultPanel().clearResults();
+					VisualizerWindow.instance.getResultPanel().clearResults();
 					for (SearchResultEntry result : results) {
-						MainWindow.instance.getResultPanel().addResult(result);
+						VisualizerWindow.instance.getResultPanel().addResult(result);
 					}
 				}
 			});
@@ -166,16 +166,16 @@ public class ContextMenuAdapter extends MouseAdapter {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					List<SearchResultEntry> results = SearchUtil.findStringsSimiliar(selection.getSelection());
-					MainWindow.instance.getResultPanel().clearResults();
+					VisualizerWindow.instance.getResultPanel().clearResults();
 					for (SearchResultEntry result : results) {
-						MainWindow.instance.getResultPanel().addResult(result);
+						VisualizerWindow.instance.getResultPanel().addResult(result);
 					}
 				}
 			});
 			context.add(searchContaining);
 			context.add(searchSimiliar);
 		}
-		JScrollPane scroll = MainWindow.instance.getDecompilePanel().getTextScroll();
-		context.show(MainWindow.instance.getDecompilePanel(), e.getX() + scroll.getX(), e.getY() - scroll.getVerticalScrollBar().getValue());
+		JScrollPane scroll = VisualizerWindow.instance.getDecompilePanel().getTextScroll();
+		context.show(VisualizerWindow.instance.getDecompilePanel(), e.getX() + scroll.getX(), e.getY() - scroll.getVerticalScrollBar().getValue());
 	}
 }

@@ -1,4 +1,4 @@
-package me.lpk;
+package me.lpk.gui;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -20,7 +20,7 @@ import me.lpk.gui.listeners.SearchKeyListener;
 import me.lpk.mapping.MappedClass;
 import me.lpk.mapping.MappingGen;
 
-public class MainWindow extends JFrame {
+public class VisualizerWindow extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private static final String TITLE = "SkidVisualizer";
 	private static final int INIT_WIDTH = 1080, INIT_HEIGHT = 800;
@@ -32,13 +32,13 @@ public class MainWindow extends JFrame {
 	private final JComboBox<String> decompileMode;
 	private final DecompilePanel decompilePanel;
 	private final SearchResultPanel searchResults;
-	public static MainWindow instance;
+	public static VisualizerWindow instance;
 
 	public static void main(String[] args) {
-		new MainWindow().setVisible(true);
+		new VisualizerWindow().setVisible(true);
 	}
 
-	public MainWindow() {
+	public VisualizerWindow() {
 		instance = this;
 		menuBar = new JMenuBar();
 		txtMenuSearch = new JTextField();

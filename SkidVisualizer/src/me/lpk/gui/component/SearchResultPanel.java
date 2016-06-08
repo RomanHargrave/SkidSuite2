@@ -14,7 +14,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.BevelBorder;
 
-import me.lpk.MainWindow;
+import me.lpk.gui.VisualizerWindow;
 
 public class SearchResultPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
@@ -39,10 +39,10 @@ public class SearchResultPanel extends JPanel {
 				if (list.getSelectedIndex() == lastIndex) {
 					String path = getPath();
 					if (path != null) {
-						if (MainWindow.instance.getDecompilePanel().getCurrentNode() == null || !MainWindow.instance.getDecompilePanel().getCurrentNode().name.equals(path)) {
-							MainWindow.instance.getDecompilePanel().decompile(path);
+						if (VisualizerWindow.instance.getDecompilePanel().getCurrentNode() == null || !VisualizerWindow.instance.getDecompilePanel().getCurrentNode().name.equals(path)) {
+							VisualizerWindow.instance.getDecompilePanel().decompile(path);
 						}
-						MainWindow.instance.getDecompilePanel().setIndex(getSelectedSearchEntry());
+						VisualizerWindow.instance.getDecompilePanel().setIndex(getSelectedSearchEntry());
 						// TODO: Have text indexes in the ASMPanel saved where
 						// fields/methods are located
 						// SearchResultEntry can then find the correct index
@@ -72,7 +72,7 @@ public class SearchResultPanel extends JPanel {
 			}
 		});
 		JScrollPane pane = new JScrollPane(list);
-		pane.setPreferredSize(new Dimension(250, MainWindow.instance.getHeight()));
+		pane.setPreferredSize(new Dimension(250, VisualizerWindow.instance.getHeight()));
 		add(pane, BorderLayout.CENTER);
 	}
 

@@ -1,4 +1,4 @@
-package me.lpk;
+package me.lpk.gui;
 
 import javax.swing.JFrame;
 import javax.swing.JSplitPane;
@@ -43,7 +43,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
-public class Gui {
+public class Scanner {
 	private JFrame frame;
 	private JTree treeFiles;
 	private JTextPane txtpntesttitle;
@@ -56,13 +56,13 @@ public class Gui {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		new Gui();
+		new Scanner();
 	}
 
 	/**
 	 * Create the application.
 	 */
-	public Gui() {
+	public Scanner() {
 		initialize();
 		frame.setVisible(true);
 	}

@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.objectweb.asm.tree.ClassNode;
 
-import me.lpk.MainWindow;
+import me.lpk.gui.VisualizerWindow;
 import me.lpk.gui.component.SearchResultEntry;
 import me.lpk.util.SearchUtil;
 
@@ -27,31 +27,31 @@ public class SearchKeyListener implements KeyListener {
 	}
 
 	private void handle(KeyEvent e) {
-		if (MainWindow.instance.getSearchText().length() > 3 || e.getKeyCode() == KeyEvent.VK_ENTER) {
+		if (VisualizerWindow.instance.getSearchText().length() > 3 || e.getKeyCode() == KeyEvent.VK_ENTER) {
 			List<SearchResultEntry> results = null;
-			switch (MainWindow.instance.getSearchType()) {
+			switch (VisualizerWindow.instance.getSearchType()) {
 			case "Class":
-				System.out.println(MainWindow.instance.getSearchText() + ":" + MainWindow.instance.getNodes().containsKey(MainWindow.instance.getSearchText()));
-				ClassNode node = MainWindow.instance.getNodes().get(MainWindow.instance.getSearchText());
+				System.out.println(VisualizerWindow.instance.getSearchText() + ":" + VisualizerWindow.instance.getNodes().containsKey(VisualizerWindow.instance.getSearchText()));
+				ClassNode node = VisualizerWindow.instance.getNodes().get(VisualizerWindow.instance.getSearchText());
 				if (node == null){
 					return;
 				}
 				results = SearchUtil.findReferences(node);
 				break;
 			case "Method":
-				results = SearchUtil.findMethods(MainWindow.instance.getSearchText());
+				results = SearchUtil.findMethods(VisualizerWindow.instance.getSearchText());
 				break;
 			case "Field":
-				results = SearchUtil.findFields(MainWindow.instance.getSearchText());
+				results = SearchUtil.findFields(VisualizerWindow.instance.getSearchText());
 				break;
 			case "LDC":
-				results = SearchUtil.findStringsContaining(MainWindow.instance.getSearchText());
+				results = SearchUtil.findStringsContaining(VisualizerWindow.instance.getSearchText());
 				break;
 			}
 			if (results != null) {
-				MainWindow.instance.getResultPanel().clearResults();
+				VisualizerWindow.instance.getResultPanel().clearResults();
 				for (SearchResultEntry result : results) {
-					MainWindow.instance.getResultPanel().addResult(result);
+					VisualizerWindow.instance.getResultPanel().addResult(result);
 				}
 			}
 		}

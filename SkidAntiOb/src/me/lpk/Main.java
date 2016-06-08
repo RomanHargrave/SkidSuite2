@@ -8,9 +8,7 @@ import java.util.Map;
 import org.objectweb.asm.tree.ClassNode;
 
 import me.lpk.antis.AntiBase;
-import me.lpk.antis.impl.AntiDashO;
-import me.lpk.antis.impl.AntiZKM5;
-import me.lpk.antis.impl.AntiZKM8;
+import me.lpk.antis.impl.*;
 import me.lpk.mapping.MappedClass;
 import me.lpk.mapping.MappingProcessor;
 import me.lpk.util.Classpather;
@@ -20,20 +18,21 @@ import me.lpk.util.LazySetupMaker;
 public class Main {
 
 	public static void main(String[] args) {
+
 		try {
-			String file = "DashOPro.jar";
+			String file = "Stringer1.jar";
 			LazySetupMaker lsm = LazySetupMaker.get(file, false, false);
-			File dir = new File("x");
-			for (File f : dir.listFiles()){
-				lsm.addExtraLibraryJar(f);
+
+			File dir = new File("y");
+			for (File f : dir.listFiles()) {
+				LazySetupMaker.addExtraLibraryJar(f);
 			}
-			for (File f : lsm.getExtraLibs()){
+			for (File f : LazySetupMaker.getExtraLibs()) {
 				Classpather.addFile(f);
 			}
 			Classpather.addFile(file);
-
 			for (String className : lsm.getNodes().keySet()) {
-				AntiBase anti = new AntiDashO(lsm.getNodes());
+				AntiBase anti = new AntiStringer(lsm.getNodes());
 				ClassNode node = lsm.getNodes().get(className);
 				lsm.getNodes().put(className, anti.scan(node));
 			}
@@ -43,5 +42,6 @@ public class Main {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
 	}
 }
