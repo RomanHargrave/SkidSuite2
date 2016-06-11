@@ -22,6 +22,7 @@ public class Remover {
 	private final static Set<String> visited = new HashSet<String>();
 
 	public static Set<String> evaluate(String mainClass, Map<String, ClassNode> nodes) {
+		visited.clear();
 		Set<String> keep = new HashSet<String>();
 		ClassNode initNode = nodes.get(mainClass);
 		if (initNode == null){

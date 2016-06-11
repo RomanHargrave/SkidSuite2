@@ -103,7 +103,7 @@ public class WindowMappingConverter {
 		frmMappingConverter.getContentPane().add(pnlMappings, BorderLayout.CENTER);
 		pnlMappings.setLayout(new BorderLayout(0, 0));
 
-		JComboBox cmboMappingTypes = new JComboBox(new String[] { "Proguard", "Enigma", "SRG" });
+		JComboBox<String> cmboMappingTypes = new JComboBox<String>(new String[] { "Proguard", "Enigma", "SRG" });
 		cmboMappingTypes.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
