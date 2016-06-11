@@ -30,7 +30,7 @@ public class CorrelationMapperr {
 	 */
 	public static Map<String, MappedClass> correlate(MappedClass targetClass, MappedClass cleanClass, Map<String, MappedClass> targetMap,
 			Map<String, MappedClass> cleanMap) {
-		if (targetClass.isTruelyRenamed()) {
+		if (targetClass.isRenamed()) {
 			return targetMap;
 		}
 		// Verify classes are similiar
@@ -42,19 +42,22 @@ public class CorrelationMapperr {
 			targetMap = correlate(targetClass.getParent(), cleanClass.getParent(), targetMap, cleanMap);
 		}
 		// Hop to all interfaces.
-		for (int key = 0; key < targetClass.getInterfaces().size(); key++) {
-			MappedClass interfaceClassTarget = targetClass.getInterfaces().get(key);
-			MappedClass interfaceClassClean = cleanClass.getInterfaces().get(key);
-			targetMap = correlate(interfaceClassTarget, interfaceClassClean, targetMap, cleanMap);
-		}
+		int inters = targetClass.getInterfaces().size();
+		if (inters > 0)
+			for (int key = 0; key < inters; key++) {
+				MappedClass interfaceClassTarget = targetClass.getInterfaces().get(key);
+				MappedClass interfaceClassClean = cleanClass.getInterfaces().get(key);
+				targetMap = correlate(interfaceClassTarget, interfaceClassClean, targetMap, cleanMap);
+			}
 		// Begin renaming
 		targetClass.setNewName(cleanClass.getOriginalName());
+		targetClass.setRenamedOverride(true);
 		// Fields
 		List<MappedMember> targetFields = targetClass.getFields();
 		List<MappedMember> cleanFields = cleanClass.getFields();
 		int offsetField = 0;
 		for (int key = 0; key < targetFields.size(); key++) {
-			if (key >= cleanFields.size()){
+			if (key >= cleanFields.size()) {
 				continue;
 			}
 			MappedMember targetField = targetFields.get(key);
@@ -69,19 +72,19 @@ public class CorrelationMapperr {
 				// x++
 				offsetField -= 1;
 				continue;
-			}else{
-				if (targetField.getDesc().length() > 4 && cleanField.getDesc().length() > 4){
-				String n1 = RegexUtils.matchDescriptionClasses(targetField.getDesc()).get(0);
-				String n2 = RegexUtils.matchDescriptionClasses(cleanField.getDesc()).get(0);
-				MappedClass c1 =  targetMap.get(n1);
-				MappedClass c2 =  targetMap.get(n2);
-				if (c1 != null && c2 != null){
-					boolean flag = areSimiliar(c1, c2);
-					if (!flag){
-						offsetField -= 1;
-						continue;
+			} else {
+				if (targetField.getDesc().length() > 4 && cleanField.getDesc().length() > 4) {
+					String n1 = RegexUtils.matchDescriptionClasses(targetField.getDesc()).get(0);
+					String n2 = RegexUtils.matchDescriptionClasses(cleanField.getDesc()).get(0);
+					MappedClass c1 = targetMap.get(n1);
+					MappedClass c2 = targetMap.get(n2);
+					if (c1 != null && c2 != null) {
+						boolean flag = areSimiliar(c1, c2);
+						if (!flag) {
+							offsetField -= 1;
+							continue;
+						}
 					}
-				}
 				}
 			}
 			targetField.setNewName(cleanField.getOriginalName());
@@ -114,10 +117,10 @@ public class CorrelationMapperr {
 		List<MappedMember> cleanMethods = cleanClass.getMethods();
 		int offsetMethd = 0;
 		for (int key = 0; key < targetMethods.size(); key++) {
-			if (key >= cleanMethods.size()){
+			if (key >= cleanMethods.size()) {
 				continue;
 			}
-			MappedMember targetMethod = targetMethods.get(key);	
+			MappedMember targetMethod = targetMethods.get(key);
 			MappedMember cleanMethod = cleanMethods.get(key + offsetMethd);
 			// Extra method?
 			if (cleanMethod == null) {
@@ -145,11 +148,11 @@ public class CorrelationMapperr {
 			// Map the method's class types
 			int offset = 0;
 			for (int i = 0; i < targetMethodTypes.size() - offset; i++) {
-				if (i >= targetMethodTypes.size()){
+				if (i >= targetMethodTypes.size()) {
 					break;
 				}
 				MappedClass targetType = targetMethodTypes.get(i);
-				if (targetType.getOriginalName().equals(targetClass.getOriginalName())) {					
+				if (targetType.getOriginalName().equals(targetClass.getOriginalName())) {
 					continue;
 				}
 				if (i + offset >= cleanMethodTypes.size()) {
@@ -160,7 +163,7 @@ public class CorrelationMapperr {
 					continue;
 				}
 				if (!areSimiliar(targetType, cleanType)) {
-					//offset -= 1;
+					// offset -= 1;
 					continue;
 				}
 				targetMap = correlate(targetType, cleanType, targetMap, cleanMap);
@@ -235,7 +238,7 @@ public class CorrelationMapperr {
 				// Move next to parent. Organizes packages and is less likely to
 				// cass AccessErrors for non-public methods.
 				String newNamePackage = parent.getNewName().substring(0, parent.getNewName().lastIndexOf("/") + 1);
-				if (newNameClass.contains("/")){
+				if (newNameClass.contains("/")) {
 					newNameClass = newNameClass.substring(newNameClass.lastIndexOf("/") + 1);
 				}
 				mappedClass.setNewName(newNamePackage + newNameClass);
@@ -262,7 +265,7 @@ public class CorrelationMapperr {
 					if (failed || s == null) {
 						mappedClass.setNewName(newNameClass);
 					} else {
-						if (newNameClass.contains("/")){
+						if (newNameClass.contains("/")) {
 							newNameClass = newNameClass.substring(newNameClass.lastIndexOf("/") + 1);
 
 						}
@@ -315,13 +318,7 @@ public class CorrelationMapperr {
 		if (c1.getNode() == null || c2.getNode() == null) {
 			return false;
 		}
-		if (c1.getNode().interfaces.size() != c2.getNode().interfaces.size()) {
-			return false;
-		}
-		if (c1.getOriginalName().contains("me/seriexcode/hasureclient/aW")
-				&& c2.getOriginalName().contains("net/")
-	
-				){
+		if (c1.getInterfaces().size() != c2.getInterfaces().size()) {
 			return false;
 		}
 		// Must have a similar # of fields. Change is porportionate to class
@@ -368,11 +365,10 @@ public class CorrelationMapperr {
 				} else if (ain.getType() == AbstractInsnNode.TYPE_INSN) {
 					TypeInsnNode tin = (TypeInsnNode) ain;
 					names.addAll(RegexUtils.matchDescriptionClasses(tin.desc));
-				}
-				else if (ain.getType() == AbstractInsnNode.LDC_INSN) {
+				} else if (ain.getType() == AbstractInsnNode.LDC_INSN) {
 					LdcInsnNode ldc = (LdcInsnNode) ain;
-					if (ldc.cst instanceof Type){
-						Type t= (Type) ldc.cst;
+					if (ldc.cst instanceof Type) {
+						Type t = (Type) ldc.cst;
 						names.add(t.getClassName().replace(".", "/"));
 					}
 				}

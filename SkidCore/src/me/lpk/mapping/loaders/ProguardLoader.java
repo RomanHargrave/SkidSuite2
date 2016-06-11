@@ -1,12 +1,18 @@
 package me.lpk.mapping.loaders;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
+import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
 
 import me.lpk.mapping.MappedClass;
@@ -14,7 +20,7 @@ import me.lpk.mapping.MappedMember;
 import me.lpk.mapping.MappingGen;
 import me.lpk.util.StringUtils;
 
-public class ProguardLoader  extends MappingLoader{
+public class ProguardLoader extends MappingLoader {
 	private final static Map<String, String> primitives;
 
 	static {
@@ -42,6 +48,13 @@ public class ProguardLoader  extends MappingLoader{
 	 */
 	public ProguardLoader(Map<String, ClassNode> nodes) {
 		super(nodes);
+	}
+
+	/**
+	 * Instantiates the loader without a classnode map.
+	 */
+	public ProguardLoader() {
+		super(null);
 	}
 
 	/**
@@ -121,6 +134,61 @@ public class ProguardLoader  extends MappingLoader{
 		return origNameMap;
 	}
 
+	@Override
+	public void save(Map<String, MappedClass> mappings, File file) {
+		if (!file.exists()) {
+			try {
+				file.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
+			for (MappedClass mc : mappings.values()) {
+				bw.write(mc.getOriginalName().replace("/", ".") + " -> " + mc.getNewName().replace("/", ".") + ":\n");
+				for (MappedMember mm : mc.getFields()) {
+					bw.write("    " + toProguardFieldDesc(mm.getDesc()) + mm.getOriginalName() + " -> " + mm.getNewName());
+				}
+				for (MappedMember mm : mc.getMethods()) {
+					bw.write("    " + toProguardReturn(mm.getDesc()) + " " + mm.getOriginalName() + toProguardArgDesc(mm.getDesc()) + " -> " + mm.getNewName());
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private String toProguardFieldDesc(String desc) {
+		desc = desc.replace("/", ".");
+		for (Entry<String, String> es : primitives.entrySet()) {
+			desc.replace(es.getValue(), es.getKey());
+		}
+		return desc;
+	}
+
+	private String toProguardReturn(String desc) {
+		desc = desc.replace("/", ".");
+		desc = desc.substring(desc.indexOf(")") + 1);
+		if (desc.length() == 1) {
+			for (Entry<String, String> es : primitives.entrySet()) {
+				desc.replace(es.getValue(), es.getKey());
+			}
+		}
+		return desc;
+	}
+
+	private String toProguardArgDesc(String desc) {
+		Type type = Type.getType(desc);
+		String newDesc = "(";
+		for (Type arg : type.getArgumentTypes()) {
+			newDesc += arg.getInternalName() + ",";
+		}
+		if (newDesc.endsWith(",")) {
+			newDesc = newDesc.substring(0, newDesc.length() - 1);
+		}
+		return newDesc + ")";
+	}
+
 	private boolean isMethod(String text) {
 		return text.contains("(");
 	}
@@ -134,7 +202,7 @@ public class ProguardLoader  extends MappingLoader{
 	private MappedClass readClass(String[] parts) {
 		String original = parts[0].replace(".", "/");
 		String obfuscated = parts[2].replace(".", "/").substring(0, parts[2].length() - 1);
-		ClassNode node = nodes.get(obfuscated);
+		ClassNode node = nodes == null ? fakeNode(obfuscated) : nodes.get(obfuscated);
 		MappedClass mc = new MappedClass(node, obfuscated);
 		if (mc != null) {
 			mc.setNewName(original);
@@ -274,4 +342,5 @@ public class ProguardLoader  extends MappingLoader{
 		}
 		return arrayPrefix;
 	}
+
 }

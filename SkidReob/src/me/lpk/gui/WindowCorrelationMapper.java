@@ -84,8 +84,7 @@ public class WindowCorrelationMapper {
 		btnLoadTarget.setBounds(10, 10, 95, 23);
 		btnLoadClean.setBounds(10, 44, 95, 23);
 		splitPane.setBounds(10, 109, 761, 301);
-		
-		
+
 		btnLoadTarget.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser fc = getFileChooser();
@@ -125,22 +124,22 @@ public class WindowCorrelationMapper {
 		frmCorrelationMapper.getContentPane().add(btnCorrelate);
 		frmCorrelationMapper.getContentPane().add(splitPane);
 	}
-	
+
 	public void go(String pathTarget, String pathClean) {
 		// Loading
 		File targetJar = new File(pathTarget);
 		File cleanJar = new File(pathClean);
-		LazySetupMaker l = LazySetupMaker.get(targetJar.getAbsolutePath(), false, false);
-		LazySetupMaker l2 = LazySetupMaker.get(cleanJar.getAbsolutePath(), false, false);
+		LazySetupMaker targ = LazySetupMaker.get(targetJar.getAbsolutePath(), false, false);
+		LazySetupMaker clen = LazySetupMaker.get(cleanJar.getAbsolutePath(), false, false);
 		try {
 			Classpather.addFile(targetJar);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		System.out.println("Loading classes...");
-		Map<String, ClassNode> targetNodes = l.getNodes();
-		Map<String, ClassNode> baseNodes = l2.getNodes();
+		Map<String, ClassNode> targetNodes = targ.getNodes();
+		Map<String, ClassNode> baseNodes = clen.getNodes();
 		// Making maps
 		System.out.println("Generating mappings");
 		Map<String, MappedClass> targetMappings = MappingGen.mappingsFromNodes(targetNodes);
@@ -158,23 +157,27 @@ public class WindowCorrelationMapper {
 		// Processing
 		System.out.println("Processing output jar...");
 		saveJar(targetJar, targetNodes, targetMappings);
-		saveMappings(targetMappings, l.getName() + ".enigma.map");
+		saveMappings(targetMappings, targ.getName() + ".enigma.map");
 		System.out.println("Done!");
 	}
-	
-	private  void correlate(Map<String, MappedClass> mappedClasses, Map<String, MappedClass> baseClasses) {
+
+	private void correlate(Map<String, MappedClass> mappedClasses, Map<String, MappedClass> baseClasses) {
 		HashMap<String, String> h = new HashMap<String, String>();
 		String[] clean = txtrCleanNames.getText().split("\n");
 		String[] target = txtrTargetNames.getText().split("\n");
-		for (int i = 0; i < Math.min(clean.length, target.length); i++){
+		for (int i = 0; i < Math.min(clean.length, target.length); i++) {
 			h.put(target[i], clean[i]);
 		}
 		for (String obfu : h.keySet()) {
 			MappedClass targetClass = mappedClasses.get(obfu);
 			MappedClass cleanClass = baseClasses.get(h.get(obfu));
-			if (targetClass == null || cleanClass == null) {
-				System.err.println("NULL: " + obfu + ":" + h.get(obfu));
-				continue;
+			if (targetClass == null) {
+				System.err.println("NULL 1: " + obfu + ":" + h.get(obfu));
+
+				if (cleanClass == null) {
+					System.err.println("NULL 2: " + obfu + ":" + h.get(obfu));
+					continue;
+				}
 			}
 			mappedClasses = CorrelationMapperr.correlate(targetClass, cleanClass, mappedClasses, baseClasses);
 		}
@@ -182,24 +185,25 @@ public class WindowCorrelationMapper {
 
 	private static void saveMappings(Map<String, MappedClass> mappedClasses, String string) {
 		StringBuilder sb = new StringBuilder();
-		for (MappedClass clazz : mappedClasses.values()){
-			sb.append("CLASS " + clazz.getOriginalName() + " " + clazz.getNewName()+"\n");
-			for (MappedMember f : clazz.getFields()){
-				sb.append("\tFIELD " + f.getOriginalName() + " " + f.getNewName() + " " + f.getDesc()+"\n");
+		for (MappedClass clazz : mappedClasses.values()) {
+			sb.append("CLASS " + clazz.getOriginalName() + " " + clazz.getNewName() + "\n");
+			for (MappedMember f : clazz.getFields()) {
+				sb.append("\tFIELD " + f.getOriginalName() + " " + f.getNewName() + " " + f.getDesc() + "\n");
 			}
-			for (MappedMember m : clazz.getMethods()){
-				if (m.getOriginalName().contains("<")){
+			for (MappedMember m : clazz.getMethods()) {
+				if (m.getOriginalName().contains("<")) {
 					continue;
 				}
-				sb.append("\tMETHOD " + m.getOriginalName() + " " + m.getNewName() + " " + m.getDesc()+"\n");
+				sb.append("\tMETHOD " + m.getOriginalName() + " " + m.getNewName() + " " + m.getDesc() + "\n");
 			}
-		} 
+		}
 		try {
-			FileUtils.write(new File(string) , sb.toString());
+			FileUtils.write(new File(string), sb.toString());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
+
 	private static Map<String, MappedClass> resetRemapped(Map<String, MappedClass> mappedClasses) {
 		for (String name : mappedClasses.keySet()) {
 			MappedClass mc = mappedClasses.get(name);
@@ -208,7 +212,6 @@ public class WindowCorrelationMapper {
 		}
 		return mappedClasses;
 	}
-	
 
 	private static void saveJar(File nonEntriesJar, Map<String, ClassNode> nodes, Map<String, MappedClass> mappedClasses) {
 		Map<String, byte[]> out = null;
@@ -227,7 +230,7 @@ public class WindowCorrelationMapper {
 		System.out.println("Saving...  [Ranemed " + renamed + " classes]");
 		JarUtils.saveAsJar(out, nonEntriesJar.getName() + "_correlated.jar");
 	}
-	
+
 	private JFileChooser getFileChooser() {
 		if (chooser == null) {
 			chooser = new JFileChooser();

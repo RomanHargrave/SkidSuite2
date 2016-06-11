@@ -1,7 +1,11 @@
 package me.lpk.mapping.loaders;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,7 +17,7 @@ import me.lpk.mapping.MappedClass;
 import me.lpk.mapping.MappedMember;
 import me.lpk.mapping.MappingGen;
 
-public class EnigmaLoader extends MappingLoader{
+public class EnigmaLoader extends MappingLoader {
 	/**
 	 * Instantiates the loader with a map of classnodes to be mapped.
 	 * 
@@ -21,6 +25,13 @@ public class EnigmaLoader extends MappingLoader{
 	 */
 	public EnigmaLoader(Map<String, ClassNode> nodes) {
 		super(nodes);
+	}
+
+	/**
+	 * Instantiates the loader without a classnode map.
+	 */
+	public EnigmaLoader() {
+		super(null);
 	}
 
 	/**
@@ -112,6 +123,31 @@ public class EnigmaLoader extends MappingLoader{
 		return remap;
 	}
 
+	@Override
+	public void save(Map<String, MappedClass> mappings, File file) {
+		if (!file.exists()) {
+			try {
+				file.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
+			for (MappedClass mc : mappings.values()) {
+				String renamed = mc.isTruelyRenamed() ? " " + mc.getNewName() : "";
+				bw.write("CLASS " + mc.getOriginalName() + renamed + "\n");
+				for (MappedMember mm : mc.getFields()) {
+					bw.write("\tFIELD " + mm.getOriginalName() + " " + mm.getNewName() + " " + mm.getDesc());
+				}
+				for (MappedMember mm : mc.getMethods()) {
+					bw.write("\tMETHOD " + mm.getOriginalName() + " " + mm.getNewName() + " " + mm.getDesc());
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	/**
 	 * Generating mapping for a class.
 	 * 
@@ -125,10 +161,10 @@ public class EnigmaLoader extends MappingLoader{
 		}
 		MappedClass mc = null;
 		if (parts.length == 2) {
-			mc = new MappedClass(nodes.get(original), original);
+			mc = new MappedClass(nodes == null ? fakeNode(original) : nodes.get(original), original);
 		} else if (parts.length == 3) {
 			String newName = parts[2];
-			mc = new MappedClass(nodes.get(original), newName);
+			mc = new MappedClass(nodes == null ? fakeNode(original) : nodes.get(original), newName);
 		}
 		return mc;
 	}

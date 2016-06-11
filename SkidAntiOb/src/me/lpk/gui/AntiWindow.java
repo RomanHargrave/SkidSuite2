@@ -221,7 +221,6 @@ public class AntiWindow {
 
 	private void addLibrary(File jar) {
 		libraries.add(jar);
-		System.out.println(jar.getName());
 		DefaultListModel<String> model = (DefaultListModel<String>) list.getModel();
 		model.addElement("  " + jar.getName() + "  ");
 		list.setModel(model);

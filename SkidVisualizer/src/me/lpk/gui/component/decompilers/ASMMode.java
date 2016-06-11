@@ -43,7 +43,7 @@ public class ASMMode extends DecompileMode {
 	
 	@Override
 	public void decompile(ClassNode cn, JTextPane txtEdit, StyledDocument doc) {
-		ClassReader cr = new ClassReader(ASMUtils.getNodeBytes(cn));
+		ClassReader cr = new ClassReader(ASMUtils.getNodeBytes(cn, true));
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		PrintStream ps = new PrintStream(os);
 		cr.accept(new TraceClassVisitor(null, new Textifier(), new PrintWriter(ps)), 0);

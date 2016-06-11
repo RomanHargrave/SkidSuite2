@@ -26,7 +26,7 @@ public class MappingProcessor {
 			ClassWriter cw = new ClassWriter(useMaxs ? ClassWriter.COMPUTE_MAXS : ClassWriter.COMPUTE_FRAMES);
 			ClassVisitor remapper = new ClassRemapper(cw, mapper);
 			cn.accept(remapper);
-				out.put(mappings.containsKey(cn.name) ? mappings.get(cn.name).getNewName() : cn.name, cw.toByteArray());
+			out.put(mappings.containsKey(cn.name) ? mappings.get(cn.name).getNewName() : cn.name, cw.toByteArray());
 		}
 		return out;
 	}
