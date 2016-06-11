@@ -13,13 +13,14 @@ import org.objectweb.asm.tree.VarInsnNode;
 
 public class ASMUtils {
 	/**
-	 * Gets the bytes of a given ClassNode
+	 * Gets the bytes of a given ClassNode.
 	 * 
 	 * @param cn
+	 * @param useMaxs
 	 * @return
 	 */
-	public static byte[] getNodeBytes(ClassNode cn) {
-		ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+	public static byte[] getNodeBytes(ClassNode cn, boolean useMaxs) {
+		ClassWriter cw = new ClassWriter(useMaxs ? ClassWriter.COMPUTE_MAXS : ClassWriter.COMPUTE_FRAMES);
 		cn.accept(cw);
 		byte[] b = cw.toByteArray();
 		return b;
