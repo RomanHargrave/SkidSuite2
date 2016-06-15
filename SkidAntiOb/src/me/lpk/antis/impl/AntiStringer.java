@@ -30,6 +30,14 @@ public class AntiStringer extends AntiBase {
 
 	@Override
 	public ClassNode scan(ClassNode node) {
+		// TODO:
+		// final int hashCode =
+		// (SharedSecrets.getJavaLangAccess().getConstantPool(Class.forName(stackTrace[2].getClassName())).getSize()
+		// + stackTrace[2].getClassName() + stackTrace[2].getMethodName() +
+		// SharedSecrets.getJavaLangAccess().getConstantPool(Class.forName(stackTrace[2].getClassName())).getSize()).hashCode();
+		//
+		// New stringer does this. Find out what that turns into and edit the
+		// method THEN invoke it.
 		for (MethodNode mnode : node.methods) {
 			replace(mnode);
 		}
@@ -37,6 +45,7 @@ public class AntiStringer extends AntiBase {
 	}
 
 	private void replace(MethodNode method) {
+		String callerCaller = null;
 		AbstractInsnNode ain = method.instructions.getFirst();
 		List<String> strings = new ArrayList<String>();
 		List<Integer> argSizes = new ArrayList<Integer>();
@@ -52,8 +61,17 @@ public class AntiStringer extends AntiBase {
 						ain = ain.getNext();
 						continue;
 					}
-					Object o = Sandbox.getReturn(owner, min, new Object[] { text });
+					//Object o = Sandbox.getProxyReturn(method, owner, min, new Object[] { text });
+					if (callerCaller == null){
+						callerCaller = findCaller(method);
+						if (callerCaller == null){
+							return;
+						}
+					}
+					Object o = Sandbox.getProxyReturnStringer(callerCaller,method, owner, min, new Object[] { text });
 					if (o != null) {
+						//System.out.println("\t" + text + " : " + o);
+
 						strings.add(o.toString());
 						argSizes.add(1);
 						indecies.add(OpUtils.getIndex(ain));
@@ -73,11 +91,9 @@ public class AntiStringer extends AntiBase {
 					int opIndex = OpUtils.getIndex(ain);
 					if (indecies.size() > 0 && indecies.get(0) == opIndex) {
 						indecies.remove(0);
-						int args = argSizes.remove(0);
 						String string = strings.remove(0);
-						for (int i = 0; i < args; i++) {
-							method.instructions.set(ain.getPrevious(), new InsnNode(Opcodes.NOP));
-						}
+						method.instructions.set(ain.getPrevious(), new InsnNode(Opcodes.NOP));
+
 						LdcInsnNode ldc = new LdcInsnNode(string);
 						method.instructions.set(ain, ldc);
 						ain = ldc;
@@ -86,6 +102,22 @@ public class AntiStringer extends AntiBase {
 			}
 			ain = ain.getNext();
 		}
+	}
+
+	private String findCaller(MethodNode method) {
+		for (ClassNode cn : getNodes().values()){
+			for (MethodNode mn : cn.methods){
+				for (AbstractInsnNode ain : mn.instructions.toArray()){
+					if (ain.getType() == AbstractInsnNode.METHOD_INSN){
+						MethodInsnNode min = (MethodInsnNode) ain;
+						if (min.owner.equals(method.owner) && min.name.equals(method.name) && min.desc.equals(method.desc)){
+							return cn.name;
+						}
+					}
+				}
+			}
+		}
+		return null;
 	}
 
 	private boolean isStringerDesc(String desc) {

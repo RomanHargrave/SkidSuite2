@@ -78,11 +78,11 @@ public class WindowCorrelationMapper {
 		txtrTargetNames = new JTextArea();
 		txtCleanJar = new JTextField();
 		txtTargetJar = new JTextField();
-		txtCleanJar.setBounds(115, 45, 656, 20);
-		txtTargetJar.setBounds(115, 11, 656, 20);
-		btnCorrelate.setBounds(10, 75, 95, 23);
-		btnLoadTarget.setBounds(10, 10, 95, 23);
-		btnLoadClean.setBounds(10, 44, 95, 23);
+		txtCleanJar.setBounds(122, 45, 649, 20);
+		txtTargetJar.setBounds(122, 11, 649, 20);
+		btnCorrelate.setBounds(10, 75, 102, 23);
+		btnLoadTarget.setBounds(10, 10, 102, 23);
+		btnLoadClean.setBounds(10, 44, 102, 23);
 		splitPane.setBounds(10, 109, 761, 301);
 
 		btnLoadTarget.addActionListener(new ActionListener() {

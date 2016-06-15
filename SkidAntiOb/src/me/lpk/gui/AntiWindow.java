@@ -8,17 +8,17 @@ import java.awt.BorderLayout;
 import javax.swing.JSplitPane;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import java.awt.FlowLayout;
-import javax.swing.AbstractListModel;
 import javax.swing.SwingConstants;
 import javax.swing.TransferHandler;
 
 import org.objectweb.asm.tree.ClassNode;
 
 import me.lpk.antis.AntiBase;
+import me.lpk.antis.impl.AntiAllatori;
 import me.lpk.antis.impl.AntiDashO;
 import me.lpk.antis.impl.AntiStringer;
 import me.lpk.antis.impl.AntiZKM5;
+import me.lpk.log.Logger;
 import me.lpk.mapping.MappedClass;
 import me.lpk.mapping.MappingProcessor;
 import me.lpk.util.Classpather;
@@ -46,7 +46,7 @@ public class AntiWindow {
 	private JList<String> list;
 	private JComboBox<String> comboObfuscator;
 	private Set<File> libraries = new HashSet<File>();
-	private final static String OB_ZKM = "ZKM5", OB_STRING = "Stringer", OB_DASH = "DashO";
+	private final static String OB_ZKM = "ZKM5", OB_STRING = "Stringer", OB_DASH = "DashO", OB_ALLA = "Allatori";
 
 	/**
 	 * Launch the application.
@@ -84,7 +84,7 @@ public class AntiWindow {
 		panel_1.setLayout(new BorderLayout(0, 0));
 
 		comboObfuscator = new JComboBox<String>();
-		comboObfuscator.setModel(new DefaultComboBoxModel<String>(new String[] { OB_ZKM, OB_STRING, OB_DASH }));
+		comboObfuscator.setModel(new DefaultComboBoxModel<String>(new String[] { OB_STRING , OB_ZKM, OB_ALLA, OB_DASH }));
 		panel_1.add(comboObfuscator);
 
 		JLabel lblObfuscatorUsed = new JLabel("Obfuscator Used:  ");
@@ -115,7 +115,7 @@ public class AntiWindow {
 		list = new JList<String>();
 		DefaultListModel<String> model = new DefaultListModel<String>();
 		model.addElement("  Loaded Libraries ");
-		list.setModel(model); 
+		list.setModel(model);
 		TransferHandler handler = new TransferHandler() {
 			private static final long serialVersionUID = 1L;
 
@@ -136,13 +136,18 @@ public class AntiWindow {
 				} catch (Exception e) {
 					return false;
 				}
-				for (File jar : data)
-					if (jar.getName().toLowerCase().endsWith(".jar"))
+				frame.setTitle("Deobfuscating...");
+				for (File jar : data) {
+					if (jar.getName().toLowerCase().endsWith(".jar")) {
 						try {
 							runAnti(jar);
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
+					}
+				}
+				System.out.println("Done!");
+
 				return true;
 			}
 
@@ -204,6 +209,7 @@ public class AntiWindow {
 		}
 		Map<String, byte[]> out = MappingProcessor.process(lsm.getNodes(), new HashMap<String, MappedClass>(), false);
 		out.putAll(JarUtils.loadNonClassEntries(jar));
+		Logger.logLow("Saving...");
 		JarUtils.saveAsJar(out, jar.getName() + "-re.jar");
 	}
 
@@ -215,6 +221,8 @@ public class AntiWindow {
 			return new AntiStringer(nodes);
 		case OB_DASH:
 			return new AntiDashO(nodes);
+		case OB_ALLA:
+			return new AntiAllatori(nodes);
 		}
 		return null;
 	}

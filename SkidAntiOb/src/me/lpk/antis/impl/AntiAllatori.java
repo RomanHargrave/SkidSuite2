@@ -1,0 +1,60 @@
+package me.lpk.antis.impl;
+
+import java.util.Map;
+
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.LdcInsnNode;
+import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.MethodNode;
+
+import me.lpk.analysis.Sandbox;
+import me.lpk.antis.AntiBase;
+
+public class AntiAllatori extends AntiBase {
+	public AntiAllatori(Map<String, ClassNode> nodes) {
+		super(nodes);
+	}
+
+	@Override
+	public ClassNode scan(ClassNode node) {
+		for (MethodNode mnode : node.methods) {
+			replace(mnode);
+		}
+		return node;
+	}
+
+	private void replace(MethodNode method) {
+		AbstractInsnNode ain = method.instructions.getFirst();
+		while (ain != null && ain.getNext() != null) {
+			if (ain.getType() != AbstractInsnNode.LDC_INSN || ain.getNext().getOpcode() != Opcodes.INVOKESTATIC) {
+				ain = ain.getNext();
+				continue;
+			}
+			MethodInsnNode min = (MethodInsnNode) ain.getNext();
+			if (!min.desc.endsWith("(Ljava/lang/String;)Ljava/lang/String;")) {
+				ain = ain.getNext();
+				continue;
+			}
+			ClassNode owner = getNodes().get(min.owner);
+			if (owner == null) {
+				ain = ain.getNext();
+				continue;
+			}
+			LdcInsnNode ldc = (LdcInsnNode) ain;
+			Object o = ldc.cst;
+			if (o instanceof String) {
+				Object ret = Sandbox.getProxyIsolatedReturn(method, owner, min, new Object[] { o });
+				if (ret != null) {
+					LdcInsnNode newLdc = new LdcInsnNode(ret);
+					method.instructions.remove(min);
+					method.instructions.set(ldc, newLdc);
+					ain = newLdc;
+				} else {
+					ain = ain.getNext();
+				}
+			}
+		}
+	}
+}
