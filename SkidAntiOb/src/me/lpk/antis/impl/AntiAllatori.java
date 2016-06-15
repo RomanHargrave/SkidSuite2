@@ -13,8 +13,11 @@ import me.lpk.analysis.Sandbox;
 import me.lpk.antis.AntiBase;
 
 public class AntiAllatori extends AntiBase {
-	public AntiAllatori(Map<String, ClassNode> nodes) {
+	private final boolean callProxy;
+
+	public AntiAllatori(Map<String, ClassNode> nodes, boolean callProxy) {
 		super(nodes);
+		this.callProxy = callProxy;
 	}
 
 	@Override
@@ -45,7 +48,7 @@ public class AntiAllatori extends AntiBase {
 			LdcInsnNode ldc = (LdcInsnNode) ain;
 			Object o = ldc.cst;
 			if (o instanceof String) {
-				Object ret = Sandbox.getProxyIsolatedReturn(method, owner, min, new Object[] { o });
+				Object ret = callProxy ? Sandbox.getProxyIsolatedReturn(method, owner, min, new Object[] { o }) : Sandbox.getReturn(owner, min, new Object[] { o });
 				if (ret != null) {
 					LdcInsnNode newLdc = new LdcInsnNode(ret);
 					method.instructions.remove(min);

@@ -16,16 +16,11 @@ import me.lpk.antis.AntiBase;
 import me.lpk.util.OpUtils;
 
 public class AntiStringer extends AntiBase {
-	/**
-	 * I'm only 'kinda' sure this was tested on actual stringer jars. It looked
-	 * like it but there was 0 confirmation.
-	 * 
-	 * Oh well! I'll fix it later if it isn't.
-	 * 
-	 * @param nodes
-	 */
-	public AntiStringer(Map<String, ClassNode> nodes) {
+	private final boolean callProxy;
+
+	public AntiStringer(Map<String, ClassNode> nodes, boolean callProxy) {
 		super(nodes);
+		this.callProxy = callProxy;
 	}
 
 	@Override
@@ -61,16 +56,20 @@ public class AntiStringer extends AntiBase {
 						ain = ain.getNext();
 						continue;
 					}
-					//Object o = Sandbox.getProxyReturn(method, owner, min, new Object[] { text });
-					if (callerCaller == null){
-						callerCaller = findCaller(method);
-						if (callerCaller == null){
-							return;
+					Object o = null;
+					if (callProxy) {
+						if (callerCaller == null) {
+							callerCaller = findCaller(method);
+							if (callerCaller == null) {
+								return;
+							}
 						}
+						o = Sandbox.getProxyReturnStringer(callerCaller, method, owner, min, new Object[] { text });
+					} else {
+						o = Sandbox.getProxyReturn(method, owner, min, new Object[] { text });
 					}
-					Object o = Sandbox.getProxyReturnStringer(callerCaller,method, owner, min, new Object[] { text });
 					if (o != null) {
-						//System.out.println("\t" + text + " : " + o);
+						// System.out.println("\t" + text + " : " + o);
 
 						strings.add(o.toString());
 						argSizes.add(1);
@@ -105,12 +104,12 @@ public class AntiStringer extends AntiBase {
 	}
 
 	private String findCaller(MethodNode method) {
-		for (ClassNode cn : getNodes().values()){
-			for (MethodNode mn : cn.methods){
-				for (AbstractInsnNode ain : mn.instructions.toArray()){
-					if (ain.getType() == AbstractInsnNode.METHOD_INSN){
+		for (ClassNode cn : getNodes().values()) {
+			for (MethodNode mn : cn.methods) {
+				for (AbstractInsnNode ain : mn.instructions.toArray()) {
+					if (ain.getType() == AbstractInsnNode.METHOD_INSN) {
 						MethodInsnNode min = (MethodInsnNode) ain;
-						if (min.owner.equals(method.owner) && min.name.equals(method.name) && min.desc.equals(method.desc)){
+						if (min.owner.equals(method.owner) && min.name.equals(method.name) && min.desc.equals(method.desc)) {
 							return cn.name;
 						}
 					}

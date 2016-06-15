@@ -46,7 +46,8 @@ public class AntiWindow {
 	private JList<String> list;
 	private JComboBox<String> comboObfuscator;
 	private Set<File> libraries = new HashSet<File>();
-	private final static String OB_ZKM = "ZKM5", OB_STRING = "Stringer", OB_DASH = "DashO", OB_ALLA = "Allatori";
+	private final static String OB_ZKM5 = "ZKM-5", OB_STRING = "Stringer", OB_STRING_P = "Stringer (Call Proxy x2)", OB_DASH = "DashO", OB_ALLA = "Allatori",
+			OB_ALLA_P = "Allatori (Call Proxy x1)";
 
 	/**
 	 * Launch the application.
@@ -84,7 +85,8 @@ public class AntiWindow {
 		panel_1.setLayout(new BorderLayout(0, 0));
 
 		comboObfuscator = new JComboBox<String>();
-		comboObfuscator.setModel(new DefaultComboBoxModel<String>(new String[] { OB_STRING , OB_ZKM, OB_ALLA, OB_DASH }));
+		// OB_ALLA, OB_ALLA_P, OB_DASH, OB_STRING, OB_STRING_P, OB_ZKM
+		comboObfuscator.setModel(new DefaultComboBoxModel<String>(new String[] { OB_STRING_P, OB_STRING, OB_ZKM5, OB_ALLA, OB_ALLA_P, OB_DASH }));
 		panel_1.add(comboObfuscator);
 
 		JLabel lblObfuscatorUsed = new JLabel("Obfuscator Used:  ");
@@ -147,10 +149,8 @@ public class AntiWindow {
 					}
 				}
 				System.out.println("Done!");
-
 				return true;
 			}
-
 		};
 		lblLoadTarget.setTransferHandler(handler);
 		TransferHandler handler2 = new TransferHandler() {
@@ -215,14 +215,18 @@ public class AntiWindow {
 
 	private AntiBase makeAnti(Map<String, ClassNode> nodes) {
 		switch (comboObfuscator.getSelectedItem().toString()) {
-		case OB_ZKM:
+		case OB_ZKM5:
 			return new AntiZKM5();
+		case OB_STRING_P:
+			return new AntiStringer(nodes, true);
 		case OB_STRING:
-			return new AntiStringer(nodes);
+			return new AntiStringer(nodes, false);
 		case OB_DASH:
 			return new AntiDashO(nodes);
+		case OB_ALLA_P:
+			return new AntiAllatori(nodes, true);
 		case OB_ALLA:
-			return new AntiAllatori(nodes);
+			return new AntiAllatori(nodes, false);
 		}
 		return null;
 	}
