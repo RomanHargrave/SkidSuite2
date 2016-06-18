@@ -18,7 +18,7 @@ import me.lpk.mapping.remap.MappingMode;
 import me.lpk.util.ParentUtils;
 import me.lpk.util.RegexUtils;
 
-public class CorrelationMapperr {
+public class CorrelationMapper {
 	/**
 	 * Maps the correlations between target and clean classes.
 	 * 
@@ -51,7 +51,10 @@ public class CorrelationMapperr {
 			}
 		// Begin renaming
 		targetClass.setNewName(cleanClass.getOriginalName());
-		targetClass.setRenamedOverride(true);
+		if (!targetClass.isTruelyRenamed()){
+			targetClass.setRenamedOverride(true);
+		}
+		//targetClass.setRenamedOverride(true);
 		// Fields
 		List<MappedMember> targetFields = targetClass.getFields();
 		List<MappedMember> cleanFields = cleanClass.getFields();

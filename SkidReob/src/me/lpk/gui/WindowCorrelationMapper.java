@@ -14,7 +14,7 @@ import javax.swing.JTextField;
 import org.apache.commons.io.FileUtils;
 import org.objectweb.asm.tree.ClassNode;
 
-import me.lpk.CorrelationMapperr;
+import me.lpk.CorrelationMapper;
 import me.lpk.mapping.MappedClass;
 import me.lpk.mapping.MappedMember;
 import me.lpk.mapping.MappingGen;
@@ -153,7 +153,7 @@ public class WindowCorrelationMapper {
 		correlate(targetMappings, cleanMappings);
 		// Filling in the gaps
 		System.out.println("Filling in missing classes...");
-		targetMappings = CorrelationMapperr.fillInTheGaps(targetMappings, new ModeNone());
+		targetMappings = CorrelationMapper.fillInTheGaps(targetMappings, new ModeNone());
 		// Processing
 		System.out.println("Processing output jar...");
 		saveJar(targetJar, targetNodes, targetMappings);
@@ -179,7 +179,7 @@ public class WindowCorrelationMapper {
 					continue;
 				}
 			}
-			mappedClasses = CorrelationMapperr.correlate(targetClass, cleanClass, mappedClasses, baseClasses);
+			mappedClasses = CorrelationMapper.correlate(targetClass, cleanClass, mappedClasses, baseClasses);
 		}
 	}
 

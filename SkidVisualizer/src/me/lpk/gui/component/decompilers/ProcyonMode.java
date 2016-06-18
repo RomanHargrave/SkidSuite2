@@ -70,6 +70,9 @@ public class ProcyonMode extends DecompileMode {
 
 			for (String node : nodes.keySet()) {
 				String target = node.contains("/") ? node.substring(node.lastIndexOf("/") + 1) : node;
+				if (target.length() <= 3){
+					continue;
+				}
 				int index = output.indexOf(target);
 				while (index >= 0) {
 					if (isNotAlphabetic(output.charAt(index - 1)) && isNotAlphabetic(output.charAt(index + target.length()))) {

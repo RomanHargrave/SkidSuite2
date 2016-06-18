@@ -19,7 +19,9 @@ Temporary Items
 .apdisk
 .metadata/**
 .recommenders/**
-**/bin/**
+*.class
+*.dtd
+*.lst
 *.lock
 *.lo
 *.jar
@@ -31,6 +33,8 @@ Temporary Items
 *.sha
 *.sha
 **/build.xml
+**/pom.xml
 *.MF
 *.bat
 *.dox
+REAMDE.txt
