@@ -21,6 +21,9 @@ A tool used for finding object usage in a program.
 ## SkidAntiOb
 Automated removal of known obfuscators such as ZKM / Allatori / DashO
 
+## SkidHijack
+Allows for the rewriting of classes at runtime. (Requires Java 8 JDK + tools.jar in classpath)
+
 ## SkidObfuscator
 ...
 

@@ -30,6 +30,7 @@ Temporary Items
 *.zip
 *.sha
 *.sha
+**/build.xml
 *.MF
 *.bat
 *.dox
