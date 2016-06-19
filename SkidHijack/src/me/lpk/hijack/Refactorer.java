@@ -44,7 +44,7 @@ public class Refactorer implements ClassFileTransformer, Opcodes {
 			cm.setLoader(loader);
 			cm.setClass(clazz);
 			cm.modify(cn);
-			return ASMUtils.getNodeBytes(cn, true);
+			return ASMUtils.getNodeBytes(cn, false);
 		}
 		return bytes;
 	}

@@ -1,101 +1,133 @@
 package me.lpk.antis.impl;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
+import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.FieldNode;
+import org.objectweb.asm.tree.LdcInsnNode;
+import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
+import me.lpk.analysis.Sandbox;
 import me.lpk.antis.AntiBase;
+import me.lpk.util.OpUtils;
 
 public class AntiZKM8 extends AntiBase {
-	private final Map<Integer, String> strings1 = new HashMap<Integer, String>();
-	private final Map<Integer, String> strings2 = new HashMap<Integer, String>();
-	private final Map<Integer, Integer> modifiers = new HashMap<Integer, Integer>();
-	private String zkmField1;
-	private boolean multiZKM = false;
+	public static final String clinit = "init_zkm";
+	private boolean canRemove = true;
 
 	public AntiZKM8() {
-		// No nodes are needed for reversing.
-		// TODO: Look at recent JRat builds. They use the newest ZKM 8.
-		// TODO: Port ZKM5 Anti features that apply for this update (Most of it should still apply)
 		super(null);
 	}
 
 	@Override
 	public ClassNode scan(ClassNode node) {
+		MethodNode clinit = null;
+		MethodNode decrypt = null;
 		for (MethodNode mnode : node.methods) {
 			if (mnode.name.startsWith("<c")) {
-				extractStatic(mnode);
-				cleanStatic(mnode);
+				clinit = mnode;
+			} else if (mnode.desc.endsWith("(II)Ljava/lang/String;")) {
+				// TODO: Check if valid decrypt method
+				decrypt = mnode;
 			}
+		}
+		if (clinit == null || decrypt == null) {
+			return node;
+		}
+		ClassNode cn = new ClassNode();
+		cn.name = node.name;
+		cn.superName = "java/lang/Object";
+		cn.version = 52;
+		cn.access = Opcodes.ACC_PUBLIC;
+		// TODO: Edit the clinit so that anything extra isn't called (cut up to
+		// certain point)
+		// TODO: Make check for single-string decrypt.
+		int oldAcc = clinit.access;
+		clinit.name = AntiZKM8.clinit;
+		clinit.access = Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC;
+		decrypt.access = Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC;
+		cn.methods.add(clinit);
+		cn.methods.add(decrypt);
+		for (FieldNode fnode : node.fields) {
+			fnode.access = Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC;
+			cn.fields.add(fnode);
 		}
 		for (MethodNode mnode : node.methods) {
-			if (mnode.desc.endsWith("(II)Ljava/lang/String;")) {
-				extractDecrypt(mnode);
-			}
+			replace(cn, mnode);
 		}
-		for (MethodNode mnode : node.methods) {
-			if (mnode.name.startsWith("<")) {
-				continue;
-			}
-			replace(mnode);
+		if (canRemove) {
+			cn.methods.remove(1);
 		}
-		for (String s : strings1.values()) {
-			System.out.println(s);
-		}
-		for (String s : strings2.values()) {
-			System.out.println(s);
-		}
+		clinit.name ="<clinit>";
+		clinit.access = oldAcc;
+		// TODO: Clean up clinit (remove ZKM blob)
 		return node;
 	}
 
-	/**
-	 * Update values of the ZKM decrypt(int,int) with the original strings.
-	 * 
-	 * @param method
-	 *            The method to replace strings in.
-	 */
-	private void replace(MethodNode method) {
-
+	private void replace(ClassNode cn, MethodNode method) {
+		AbstractInsnNode ain = method.instructions.getFirst();
+		while (ain != null) {
+			if (ain.getOpcode() == Opcodes.INVOKESTATIC) {
+				MethodInsnNode min = ((MethodInsnNode) ain);
+				String desc = min.desc;
+				if (desc.equals("(II)Ljava/lang/String;")) {
+					int opIndex = OpUtils.getIndex(ain);
+					if (opIndex < 0 || opIndex >= method.instructions.size()) {
+						ain = ain.getNext();
+						continue;
+					}
+					Object[] args = new Object[] { OpUtils.getIntValue(ain.getPrevious().getPrevious()), OpUtils.getIntValue(ain.getPrevious()) };
+					Object o = getZKMReturn(cn, min, args);
+					if (o != null) {
+						method.instructions.remove(min.getPrevious());
+						method.instructions.remove(min.getPrevious());
+						method.instructions.set(min, new LdcInsnNode(o));
+						ain = method.instructions.getFirst();
+					} else {
+						canRemove = false;
+					}
+				}
+			}
+			ain = ain.getNext();
+		}
 	}
 
-	private void extractDecrypt(MethodNode mnode) {
-
-	}
-
 	/**
-	 * Extracts the strings from the static block and deobfuscates them.
+	 * Loads the ZKM class and decrypts a string based on the given arguments.
 	 * 
-	 * @param method
-	 */
-	private void extractStatic(MethodNode method) {
-
-	}
-
-	/**
-	 * Finds the begining of the ZKM blurb, the end, then removed everything in
-	 * between!
-	 * 
-	 * @param method
+	 * @param cn
+	 * @param decrypt
+	 * @param min
+	 * @param args
 	 * @return
 	 */
-	private void cleanStatic(MethodNode method) {
-
-	}
-
-	/**
-	 * Decrypts a string based on their index in the array (or alone if only one
-	 * string) and the existing modifiers.
-	 * 
-	 * @param input
-	 *            Obfuscated string
-	 * @return Deobfuscated string
-	 */
-
-	private String decrypt(String input) {
-		String decrypted = "";
-		// TODO: 
-		return decrypted;
+	public static Object getZKMReturn(ClassNode cn, MethodInsnNode min, Object[] args) {
+		try {
+			Class<?> clazz = Sandbox.load(cn);
+			for (Method m : clazz.getMethods()) {
+				if (m.getName().equals(AntiZKM8.clinit) && m.getParameterCount() == 0) {
+					m.setAccessible(true);
+					m.invoke(null, new Object[] {});
+				}
+			}
+			for (Method m : clazz.getMethods()) {
+				boolean b2 = m.getName().equals(min.name), b3 = Type.getMethodDescriptor(m).equals(min.desc);
+				if (b2 && b3) {
+					m.setAccessible(true);
+					return m.invoke(null, args);
+				}
+			}
+		} catch (InvocationTargetException ite) {
+			ite.getTargetException().printStackTrace();
+		} catch (IllegalAccessError iae) {
+			iae.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 }

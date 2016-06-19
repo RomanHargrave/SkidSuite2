@@ -42,7 +42,7 @@ public class AntiDashO extends AntiBase {
 	 * @param method
 	 */
 	private void replace(MethodNode method) {
-		StackFrame[] frames = StackUtil.getFrames(method, getNodes());
+		StackFrame[] frames = StackUtil.getFrames(method);
 		AbstractInsnNode ain = method.instructions.getFirst();
 		List<String> strings = new ArrayList<String>();
 		List<Integer> argSizes = new ArrayList<Integer>();

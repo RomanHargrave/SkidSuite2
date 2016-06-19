@@ -127,7 +127,7 @@ public class MethodSimulatorPanel extends JPanel {
 		}
 		msp.listOpcodes.setListData(opcodesText.toArray(new String[0]));
 		// Setting up Stack
-		msp.frames = StackUtil.getFrames(mn, VisualizerWindow.instance.getNodes());
+		msp.frames = StackUtil.getFrames(mn);
 		// Making the frame
 		JFrame frame = new JFrame();
 		frame.setSize(1000, 555);

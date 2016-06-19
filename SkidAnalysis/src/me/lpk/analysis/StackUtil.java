@@ -1,14 +1,11 @@
 package me.lpk.analysis;
 
-import java.util.Map;
-
-import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.analysis.AnalyzerException;
 
 public class StackUtil {
 
-	public static StackFrame[] getFrames(MethodNode mn, Map<String, ClassNode> nodes) {
+	public static StackFrame[] getFrames(MethodNode mn) {
 		InsnAnalyzer a = new InsnAnalyzer(new StackHelper());
 		StackFrame[] sfs = null;
 		try {

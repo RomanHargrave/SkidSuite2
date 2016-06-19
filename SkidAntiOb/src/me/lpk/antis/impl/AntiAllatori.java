@@ -11,6 +11,7 @@ import org.objectweb.asm.tree.MethodNode;
 
 import me.lpk.analysis.Sandbox;
 import me.lpk.antis.AntiBase;
+import me.lpk.util.OpUtils;
 
 public class AntiAllatori extends AntiBase {
 	private final boolean callProxy;
@@ -48,12 +49,13 @@ public class AntiAllatori extends AntiBase {
 			LdcInsnNode ldc = (LdcInsnNode) ain;
 			Object o = ldc.cst;
 			if (o instanceof String) {
-				Object ret = callProxy ? Sandbox.getProxyIsolatedReturn(method, owner, min, new Object[] { o }) : Sandbox.getReturn(owner, min, new Object[] { o });
+				Object ret = callProxy ? Sandbox.getProxyIsolatedReturn(method, owner, min, new Object[] { o }) : Sandbox.getIsolatedReturn(owner, min, new Object[] { o });
 				if (ret != null) {
+					int index = OpUtils.getIndex(ain);
 					LdcInsnNode newLdc = new LdcInsnNode(ret);
 					method.instructions.remove(min);
 					method.instructions.set(ldc, newLdc);
-					ain = newLdc;
+					ain = method.instructions.get(index).getNext();
 				} else {
 					ain = ain.getNext();
 				}

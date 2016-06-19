@@ -22,8 +22,6 @@ import me.lpk.util.AccessHelper;
 import me.lpk.util.OpUtils;
 
 public class Sandbox {
-	private final static String VIRTUAL_NAME = "Sandbox";
-
 	/**
 	 * Invokes the method through reflection. Other methods and fields are
 	 * removed to prevent accidental execution.
@@ -42,7 +40,7 @@ public class Sandbox {
 		}
 		ClassNode isolated = new ClassNode();
 		isolated.version = 52;
-		isolated.name = VIRTUAL_NAME;
+		isolated.name = owner.name;
 		isolated.superName = "java/lang/Object";
 		int i = 0;
 		for (MethodNode mn : owner.methods) {
@@ -302,6 +300,9 @@ public class Sandbox {
 		}
 		return get(owner, min.name, min.desc, args);
 	}
+	
+
+
 
 	/**
 	 * Get the return value of a node's method given by it's name, description,
@@ -346,7 +347,7 @@ public class Sandbox {
 	 *            invocation won't occur.
 	 * @return
 	 */
-	private static Class<?> load(ClassNode cn) {
+	public static Class<?> load(ClassNode cn) {
 		ClassWriter cw = new ClassWriter(0);
 		cn.accept(new VisitorImpl(cw));
 		return new ClassDefiner(ClassLoader.getSystemClassLoader()).get(cn.name.replace("/", "."), cw.toByteArray());
