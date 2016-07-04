@@ -169,6 +169,7 @@ public class CorrelationMapper {
 					// offset -= 1;
 					continue;
 				}
+				//System.out.println(targetClass.getNewName() + ":" + targetType.getNewName());
 				targetMap = correlate(targetType, cleanType, targetMap, cleanMap);
 			}
 		}
@@ -357,7 +358,7 @@ public class CorrelationMapper {
 		List<String> names = RegexUtils.matchDescriptionClasses(member.getDesc());
 		if (member.isMethod()) {
 			for (AbstractInsnNode ain : member.getMethodNode().instructions.toArray()) {
-				if (ain.getType() == AbstractInsnNode.INVOKE_DYNAMIC_INSN || ain.getType() == AbstractInsnNode.METHOD_INSN) {
+				if (ain.getType() == AbstractInsnNode.METHOD_INSN) {
 					MethodInsnNode min = (MethodInsnNode) ain;
 					names.addAll(RegexUtils.matchDescriptionClasses(min.desc));
 					names.add(min.owner);

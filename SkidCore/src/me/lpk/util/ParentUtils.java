@@ -1,9 +1,11 @@
 package me.lpk.util;
 
 import java.util.List;
+import java.util.Map;
 
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
@@ -186,5 +188,16 @@ public class ParentUtils {
 	 */
 	public static boolean matches(MappedMember mm, MappedMember mm2, boolean orig) {
 		return matches(mm, orig ? mm2.getOriginalName() : mm2.getNewName(), mm2.getDesc());
+	}
+
+	public static boolean isLoop(ClassNode node, Map<String, ClassNode> nodes, int i) {
+		ClassNode parentNode = nodes.get(node.superName);
+		if (parentNode == null){
+			return false;
+		}
+		if (node.name.equals(parentNode.superName)){
+			return true;
+		}
+		return false;
 	}
 }

@@ -42,7 +42,7 @@ public class MappingGen {
 		}
 		return base;
 	}
-	
+
 	/**
 	 * Returns a map of class names to mapped classes given an Engima mapping
 	 * file.
@@ -153,7 +153,7 @@ public class MappingGen {
 		}
 		return mappedClasses;
 	}
-	
+
 	/**
 	 * Returns a map of class names to mapped classes given a map of class names
 	 * to ClassNodes. Does not link the classes once the mappings are generated.
@@ -183,7 +183,15 @@ public class MappingGen {
 			boolean parentRenamed = mappedClasses.containsKey(node.superName);
 			ClassNode parentNode = nodes.get(node.superName);
 			if (parentNode != null && !parentRenamed) {
-				generateClassMapping(parentNode, nodes, mappedClasses);
+				boolean conflict = ParentUtils.isLoop(node, nodes, 0);
+				if (conflict){
+					// Really ugly hack for when class super names loop. 
+					// Only happens on a few obfuscated samples
+					parentNode.superName = "java/lang/Object";
+				}
+				else {
+					generateClassMapping(parentNode, nodes, mappedClasses);
+				}
 			}
 		}
 		if (hasInterfaces) {
@@ -254,7 +262,7 @@ public class MappingGen {
 				}
 			} else {
 				int synths = 0, synthID = -1;
-				for (int fieldKey =0;fieldKey< mappedClass.getFields().size(); fieldKey++) {
+				for (int fieldKey = 0; fieldKey < mappedClass.getFields().size(); fieldKey++) {
 					// Check for synthetic fields
 					FieldNode fn = mappedClass.getFields().get(fieldKey).getFieldNode();
 					if (fn == null) {
@@ -290,7 +298,7 @@ public class MappingGen {
 		}
 		// Adding method overrides
 		for (MappedMember method : mappedClass.getMethods()) {
-			if (method.getOverride() != null){
+			if (method.getOverride() != null) {
 				continue;
 			}
 			MappedMember methodOverriden = ParentUtils.findMethodParent(method.getOwner(), method.getOriginalName(), method.getDesc());

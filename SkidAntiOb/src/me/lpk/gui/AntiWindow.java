@@ -18,6 +18,7 @@ import me.lpk.antis.impl.AntiAllatori;
 import me.lpk.antis.impl.AntiDashO;
 import me.lpk.antis.impl.AntiStringer;
 import me.lpk.antis.impl.AntiZKM5;
+import me.lpk.antis.impl.AntiZKM8;
 import me.lpk.log.Logger;
 import me.lpk.mapping.MappedClass;
 import me.lpk.mapping.MappingProcessor;
@@ -46,7 +47,7 @@ public class AntiWindow {
 	private JList<String> list;
 	private JComboBox<String> comboObfuscator;
 	private Set<File> libraries = new HashSet<File>();
-	private final static String OB_ZKM5 = "ZKM-5", OB_STRING = "Stringer", OB_STRING_P = "Stringer (Call Proxy x2)", OB_DASH = "DashO", OB_ALLA = "Allatori",
+	private final static String OB_ZKM5 = "ZKM-5", OB_ZKM8 = "ZKM-8", OB_STRING = "Stringer", OB_STRING_P = "Stringer (Call Proxy x2)", OB_DASH = "DashO", OB_ALLA = "Allatori",
 			OB_ALLA_P = "Allatori (Call Proxy x1)";
 
 	/**
@@ -86,7 +87,7 @@ public class AntiWindow {
 
 		comboObfuscator = new JComboBox<String>();
 		// OB_ALLA, OB_ALLA_P, OB_DASH, OB_STRING, OB_STRING_P, OB_ZKM
-		comboObfuscator.setModel(new DefaultComboBoxModel<String>(new String[] { OB_STRING_P, OB_STRING, OB_ZKM5, OB_ALLA, OB_ALLA_P, OB_DASH }));
+		comboObfuscator.setModel(new DefaultComboBoxModel<String>(new String[] { OB_STRING_P, OB_STRING, OB_ZKM5, OB_ZKM8, OB_ALLA, OB_ALLA_P, OB_DASH }));
 		panel_1.add(comboObfuscator);
 
 		JLabel lblObfuscatorUsed = new JLabel("Obfuscator Used:  ");
@@ -207,7 +208,7 @@ public class AntiWindow {
 			ClassNode node = lsm.getNodes().get(className);
 			lsm.getNodes().put(className, anti.scan(node));
 		}
-		Map<String, byte[]> out = MappingProcessor.process(lsm.getNodes(), new HashMap<String, MappedClass>(), false);
+		Map<String, byte[]> out = MappingProcessor.process(lsm.getNodes(), new HashMap<String, MappedClass>(), true);
 		out.putAll(JarUtils.loadNonClassEntries(jar));
 		Logger.logLow("Saving...");
 		JarUtils.saveAsJar(out, jar.getName() + "-re.jar");
@@ -217,6 +218,8 @@ public class AntiWindow {
 		switch (comboObfuscator.getSelectedItem().toString()) {
 		case OB_ZKM5:
 			return new AntiZKM5();
+		case OB_ZKM8:
+			return new AntiZKM8();
 		case OB_STRING_P:
 			return new AntiStringer(nodes, true);
 		case OB_STRING:

@@ -19,6 +19,8 @@ import org.objectweb.asm.tree.TryCatchBlockNode;
 import org.objectweb.asm.tree.VarInsnNode;
 import org.objectweb.asm.tree.analysis.*;
 
+import me.lpk.util.OpUtils;
+
 /**
  * A semantic bytecode analyzer. <i>This class does not fully check that JSR and
  * RET instructions are valid.</i>
@@ -262,11 +264,15 @@ public class InsnAnalyzer implements Opcodes {
 					}
 				}
 			} catch (AnalyzerException e) {
-				e.printStackTrace();
+				// e.printStackTrace();
 				// throw new AnalyzerException(e.node, "Error at instruction " +
 				// insn + ": " + e.getMessage(), e);
 			} catch (Exception e) {
-				e.printStackTrace();
+				if (!e.getClass().equals(ArrayIndexOutOfBoundsException.class)) {
+					System.err.println(m.owner  + "." + m.name + m.desc + "@" + insn );
+					System.err.println(OpUtils.toString(f.ain));
+					e.printStackTrace();
+				}
 				// throw new AnalyzerException(insnNode, "Error at instruction "
 				// + insn + ": " + e.getMessage(), e);
 			}
@@ -401,7 +407,7 @@ public class InsnAnalyzer implements Opcodes {
 	 *            a frame.
 	 * @return the created frame.
 	 */
-	protected StackFrame newFrame(final Frame src, AbstractInsnNode ain) {
+	protected StackFrame newFrame(final Frame<?> src, AbstractInsnNode ain) {
 		return new StackFrame(src, ain);
 	}
 
@@ -463,7 +469,6 @@ public class InsnAnalyzer implements Opcodes {
 
 	// -------------------------------------------------------------------------
 
-	@SuppressWarnings("unchecked")
 	private void merge(final int insn, final StackFrame frame, final Subroutine subroutine) throws AnalyzerException {
 		StackFrame oldFrame = frames[insn];
 		Subroutine oldSubroutine = subroutines[insn];

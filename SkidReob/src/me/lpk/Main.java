@@ -59,7 +59,7 @@ public class Main {
 		// Filling in the gaps
 		System.out.println("Filling in missing classes...");
 		mappedClasses = uglyHacksPre(mappedClasses);
-		mappedClasses = CorrelationMapperr.fillInTheGaps(mappedClasses, new ModeNone());
+		mappedClasses = CorrelationMapper.fillInTheGaps(mappedClasses, new ModeNone());
 		mappedClasses = uglyHacks(mappedClasses);
 		t.log("Filled the gaps in: ");
 		// Processing
@@ -100,7 +100,7 @@ public class Main {
 		// Filling in the gaps
 		System.out.println("Filling in missing classes...");
 		targetMappings = uglyHacksPre(targetMappings);
-		targetMappings = CorrelationMapperr.fillInTheGaps(targetMappings, new ModeNone());
+		targetMappings = CorrelationMapper.fillInTheGaps(targetMappings, new ModeNone());
 		targetMappings = uglyHacks(targetMappings);
 		// Processing
 		System.out.println("Processing output jar...");
@@ -156,7 +156,7 @@ public class Main {
 				System.err.println("NULL: " + obfu + ":" + h.get(obfu));
 				continue;
 			}
-			mappedClasses = CorrelationMapperr.correlate(targetClass, cleanClass, mappedClasses, baseClasses);
+			mappedClasses = CorrelationMapper.correlate(targetClass, cleanClass, mappedClasses, baseClasses);
 		}
 	}
 
