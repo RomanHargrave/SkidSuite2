@@ -138,7 +138,7 @@ public class WindowMappingConverter {
 		try (InputStream fis = new FileInputStream(map);
 				InputStreamReader isr = new InputStreamReader(fis, Charset.forName("UTF-8"));
 				BufferedReader br = new BufferedReader(isr);) {
-			br.mark(0);
+			br.mark(1);
 			String line = br.readLine();
 			br.reset();
 			if (line.startsWith("CLASS ")) {
