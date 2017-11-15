@@ -1,0 +1,17 @@
+plugins {
+  id 'com.github.johnrengelman.shadow' version '2.0.1'
+  id 'java'
+}
+
+allprojects {
+   apply plugin: 'com.github.johnrengelman.shadow'
+
+   repositories {
+       jcenter()
+       mavenLocal()
+   }
+}
+
+dependencies {
+   compile 'org.jboss.windup.decompiler.procyon:procyon-compilertools:2.5.0.Final'
+}

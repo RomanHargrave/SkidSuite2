@@ -1,0 +1,11 @@
+apply plugin: 'java'
+
+jar {
+   manifest {
+      attributes 'Main-Class': 'me.lpk.Main'
+   }
+}
+
+dependencies {
+   compile project(':SkidCore')
+}

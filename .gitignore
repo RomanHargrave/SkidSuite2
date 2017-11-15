@@ -17,24 +17,3 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
-.metadata/**
-.recommenders/**
-*.class
-*.dtd
-*.lst
-*.lock
-*.lo
-*.jar
-*.project
-*.classpath
-*.prefs
-*.map
-*.zip
-*.sha
-*.sha
-**/build.xml
-**/pom.xml
-*.MF
-*.bat
-*.dox
-REAMDE.txt

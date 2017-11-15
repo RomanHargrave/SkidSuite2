@@ -1,0 +1,10 @@
+rootProject.name = 'SkidSuite2'
+
+include 'SkidAnalysis'
+include 'SkidAntiOb'
+include 'SkidCore'
+include 'SkidHijack'
+include 'SkidObfuscator'
+include 'SkidReob'
+include 'SkidScan'
+include 'SkidVisualizer'

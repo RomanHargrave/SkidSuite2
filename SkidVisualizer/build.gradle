@@ -1,0 +1,12 @@
+apply plugin: 'java'
+
+jar {
+   manifest {
+      attributes 'Main-Class': 'me.lpk.gui.VisualizerWindow'
+   }
+}
+
+dependencies {
+   compile 'com.strobel:procyon:0.5.30'
+   compile project(':SkidCore')
+}
